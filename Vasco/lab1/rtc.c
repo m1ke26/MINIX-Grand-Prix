@@ -14,4 +14,5 @@
 
 static int bcd_to_bin(uint8_t bcd) { TODO; }
 
-int rtc_read_date(rtc_date *date) { TODO; }
+int rtc_read_date(rtc_date *date) { 
+  ; }
