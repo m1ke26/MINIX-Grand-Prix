@@ -50,8 +50,6 @@ int rtc_read_date(rtc_date *date) {
       break;
     }
   }
-  if (sys_outb(RTC_ADDR_REG, RTC_REG_B)) return 1;
-  if (util_sys_inb(RTC_DATA_REG, &regB)) return 1;
 
   uint8_t day,month,year;
 
@@ -63,6 +61,10 @@ int rtc_read_date(rtc_date *date) {
 
   if (sys_outb(RTC_ADDR_REG, RTC_REG_YEAR)) return 1;
   if (util_sys_inb(RTC_DATA_REG, &year)) return 1;
+
+
+  if (sys_outb(RTC_ADDR_REG, RTC_REG_B)) return 1;
+  if (util_sys_inb(RTC_DATA_REG, &regB)) return 1;
 
   if (!(regB & RTC_DM_MSK)) {
     day = bcd_to_bin(day);
