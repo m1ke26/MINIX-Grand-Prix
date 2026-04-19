@@ -2,8 +2,12 @@
 
 #include <lcom/lab3.h>
 
+#include <lcom/timer.h>
+
 #include <stdbool.h>
 #include <stdint.h>
+
+#include "kbc.h"
 
 #define KBC_ST_REG 0x64
 #define KBC_CMD_REG 0x64
@@ -47,16 +51,12 @@ int main(int argc, char *argv[]) {
 
 int(kbd_test_scan)() {
 
-  int hook_id = 0;
-  uint8_t bit_no = hook_id;
-  uint32_t irq_set = BIT(bit_no);
+  uint8_t bit_no;
 
-  extern uint8_t scancode;
-
-  if (sys_irqsetpolicy(KEYBOARD_IRQ, IRQ_REENABLE | IRQ_EXCLUSIVE, &hook_id) != 0) {
+  if (kbd_subscribe_int(&bit_no) != 0) {
     return 1;
   }
-
+  uint32_t irq_set = BIT(bit_no);
 
   int ipc_status;
   message msg;
@@ -103,7 +103,7 @@ int(kbd_test_scan)() {
     }
   }
 
-  if (sys_irqrmpolicy(&hook_id) != 0) return 1;
+  if (kbd_unsubscribe_int() != 0) return 1;
   return 0;
 }
 
@@ -122,8 +122,6 @@ int(kbd_test_poll)() {
   }
   */ // Already done by lcf_start();
 
-
-  extern uint8_t scancode;
 
   //Read initial command byte
   uint8_t status;
@@ -192,15 +190,13 @@ int(kbd_test_timed_scan)(uint8_t n) {
   if (timer_subscribe_int(&bit_no_timer) != 0) return 1;
   uint32_t irq_set_timer = BIT(bit_no_timer);
 
-  int hook_id = 3; 
-  uint8_t bit_no = hook_id;
-  uint32_t irq_set = BIT(bit_no);
+  uint8_t bit_no;
+  uint32_t irq_set;
 
-  extern uint8_t scancode;
-
-  if (sys_irqsetpolicy(KEYBOARD_IRQ, IRQ_REENABLE | IRQ_EXCLUSIVE, &hook_id) != 0) {
+  if (kbd_subscribe_int(&bit_no) != 0) {
     return 1;
   }
+  irq_set = bit_no;
 
   int ipc_status;
   message msg;
@@ -256,7 +252,7 @@ int(kbd_test_timed_scan)(uint8_t n) {
   }
 
   if (timer_unsubscribe_int() != 0) return 1;
-  if (sys_irqrmpolicy(&hook_id) != 0) return 1;
+  if (kbd_unsubscribe_int() != 0) return 1;
   
   return 0;
 }

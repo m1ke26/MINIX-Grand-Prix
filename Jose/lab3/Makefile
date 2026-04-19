@@ -1,20 +1,35 @@
 # name of the program (Minix service)
-PROG=lab3 
+PROG = lab3
+
+SRCS = lab3.c timer.c utils.c kbc.c
 
 .PATH: ../lab2
-
-# source code files to be compiled
-SRCS = lab3.c kbc.c utils.c timer.c
-
-# additional compilation flags
-# "-Wall -Wextra -Werror -I . -std=c11 -Wno-unused-parameter" are already set
 CFLAGS += -pedantic
 CFLAGS += -DLAB3
 CFLAGS += -I../lab2
+CFLAGS += -I.
 
-# dependencies and libraries
-DPADD += ${LIBLCF}
-LDADD += -llcf
+# -----------------------------------------------------------------------
+# libtimer.a – recompiled with -DLAB3
+# -----------------------------------------------------------------------
+TIMER_LIB  = libtimer.a
+TIMER_OBJS = timer.o utils.o
 
-# include LCOM's makefile that does all the "heavy lifting"
-.include <minix.lcom.mk>
+# -----------------------------------------------------------------------
+# libkbc.a – built here, reused by lab4+
+# -----------------------------------------------------------------------
+KBC_LIB  = libkbc.a
+KBC_OBJS = kbc.o
+
+DPADD += ${LIBLCF} ${KBC_LIB} ${TIMER_LIB}
+LDADD += -L. -lkbc -ltimer -llcf
+
+CLEANFILES += ${TIMER_LIB} ${KBC_LIB}
+
+${TIMER_LIB}: ${TIMER_OBJS}
+	ar rcs ${TIMER_LIB} ${TIMER_OBJS}
+
+${KBC_LIB}: ${KBC_OBJS}
+	ar rcs ${KBC_LIB} ${KBC_OBJS}
+
+.include <minix.lcom.mk>	
