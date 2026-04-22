@@ -35,6 +35,10 @@ int main(int argc, char *argv[]) {
 int (mouse_test_packet)(uint32_t cnt) {
   uint8_t bit_no;
 
+  if(mouse_enable_data_reporting() != 0) {
+    return 1;
+  }
+
   if (mouse_subscribe_int(&bit_no) != 0) {
     return 1;
   }
@@ -45,11 +49,9 @@ int (mouse_test_packet)(uint32_t cnt) {
   int r;
 
   uint32_t packet_count = 0;
-  extern int mouse_byte_count; // Access the byte count from mouse.c
+  extern int mouse_byte_count; 
 
-  if(mouse_enable_data_reporting() != 0) {
-    return 1;
-  }
+
 
   while (packet_count < cnt) {
     if ((r = driver_receive(ANY, &msg, &ipc_status)) != 0) {
@@ -61,11 +63,12 @@ int (mouse_test_packet)(uint32_t cnt) {
           if (msg.m_notify.interrupts & irq_set) {
             mouse_ih();
             // If we have 3 bytes, we have a full packet
-            if (mouse_byte_count == 0) { 
+            if (mouse_byte_count == 3) { 
               struct packet pp;
               mouse_sync_and_parse(&pp);
               mouse_print_packet(&pp);
               packet_count++;
+              mouse_byte_count = 0; 
             }
           }
           break;
@@ -73,8 +76,9 @@ int (mouse_test_packet)(uint32_t cnt) {
       }
     }
   }
-  if (mouse_disable_data_reporting() != 0) return 1;
+
   if (mouse_unsubscribe_int() != 0) return 1;
+  if (mouse_disable_data_reporting() != 0) return 1;
 
   return 0;
   
@@ -83,6 +87,8 @@ int (mouse_test_packet)(uint32_t cnt) {
 
 int (mouse_test_async)(uint8_t idle_time) {
     uint8_t m_bit_no, t_bit_no;
+
+  if (mouse_enable_data_reporting() != 0) return 1;
   if (mouse_subscribe_int(&m_bit_no) != 0) return 1;
   if (timer_subscribe_int(&t_bit_no) != 0) return 1;
 
@@ -92,10 +98,8 @@ int (mouse_test_async)(uint8_t idle_time) {
   int ipc_status, r;
   message msg;
   int timer_counter = 0;
-  extern int mouse_byte_count; // Access the byte count from mouse.c
+  extern int mouse_byte_count; 
 
-  // Manual implementation of enabling data reporting using 0xD4
-  if (mouse_write_cmd_poll(0xF4) != 0) return 1;
 
   while (timer_counter < idle_time * 60) {
     if ((r = driver_receive(ANY, &msg, &ipc_status)) != 0) continue;
@@ -108,12 +112,13 @@ int (mouse_test_async)(uint8_t idle_time) {
           }
           if (msg.m_notify.interrupts & m_irq_set) {
             mouse_ih();
-            if (mouse_byte_count == 0) {
+            if (mouse_byte_count == 3) {
               struct packet pp;
               mouse_sync_and_parse(&pp);
               mouse_print_packet(&pp);
+              timer_counter = 0;
+              mouse_byte_count = 0; 
             }
-            timer_counter = 0; // Reset idle timer on mouse event
           }
           break;
         default: break;
@@ -121,10 +126,9 @@ int (mouse_test_async)(uint8_t idle_time) {
     }
   }
 
-  // Clean up
-  if (mouse_write_cmd_poll(MOUSE_DISABLE_DR) != 0) return 1;
   if (timer_unsubscribe_int() != 0) return 1;
   if (mouse_unsubscribe_int() != 0) return 1;
+  if (mouse_disable_data_reporting() != 0) return 1;
 
   return 0;
 }

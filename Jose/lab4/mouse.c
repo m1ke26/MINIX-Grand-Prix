@@ -30,10 +30,6 @@ void (mouse_ih)() {
         if (mouse_byte_count == 0 && !(data & MOUSE_SYNC)) return;
 
         mouse_bytes[mouse_byte_count++] = data;
-
-        if (mouse_byte_count == 3) {
-            mouse_byte_count = 0; 
-        }
     }
 }
 
