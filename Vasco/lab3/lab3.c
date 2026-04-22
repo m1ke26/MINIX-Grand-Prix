@@ -93,7 +93,7 @@ int(kbd_test_scan)() {
 }
 
 int(kbd_test_poll)() {
-  extern uint8_t scancode;
+  uint8_t scancode = kbc_get_scancode();
 
   //Read initial command byte
   uint8_t status;
@@ -166,7 +166,7 @@ int(kbd_test_timed_scan)(uint8_t n) {
   uint8_t bit_no = hook_id;
   uint32_t irq_set = BIT(bit_no);
 
-  extern uint8_t scancode;
+  uint8_t scancode = kbc_get_scancode();
 
   if (sys_irqsetpolicy(KEYBOARD_IRQ, IRQ_REENABLE | IRQ_EXCLUSIVE, &hook_id) != 0) {
     return 1;
