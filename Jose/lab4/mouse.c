@@ -3,7 +3,19 @@
 
 static int hook_id = 4;
 uint8_t mouse_bytes[3]; 
-int mouse_byte_count = 0;
+static int mouse_byte_count = 0;
+
+int mouse_get_byte_count(void) {
+  return mouse_byte_count;
+}
+
+void mouse_set_byte_count(int count) {
+  mouse_byte_count = count;
+}
+
+void mouse_increment_byte_count(void) {
+  mouse_byte_count++;
+}
 
 int mouse_subscribe_int(uint8_t *bit_no) {
     *bit_no = hook_id; 
@@ -27,9 +39,10 @@ void (mouse_ih)(void) {
         if (!(status & KBC_AUX)) return;
 
         // Sync: Byte 0 must have BIT(3) set.
-        if (mouse_byte_count == 0 && !(data & MOUSE_SYNC)) return;
+        if (mouse_get_byte_count() == 0 && !(data & MOUSE_SYNC)) return;
 
-        mouse_bytes[mouse_byte_count++] = data;
+        mouse_bytes[mouse_get_byte_count()] = data;
+        mouse_increment_byte_count();
     }
 }
 

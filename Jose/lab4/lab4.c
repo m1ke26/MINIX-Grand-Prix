@@ -49,9 +49,6 @@ int (mouse_test_packet)(uint32_t cnt) {
   int r;
 
   uint32_t packet_count = 0;
-  extern int mouse_byte_count; 
-
-
 
   while (packet_count < cnt) {
     if ((r = driver_receive(ANY, &msg, &ipc_status)) != 0) {
@@ -63,12 +60,12 @@ int (mouse_test_packet)(uint32_t cnt) {
           if (msg.m_notify.interrupts & irq_set) {
             mouse_ih();
             // If we have 3 bytes, we have a full packet
-            if (mouse_byte_count == 3) { 
+            if (mouse_get_byte_count() == 3) { 
               struct packet pp;
               mouse_sync_and_parse(&pp);
               mouse_print_packet(&pp);
               packet_count++;
-              mouse_byte_count = 0; 
+              mouse_set_byte_count(0); 
             }
           }
           break;
@@ -97,8 +94,7 @@ int (mouse_test_async)(uint8_t idle_time) {
   
   int ipc_status, r;
   message msg;
-  int timer_counter = 0;
-  extern int mouse_byte_count; 
+  int timer_counter = 0; 
 
 
   while (timer_counter < idle_time * 60) {
@@ -112,12 +108,12 @@ int (mouse_test_async)(uint8_t idle_time) {
           }
           if (msg.m_notify.interrupts & m_irq_set) {
             mouse_ih();
-            if (mouse_byte_count == 3) {
+            if (mouse_get_byte_count() == 3) {
               struct packet pp;
               mouse_sync_and_parse(&pp);
               mouse_print_packet(&pp);
               timer_counter = 0;
-              mouse_byte_count = 0; 
+              mouse_set_byte_count(0); 
             }
           }
           break;

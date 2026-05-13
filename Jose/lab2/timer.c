@@ -5,7 +5,16 @@
 
 #include "i8254.h"
 
-int counter = 0;
+static int counter = 0;
+
+int (timer_get_counter)() {
+  return counter;
+}
+
+void (timer_reset_counter)() {
+  counter = 0;
+}
+
 int (timer_set_frequency)(uint8_t timer, uint32_t freq) {
   uint8_t st;
   if(timer_get_conf(timer, &st) != 0) {

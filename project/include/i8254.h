@@ -52,7 +52,45 @@
 #define TIMER_RB_STATUS_ BIT(4)
 #define TIMER_RB_SEL(n)  BIT((n) + 1)
 
-/* Getter/Setter functions for encapsulation */
+/* Timer Functions */
+
+/**
+ * @brief Set the frequency of a timer
+ * 
+ * @param timer Timer number (0, 1, or 2)
+ * @param freq Desired frequency in Hz
+ * @return 0 on success, 1 on error
+ */
+int timer_set_frequency(uint8_t timer, uint32_t freq);
+
+/**
+ * @brief Subscribe to timer interrupts
+ * 
+ * @param bit_no Pointer to store the bit number for this interrupt
+ * @return 0 on success, 1 on error
+ */
+int timer_subscribe_int(uint8_t *bit_no);
+
+/**
+ * @brief Unsubscribe from timer interrupts
+ * 
+ * @return 0 on success, 1 on error
+ */
+int timer_unsubscribe_int(void);
+
+/**
+ * @brief Timer interrupt handler
+ */
+void timer_int_handler(void);
+
+/**
+ * @brief Get the configuration status of a timer
+ * 
+ * @param timer Timer number (0, 1, or 2)
+ * @param st Pointer to store the status byte
+ * @return 0 on success, 1 on error
+ */
+int timer_get_conf(uint8_t timer, uint8_t *st);
 
 /**
  * @brief Get the current timer counter value
