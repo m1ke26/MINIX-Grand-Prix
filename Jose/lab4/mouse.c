@@ -14,7 +14,7 @@ int mouse_unsubscribe_int() {
     return sys_irqrmpolicy(&hook_id);
 }
 
-void (mouse_ih)() {
+void (mouse_ih)(void) {
     uint8_t status, data;
     
     if (util_sys_inb(KBC_STAT_REG, &status) != 0) return;

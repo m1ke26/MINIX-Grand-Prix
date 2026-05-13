@@ -4,6 +4,8 @@
 
 uint8_t scancode;
 static int hook_id = 3;
+static bool error = false;
+static bool ready = false;
 
 void (kbc_ih)() {
   uint8_t status;
@@ -28,12 +30,15 @@ void (kbc_ih)() {
 
   // Read the scancode from the output buffer
   if (util_sys_inb(0x60, &scancode) != 0) {
+    error = true;
     return;
   }
+  ready = true;
+  error = false;
 }
 
 int (kbd_subscribe_int)(uint8_t *bit_no) {
-  *bit_no = BIT(hook_id);
+  *bit_no = hook_id;
   if (sys_irqsetpolicy(KEYBOARD_IRQ, IRQ_REENABLE | IRQ_EXCLUSIVE, &hook_id) != 0) {
     return 1;
   }
@@ -45,5 +50,18 @@ int (kbd_unsubscribe_int)() {
     return 1;
   }
   return 0;
+}
+
+uint8_t (kbc_get_scancode)() {
+  ready = false;
+  return scancode;
+}
+
+bool (kbc_scancode_ready)() {
+  return ready;
+}
+
+bool (kbc_has_error)() {
+  return error;
 }
 
