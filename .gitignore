@@ -1,0 +1,45 @@
+# Object files
+*.o
+*.a
+*.so
+*.ko
+*.obj
+*.elf
+
+# Dependency files
+*.d
+
+# Compiled binaries
+# (Assuming binaries might not have extensions in Minix/Linux)
+lab*
+project
+*.exe
+*.out
+
+# Editor specific
+.vscode/
+.idea/
+*.swp
+*~
+*.suo
+*.user
+*.userossc
+*.sln
+*.vcxproj
+*.filters
+
+# OS specific
+.DS_Store
+Thumbs.db
+
+# Build directories
+build/
+bin/
+obj/
+.minix-src/
+
+# Debug files
+*.log
+*.out
+gmon.out
+.gdb_history
