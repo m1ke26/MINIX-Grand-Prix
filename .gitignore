@@ -12,7 +12,6 @@
 # Compiled binaries
 # (Assuming binaries might not have extensions in Minix/Linux)
 lab*
-project
 *.exe
 *.out
 

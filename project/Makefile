@@ -15,7 +15,8 @@ CFLAGS += -pedantic
 CFLAGS += -D__LCOM_OPTIMIZED__
 
 # Libraries to link
-DPADD += ${LIBLCF} lib/librtc.a lib/libtimer.a lib/libkbc.a lib/libmouse.a lib/libvideo.a
-LDADD += -L./lib -lrtc -ltimer -lkbc -lmouse -lvideo -llcf
+DPADD += ${LIBLCF} lib/librtc.a lib/libtimer.a lib/libkbc.a lib/libmouse.a lib/libvideo.a lib/libutils.a
+LDADD += -L./lib -lrtc -ltimer -lkbc -lmouse -lvideo -llcf -lutils
+
 
 .include <minix.lcom.mk>
