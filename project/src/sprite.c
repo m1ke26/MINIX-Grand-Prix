@@ -27,9 +27,9 @@ sprite_t* create_sprite(xpm_map_t xpm) {
   }
 
   for (uint32_t i = 0; i < npixels; i++) {
-    uint8_t r = map[i * 3 + 0];
+    uint8_t r = map[i * 3 + 2];
     uint8_t g = map[i * 3 + 1];
-    uint8_t b = map[i * 3 + 2];
+    uint8_t b = map[i * 3 + 0];
     sp->map[i] = ((uint32_t)r << 16) | ((uint32_t)g << 8) | b;
   }
 
@@ -46,10 +46,12 @@ void destroy_sprite(sprite_t *sp) {
 void sprite_draw(sprite_t *sp, int x, int y) {
   if (sp == NULL || sp->map == NULL) return;
 
+  uint32_t transp = xpm_transparency_color(XPM_8_8_8);
+
   for (int row = 0; row < sp->height; row++) {
     for (int col = 0; col < sp->width; col++) {
       uint32_t color = sp->map[row * sp->width + col];
-      if (color != 0x000000)
+      if (color != transp && color != 0x000000)
         vg_buf_draw_pixel(x + col, y + row, color);
     }
   }
