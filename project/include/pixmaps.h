@@ -138,4 +138,217 @@ static xpm_row_t const button_hover_xpm[] = {
   "********************************************************************************************************************************************************************************************************"
 };
 
+static xpm_row_t const car_up_xpm[] = {
+  "16 16 5 1",
+  "  c None",
+  ". c #FF0000",
+  "X c #111111",
+  "Y c #FFFF00",
+  "M c #FF00FF",
+  "    X Y  Y X    ",
+  "    X......X    ",
+  "     ......     ",
+  "     ......     ",
+  "    X......X    ",
+  "    X......X    ",
+  "     ......     ",
+  "     ......     ",
+  "     ......     ",
+  "     ......     ",
+  "    X......X    ",
+  "    X......X    ",
+  "     ......     ",
+  "     ......     ",
+  "    X......X    ",
+  "    X M  M X    "
+};
+
+static xpm_row_t const car_up_right_xpm[] = {
+  "16 16 5 1",
+  "  c None",
+  ". c #FF0000",
+  "X c #111111",
+  "Y c #FFFF00",
+  "M c #FF00FF",
+  "          Y Y   ",
+  "        ......  ",
+  "      XX......X ",
+  "      XX......X ",
+  "      ........  ",
+  "    XX......    ",
+  "    XX......    ",
+  "    ......      ",
+  "  XX......      ",
+  "  XX......      ",
+  "  ......        ",
+  "  ......        ",
+  "  ....XX        ",
+  "  ....XX        ",
+  "  M M           ",
+  "                "
+};
+
+static xpm_row_t const car_right_xpm[] = {
+  "16 16 5 1",
+  "  c None",
+  ". c #FF0000",
+  "X c #111111",
+  "Y c #FFFF00",
+  "M c #FF00FF",
+  "                ",
+  "   XXXX   XXXX  ",
+  "   X..X   X..X  ",
+  "   XXXX   XXXX  ",
+  " .............  ",
+  "M.............Y ",
+  "..............  ",
+  "..............  ",
+  "..............  ",
+  "..............  ",
+  "M.............Y ",
+  " .............  ",
+  "   XXXX   XXXX  ",
+  "   X..X   X..X  ",
+  "   XXXX   XXXX  ",
+  "                "
+};
+
+static xpm_row_t const car_down_right_xpm[] = {
+  "16 16 5 1",
+  "  c None",
+  ". c #FF0000",
+  "X c #111111",
+  "Y c #FFFF00",
+  "M c #FF00FF",
+  "  M M           ",
+  "  ....XX        ",
+  "  ....XX        ",
+  "  ......        ",
+  "  ......        ",
+  "  XX......      ",
+  "  XX......      ",
+  "    ......      ",
+  "    XX......    ",
+  "    XX......    ",
+  "      ........  ",
+  "      XX......X ",
+  "      XX......X ",
+  "        ......  ",
+  "          Y Y   ",
+  "                "
+};
+
+static xpm_row_t const car_down_xpm[] = {
+  "16 16 5 1",
+  "  c None",
+  ". c #FF0000",
+  "X c #111111",
+  "Y c #FFFF00",
+  "M c #FF00FF",
+  "    X M  M X    ",
+  "    X......X    ",
+  "     ......     ",
+  "     ......     ",
+  "    X......X    ",
+  "    X......X    ",
+  "     ......     ",
+  "     ......     ",
+  "     ......     ",
+  "     ......     ",
+  "    X......X    ",
+  "    X......X    ",
+  "     ......     ",
+  "     ......     ",
+  "    X......X    ",
+  "    X Y  Y X    "
+};
+
+static xpm_row_t const car_down_left_xpm[] = {
+  "16 16 5 1",
+  "  c None",
+  ". c #FF0000",
+  "X c #111111",
+  "Y c #FFFF00",
+  "M c #FF00FF",
+  "          M M   ",
+  "        ......  ",
+  "      XX......X ",
+  "      XX......X ",
+  "      ........  ",
+  "    XX......    ",
+  "    XX......    ",
+  "    ......      ",
+  "  XX......      ",
+  "  XX......      ",
+  "  ......        ",
+  "  ......        ",
+  "  ....XX        ",
+  "  ....XX        ",
+  "  Y Y           ",
+  "                "
+};
+
+static xpm_row_t const car_left_xpm[] = {
+  "16 16 5 1",
+  "  c None",
+  ". c #FF0000",
+  "X c #111111",
+  "Y c #FFFF00",
+  "M c #FF00FF",
+  "                ",
+  "  XXXX   XXXX   ",
+  "  X..X   X..X   ",
+  "  XXXX   XXXX   ",
+  "  ............. ",
+  " Y.............M",
+  "  ............  ",
+  "  ............  ",
+  "  ............  ",
+  "  ............  ",
+  " Y.............M",
+  "  ............. ",
+  "  XXXX   XXXX   ",
+  "  X..X   X..X   ",
+  "  XXXX   XXXX   ",
+  "                "
+};
+
+static xpm_row_t const car_up_left_xpm[] = {
+  "16 16 5 1",
+  "  c None",
+  ". c #FF0000",
+  "X c #111111",
+  "Y c #FFFF00",
+  "M c #FF00FF",
+  "  Y Y           ",
+  "  ....XX        ",
+  "  ....XX        ",
+  "  ......        ",
+  "  ......        ",
+  "  XX......      ",
+  "  XX......      ",
+  "    ......      ",
+  "    XX......    ",
+  "    XX......    ",
+  "      ........  ",
+  "      XX......X ",
+  "      XX......X ",
+  "        ......  ",
+  "          M M   ",
+  "                "
+};
+
+/* Ordered: Up, Up-Right, Right, Down-Right, Down, Down-Left, Left, Up-Left */
+#define CAR_XPM_COUNT 8
+static xpm_row_t * const car_xpms[CAR_XPM_COUNT] = {
+    (xpm_row_t *) car_up_xpm,
+    (xpm_row_t *) car_up_right_xpm,
+    (xpm_row_t *) car_right_xpm,
+    (xpm_row_t *) car_down_right_xpm,
+    (xpm_row_t *) car_down_xpm,
+    (xpm_row_t *) car_down_left_xpm,
+    (xpm_row_t *) car_left_xpm,
+    (xpm_row_t *) car_up_left_xpm
+};
+
 #endif

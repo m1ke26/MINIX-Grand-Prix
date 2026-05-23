@@ -8,8 +8,9 @@
 #include "font.h"
 #include "button.h"
 #include "pixmaps.h"
+#include "state.h"
 
-
+bool running = true;
 int main(int argc, char *argv[]) {
   lcf_set_language("EN-US");
 
@@ -22,6 +23,8 @@ int main(int argc, char *argv[]) {
 
 int (proj_main_loop)(int argc, char *argv[]) {
   uint8_t bit_no_timer, bit_no_kbd, bit_no_mouse;
+  int cursor_x = 400;
+  int cursor_y = 300;
 
   if (timer_subscribe_int(&bit_no_timer)) return 1;
   if (kbd_subscribe_int(&bit_no_kbd)) return 1;
@@ -39,15 +42,16 @@ int (proj_main_loop)(int argc, char *argv[]) {
   font_t *font = font_create();
   if (font == NULL) return 1;
 
-  start_menu_t *menu = start_menu_create(font, (xpm_map_t) button_normal_xpm, (xpm_map_t) button_hover_xpm);
-  if (menu == NULL) { font_destroy(font); return 1; }
+  state_t *state = init_state();
+  if (state == NULL) {font_destroy(font); return 1; }
 
-  int cursor_x = 400, cursor_y = 300;
+  state->data.start.menu = start_menu_create(font, (xpm_map_t) button_normal_xpm, (xpm_map_t) button_hover_xpm);
+  if (state->data.start.menu == NULL) { font_destroy(font); destroy_state(state); return 1;}
+
 
   int ipc_status;
   message msg;
   struct packet pp;
-  bool running = true;
 
   while (running) {
     int r;
@@ -62,14 +66,18 @@ int (proj_main_loop)(int argc, char *argv[]) {
       case HARDWARE:
         if (msg.m_notify.interrupts & irq_set_timer) {
           timer_int_handler();
-          start_menu_draw(menu, cursor_x, cursor_y);
+          update_state(state);
+          draw_state(state);
           vg_buf_swap();
         }
 
         if (msg.m_notify.interrupts & irq_set_kbd) {
           kbc_ih();
-          if (kbc_scancode_ready() && kbc_get_scancode() == ESC_BREAK)
-            running = false;
+          if (kbc_scancode_ready()) {
+            uint8_t scancode = kbc_get_scancode();
+            if (scancode == ESC_BREAK) running = false;
+            handle_kbd_event(state, scancode);
+          }
         }
 
         if (msg.m_notify.interrupts & irq_set_mouse) {
@@ -83,6 +91,8 @@ int (proj_main_loop)(int argc, char *argv[]) {
             if (cursor_x > 799) cursor_x = 799;
             if (cursor_y < 0)   cursor_y = 0;
             if (cursor_y > 599) cursor_y = 599;
+
+            handle_mouse_event(state, &pp, cursor_x, cursor_y);
           }
         }
         break;
@@ -92,7 +102,10 @@ int (proj_main_loop)(int argc, char *argv[]) {
     }
   }
 
-  start_menu_destroy(menu);
+  if (state->tag == STATE_START) {
+    start_menu_destroy(state->data.start.menu);
+  }
+  destroy_state(state);
   font_destroy(font);
   vg_free_double_buffer();
   vg_exit();

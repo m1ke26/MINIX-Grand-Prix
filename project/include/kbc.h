@@ -3,7 +3,24 @@
 
 #include <lcom/lcf.h>
 
-#define ESC_BREAK 0x81
+/* --- Scancodes --- */
+/* Break codes */
+#define ESC_BREAK  0x81
+
+/* ESC */
+#define ESC_MAKE   0x01
+
+/* WASD make codes */
+#define W_MAKE     0x11
+#define S_MAKE     0x1F
+#define A_MAKE     0x1E
+#define D_MAKE     0x20
+
+/* WASD break codes (make | 0x80) */
+#define W_BREAK    (W_MAKE | 0x80)
+#define S_BREAK    (S_MAKE | 0x80)
+#define A_BREAK    (A_MAKE | 0x80)
+#define D_BREAK    (D_MAKE | 0x80)
 
 void (kbc_ih)();
 
