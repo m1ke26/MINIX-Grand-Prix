@@ -15,7 +15,7 @@ typedef struct {
     double x, y;
     double speed;
     double angle; /* degrees, 0 = up */
-    sprite_t *sprites[8];
+    sprite_t *sprites[16];
 } car_t;
 
 /**

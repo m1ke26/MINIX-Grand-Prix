@@ -1,7 +1,10 @@
 #include "state.h"
 #include "start_menu.h"
 #include "car.h"
+#include "track.h"
+#include "camera.h"
 #include "pixmaps.h"
+#include "track_pixmap.h"
 #include <math.h>
 #include "kbc.h"
 
@@ -26,6 +29,7 @@ void draw_state(state_t *state) {
         case STATE_IN_GAME:
             //Clear the screen
             vg_buf_clear();
+            track_draw();
             draw_car(&state->data.in_game.car);
             break;
         case STATE_GAME_OVER:
@@ -40,7 +44,9 @@ void destroy_state(state_t *state) {
 
 /* Encapsulates the full setup needed when transitioning to the in-game state */
 void state_enter_in_game(state_t *state) {
-    car_t *new_car = create_car(400, 300, 0, 0, (xpm_map_t *) car_xpms);
+    track_init((xpm_map_t) track_xpm);
+    camera_init(1600, 1200);
+    car_t *new_car = create_car(800, 1000, 0, 0, (xpm_map_t *) car_xpms);
     state->data.in_game.car = *new_car;
     free(new_car);
     state->data.in_game.key_w = false;
@@ -115,6 +121,11 @@ void update_state(state_t *state) {
                                state->data.in_game.key_s,
                                state->data.in_game.key_a,
                                state->data.in_game.key_d);
+            /* Center camera on the car */
+            car_t *c = &state->data.in_game.car;
+            int idx = (int)((c->angle + 11.25) / 22.5) % 16;
+            camera_follow((int)c->x + c->sprites[idx]->width / 2,
+                          (int)c->y + c->sprites[idx]->height / 2);
             break;
         }
         case STATE_GAME_OVER:

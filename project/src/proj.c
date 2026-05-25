@@ -9,6 +9,7 @@
 #include "button.h"
 #include "pixmaps.h"
 #include "state.h"
+#include "track.h"
 
 bool running = true;
 int main(int argc, char *argv[]) {
@@ -105,6 +106,7 @@ int (proj_main_loop)(int argc, char *argv[]) {
   if (state->tag == STATE_START) {
     start_menu_destroy(state->data.start.menu);
   }
+  track_free();
   destroy_state(state);
   font_destroy(font);
   vg_free_double_buffer();

@@ -1,4 +1,6 @@
 #include "car.h"
+#include "track.h"
+#include "camera.h"
 #include <stdlib.h>
 #include <math.h>
 
@@ -11,7 +13,7 @@ car_t* create_car(double x, double y, double speed, double angle, xpm_map_t xpms
   car->speed = speed;
   car->angle = angle;
   
-  for (int i = 0; i < 8; i++) {
+  for (int i = 0; i < 16; i++) {
     car->sprites[i] = create_sprite(xpms[i]);
   }
 
@@ -22,30 +24,49 @@ bool move_car(car_t *car) {
   if (car == NULL) return false;
 
   double radians = car->angle * (M_PI / 180.0);
-  
-  // Update position based on speed and angle
-  car->x += car->speed * sin(radians);
-  car->y -= car->speed * cos(radians); // Subtract because y increases downwards
+
+  // Calculate new position
+  double new_x = car->x + car->speed * sin(radians);
+  double new_y = car->y - car->speed * cos(radians);
 
   // Get index to reference sprite width/height
-  int idx = (int)((car->angle + 22.5) / 45.0) % 8;
+  int idx = (int)((car->angle + 11.25) / 22.5) % 16;
+  int w = car->sprites[idx]->width;
+  int h = car->sprites[idx]->height;
 
-  // Border collision handling (after position update)
-  if (car->x < 0) {
-    car->x = 0;
-    car->speed = 0; // Stop car on crash
-  }
-  if (car->x > 800 - car->sprites[idx]->width) {
-    car->x = 800 - car->sprites[idx]->width;
-    car->speed = 0;
-  }
-  if (car->y < 0) {
-    car->y = 0;
-    car->speed = 0;
-  }
-  if (car->y > 600 - car->sprites[idx]->height) {
-    car->y = 600 - car->sprites[idx]->height;
-    car->speed = 0;
+  // Map border clamping (track collision handles the rest)
+  if (new_x < 0) { new_x = 0; car->speed = 0; }
+  if (new_x > 1600 - w) { new_x = 1600 - w; car->speed = 0; }
+  if (new_y < 0) { new_y = 0; car->speed = 0; }
+  if (new_y > 1200 - h) { new_y = 1200 - h; car->speed = 0; }
+
+  // Track collision: check surface at new position
+  surface_t surface = track_car_surface((int)new_x, (int)new_y, w, h);
+
+  if (surface == SURFACE_BLOCKED) {
+    // Try sliding along X axis only
+    surface_t sx = track_car_surface((int)new_x, (int)car->y, w, h);
+    if (sx != SURFACE_BLOCKED) {
+      car->x = new_x;
+      if (sx == SURFACE_SLOW) car->speed *= 0.95;
+    }
+    // Try sliding along Y axis only
+    else {
+      surface_t sy = track_car_surface((int)car->x, (int)new_y, w, h);
+      if (sy != SURFACE_BLOCKED) {
+        car->y = new_y;
+        if (sy == SURFACE_SLOW) car->speed *= 0.95;
+      }
+      // Can't move at all - stop
+      else {
+        car->speed = 0;
+      }
+    }
+  } else {
+    car->x = new_x;
+    car->y = new_y;
+    // Slow zone: reduce speed gradually
+    if (surface == SURFACE_SLOW) car->speed *= 0.95;
   }
 
   return true;
@@ -53,7 +74,7 @@ bool move_car(car_t *car) {
 
 void destroy_car(car_t *car) {
   if (car == NULL) return;
-  for (int i = 0; i < 8; i++) {
+  for (int i = 0; i < 16; i++) {
     if (car->sprites[i] != NULL) {
       destroy_sprite(car->sprites[i]);
     }
@@ -65,8 +86,11 @@ void draw_car(car_t *car) {
   if (car == NULL) return;
   // Calculate which sprite to use based on angle (0 to 7)
   // Angle: 0 = Up, 45 = Up-Right, 90 = Right, etc.
-  int idx = (int)((car->angle + 22.5) / 45.0) % 8;
-  sprite_draw(car->sprites[idx], (int)car->x, (int)car->y);
+  int idx = (int)((car->angle + 11.25) / 22.5) % 16;
+  // Draw relative to camera position
+  int screen_x = (int)car->x - camera_get_x();
+  int screen_y = (int)car->y - camera_get_y();
+  sprite_draw(car->sprites[idx], screen_x, screen_y);
 }
 
 static void update_speed(car_t *car, bool key_w, bool key_s) {
