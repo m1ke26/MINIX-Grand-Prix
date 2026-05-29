@@ -73,6 +73,24 @@ void vg_buf_swap(void) {
     memcpy(video_mem, back_buf, buf_size);
 }
 
+void vg_buf_desaturate(void) {
+  if (!back_buf) return;
+  uint32_t total_pixels = (uint32_t)scr_width * scr_height;
+  for (uint32_t i = 0; i < total_pixels; i++) {
+    size_t off = (size_t)i * scr_bpp;
+    if (scr_bpp == 3) {
+      uint8_t b = back_buf[off + 0];
+      uint8_t g = back_buf[off + 1];
+      uint8_t r = back_buf[off + 2];
+      /* Luminance-weighted grayscale — matches human eye perception */
+      uint8_t grey = (uint8_t)(0.299f * r + 0.587f * g + 0.114f * b);
+      back_buf[off + 0] = grey;
+      back_buf[off + 1] = grey;
+      back_buf[off + 2] = grey;
+    }
+  }
+}
+
 void vg_free_double_buffer(void) {
   free(back_buf);
   back_buf = NULL;

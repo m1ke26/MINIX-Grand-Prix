@@ -14,7 +14,7 @@ typedef struct {
 /**
  * @brief Initializes the start menu and its buttons.
  */
-start_menu_t* start_menu_create(font_t *font, xpm_map_t btn_normal, xpm_map_t btn_hover);
+start_menu_t* start_menu_create(font_t *font);
 
 /**
  * @brief Frees start menu resources.
