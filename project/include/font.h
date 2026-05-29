@@ -127,7 +127,16 @@ void font_destroy(font_t *font);
 
 /**
  * @brief Draws a string using the font.
+ * @param color 0xRRGGBB colour to draw the text in.
  */
-void draw_string(font_t *font, const char *str, int x, int y);
+void draw_string(font_t *font, const char *str, int x, int y, uint32_t color);
+
+/**
+ * @brief Draws a string scaled up by the given integer factor.
+ * Each font pixel is rendered as a scale×scale block.
+ * @param scale Integer scale factor (1 = normal 8px, 2 = 16px, 3 = 24px, etc.)
+ * @param color 0xRRGGBB colour to draw the text in.
+ */
+void draw_string_scaled(font_t *font, const char *str, int x, int y, int scale, uint32_t color);
 
 #endif /* _FONT_H_ */

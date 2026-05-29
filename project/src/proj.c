@@ -7,7 +7,6 @@
 #include "start_menu.h"
 #include "font.h"
 #include "button.h"
-#include "pixmaps.h"
 #include "state.h"
 #include "track.h"
 
@@ -46,7 +45,7 @@ int (proj_main_loop)(int argc, char *argv[]) {
   state_t *state = init_state();
   if (state == NULL) {font_destroy(font); return 1; }
 
-  state->data.start.menu = start_menu_create(font, (xpm_map_t) button_normal_xpm, (xpm_map_t) button_hover_xpm);
+  state->data.start.menu = start_menu_create(font);
   if (state->data.start.menu == NULL) { font_destroy(font); destroy_state(state); return 1;}
 
 
@@ -76,7 +75,6 @@ int (proj_main_loop)(int argc, char *argv[]) {
           kbc_ih();
           if (kbc_scancode_ready()) {
             uint8_t scancode = kbc_get_scancode();
-            if (scancode == ESC_BREAK) running = false;
             handle_kbd_event(state, scancode);
           }
         }

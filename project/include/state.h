@@ -5,6 +5,7 @@
 #include <stdbool.h>
 #include "car.h"
 #include "start_menu.h"
+#include "pause_menu.h"
 
 extern bool running;
 
@@ -24,13 +25,17 @@ typedef struct {
         } start;
 
         struct {
-            car_t car;
+            car_t *car;
             unsigned laps;
             unsigned seconds_elapsed;
             bool key_w;
             bool key_s;
             bool key_a;
             bool key_d;
+            bool pause;
+            pause_menu_t *pause_menu;
+            int cursor_x;
+            int cursor_y;
         } in_game;
 
         struct {
@@ -83,8 +88,18 @@ void handle_kbd_event(state_t *state, uint8_t scancode);
 /**
  * @brief Transitions the game to the in-game state.
  * 
- * @param state Pointer to the current game state.
+ * @param font The font to use for pause menu rendering.
  */
-void state_enter_in_game(state_t *state);
+void state_enter_in_game(state_t *state, font_t *font);
+
+/**
+ * @brief Transitions the game back to the start-menu state, freeing in-game resources.
+ *
+ * @param state Pointer to the current game state.
+ * @param font  The font to reuse for the start menu.
+ * @param cursor_x The x-coordinate of the mouse cursor.
+ * @param cursor_y The y-coordinate of the mouse cursor.
+ */
+void state_enter_start(state_t *state, font_t *font, int cursor_x, int cursor_y);
 
 #endif /* _STATE_H_ */

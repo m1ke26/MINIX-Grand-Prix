@@ -33,6 +33,7 @@ car_t* create_car(double x, double y, double speed, double angle, xpm_map_t xpms
     @param car Pointer to the car to be destroyed.
 **/    
 void destroy_car(car_t *car);
+
 /**
     @brief Draws the car on the screen.
     @param car Pointer to the car to be drawn.
