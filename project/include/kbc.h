@@ -15,12 +15,14 @@
 #define S_MAKE     0x1F
 #define A_MAKE     0x1E
 #define D_MAKE     0x20
+#define SPACE_MAKE 0x39
 
 /* WASD break codes (make | 0x80) */
 #define W_BREAK    (W_MAKE | 0x80)
 #define S_BREAK    (S_MAKE | 0x80)
 #define A_BREAK    (A_MAKE | 0x80)
 #define D_BREAK    (D_MAKE | 0x80)
+#define SPACE_BREAK (SPACE_MAKE | 0x80)
 
 void (kbc_ih)();
 
