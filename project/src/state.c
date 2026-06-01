@@ -33,6 +33,7 @@ void draw_state(state_t *state) {
             // Always draw the game world first
             track_draw();
             draw_car(state->data.in_game.car);
+            draw_boost_indicator(state->data.in_game.car);
             if(state->data.in_game.pause){
                 vg_buf_desaturate(); // Grey out the frozen game world
                 pause_menu_draw(state->data.in_game.pause_menu, state->data.in_game.cursor_x, state->data.in_game.cursor_y);
@@ -42,8 +43,7 @@ void draw_state(state_t *state) {
         case STATE_GAME_OVER:
             break;
     }
-}
-
+}                         
 void destroy_state(state_t *state) {
     if (state == NULL) return;
     if (state->tag == STATE_IN_GAME) {
@@ -62,6 +62,7 @@ void state_enter_in_game(state_t *state, font_t *font) {
     state->data.in_game.key_s = false;
     state->data.in_game.key_a = false;
     state->data.in_game.key_d = false;
+    state->data.in_game.key_space = false;
     state->data.in_game.pause = false;
     state->data.in_game.cursor_x = 400;
     state->data.in_game.cursor_y = 300;
@@ -151,6 +152,9 @@ void handle_kbd_event(state_t *state, uint8_t scancode) {
 
                 if (scancode == D_MAKE) state->data.in_game.key_d = true;      // D Make
                 else if (scancode == D_BREAK) state->data.in_game.key_d = false; // D Break
+
+                if (scancode == SPACE_MAKE) state->data.in_game.key_space = true;
+                else if (scancode == SPACE_BREAK) state->data.in_game.key_space = false;
             }
             break;
         case STATE_GAME_OVER:
@@ -170,7 +174,8 @@ void update_state(state_t *state) {
                                state->data.in_game.key_w,
                                state->data.in_game.key_s,
                                state->data.in_game.key_a,
-                               state->data.in_game.key_d);
+                               state->data.in_game.key_d,
+                               state->data.in_game.key_space);
             /* Center camera on the car */
             car_t *c = state->data.in_game.car;
             int idx = (int)((c->angle + 11.25) / 22.5) % 16;

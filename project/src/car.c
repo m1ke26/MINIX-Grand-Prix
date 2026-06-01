@@ -1,6 +1,7 @@
 #include "car.h"
 #include "track.h"
 #include "camera.h"
+#include "video-card.h"
 #include <stdlib.h>
 #include <math.h>
 
@@ -12,6 +13,7 @@ car_t* create_car(double x, double y, double speed, double angle, xpm_map_t xpms
   car->y = y;
   car->speed = speed;
   car->angle = angle;
+  car->boost_amount = CAR_BOOST_MAX;
   
   for (int i = 0; i < 16; i++) {
     car->sprites[i] = create_sprite(xpms[i]);
@@ -93,10 +95,29 @@ void draw_car(car_t *car) {
   sprite_draw(car->sprites[idx], screen_x, screen_y);
 }
 
-static void update_speed(car_t *car, bool key_w, bool key_s) {
+static bool update_boost(car_t *car, bool key_space) {
+  bool boost_active = key_space && car->boost_amount > 0.0;
+
+  if (boost_active) {
+    car->boost_amount -= CAR_BOOST_DRAIN;
+    if (car->boost_amount < 0.0) car->boost_amount = 0.0;
+  } else if (car->boost_amount < CAR_BOOST_MAX) {
+    car->boost_amount += CAR_BOOST_RECHARGE;
+    if (car->boost_amount > CAR_BOOST_MAX) car->boost_amount = CAR_BOOST_MAX;
+  }
+
+  return boost_active;
+}
+
+static void update_speed(car_t *car, bool key_w, bool key_s, bool boost_active) {
   if (key_w) {
-    car->speed += CAR_ACCEL; 
-    if (car->speed > CAR_MAX_SPEED) car->speed = CAR_MAX_SPEED; 
+    double max_speed = boost_active ? CAR_MAX_SPEED_BOOST : CAR_MAX_SPEED;
+    double accel = boost_active ? CAR_BOOST_ACCEL : CAR_ACCEL;
+
+    if (car->speed < max_speed) car->speed += accel;
+    else car->speed -= CAR_FRICTION;
+
+    if (car->speed > max_speed) car->speed = max_speed;
   } else if (key_s) {
     car->speed -= CAR_BRAKE; 
     if (car->speed < CAR_MAX_REV_SPEED) car->speed = CAR_MAX_REV_SPEED; 
@@ -128,10 +149,26 @@ static void update_angle(car_t *car, bool key_a, bool key_d) {
   if (car->angle >= 360.0) car->angle -= 360.0;
 }
 
-void update_car_physics(car_t *car, bool key_w, bool key_s, bool key_a, bool key_d) {
+void update_car_physics(car_t *car, bool key_w, bool key_s, bool key_a, bool key_d, bool key_space) {
   if (car == NULL) return;
 
-  update_speed(car, key_w, key_s);
+  bool boost_active = update_boost(car, key_space);
+  update_speed(car, key_w, key_s, boost_active);
   update_angle(car, key_a, key_d);
   move_car(car);
+}
+
+void draw_boost_indicator(car_t *car) {
+  if (car == NULL) return;
+
+  int bar_width = 140;
+  int bar_height = 14;
+  int x = 800 - bar_width - 20;
+  int y = 600 - bar_height - 20;
+  double boost_ratio = car->boost_amount / CAR_BOOST_MAX;
+  int fill_width = (int)(bar_width * boost_ratio);
+
+  vg_buf_draw_rect(x - 2, y - 2, bar_width + 4, bar_height + 4, 0x000000);
+  vg_buf_draw_rect(x, y, bar_width, bar_height, 0x1A1A1A);
+  vg_buf_draw_rect(x, y, fill_width, bar_height, 0x007BFF);
 }

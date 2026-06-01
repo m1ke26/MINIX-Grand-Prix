@@ -32,6 +32,7 @@ typedef struct {
             bool key_s;
             bool key_a;
             bool key_d;
+            bool key_space;
             bool pause;
             pause_menu_t *pause_menu;
             int cursor_x;
