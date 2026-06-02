@@ -1,12 +1,15 @@
 #include "pause_menu.h"
+#include "colors.h"
 
 pause_menu_t* pause_menu_create(font_t *font) {
     pause_menu_t *pm = malloc(sizeof(pause_menu_t));
     if (pm == NULL) return NULL;
 
     pm->font = font;
-    pm->resume_btn = button_create(font, "RESUME", 300, 250, BTN_DARK_NAVY, BTN_LIGHT_NAVY, BTN_WHITE);
-    pm->exit_btn   = button_create(font, "EXIT",   300, 350, BTN_DARK_NAVY, BTN_LIGHT_NAVY, BTN_WHITE);
+    pm->resume_btn = button_create(font, "RESUME", 300, 250,
+                                   COLOR_BUTTON_DARK_NAVY, COLOR_BUTTON_LIGHT_NAVY, COLOR_BUTTON_BORDER);
+    pm->exit_btn   = button_create(font, "EXIT",   300, 350,
+                                   COLOR_BUTTON_DARK_NAVY, COLOR_BUTTON_LIGHT_NAVY, COLOR_BUTTON_BORDER);
 
     if (pm->resume_btn == NULL || pm->exit_btn == NULL) {
         pause_menu_destroy(pm);
@@ -29,7 +32,7 @@ void pause_menu_draw(pause_menu_t *pm, int cursor_x, int cursor_y) {
 
     // Draw "Paused" title
     if (pm->font != NULL)
-        draw_string_scaled(pm->font, "PAUSED", 328, 130, 3, 0x0000ff);
+        draw_string_scaled(pm->font, "PAUSED", 328, 130, 3, COLOR_MENU_TITLE);
 
     // Draw buttons
     if (pm->resume_btn != NULL)
@@ -38,5 +41,5 @@ void pause_menu_draw(pause_menu_t *pm, int cursor_x, int cursor_y) {
         button_draw(pm->exit_btn, button_is_hovered(pm->exit_btn, cursor_x, cursor_y));
 
     // Draw cursor
-    vg_buf_draw_rect(cursor_x, cursor_y, 8, 8, 0xFFFFFF);
+    vg_buf_draw_rect(cursor_x, cursor_y, 8, 8, COLOR_CURSOR);
 }

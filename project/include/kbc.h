@@ -5,9 +5,11 @@
 
 /* --- Scancodes --- */
 
-/* ESC */
+/* Utilitary Keys */
 #define ESC_BREAK  0x81
 #define ESC_MAKE   0x01
+#define ENTER_MAKE 0x1C
+#define ENTER_BREAK (ENTER_MAKE | 0x80)
 
 /* Movement make codes */
 #define W_MAKE     0x11

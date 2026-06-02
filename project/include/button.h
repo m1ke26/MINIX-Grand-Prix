@@ -1,6 +1,7 @@
 #ifndef _BUTTON_H_
 #define _BUTTON_H_
 
+#include "colors.h"
 #include "font.h"
 #include "video-card.h"
 #include <stdbool.h>
@@ -10,21 +11,13 @@
 #define BTN_H    60
 #define BORDER    3
 
-typedef enum {
-  BTN_DARK_NAVY  = 0x333366, /**< Normal button background  */
-  BTN_LIGHT_NAVY = 0x5555AA, /**< Hovered button background */
-  BTN_WHITE      = 0xFFFFFF, /**< Border and label text     */
-  BTN_DARK_GRAY  = 0x555555,
-  BTN_SILVER     = 0xCCCCCC,
-} button_color_t;
-
 typedef struct {
   int x, y;
   char text[100];
   font_t *font;
-  button_color_t color;        /**< Normal background color  */
-  button_color_t hover_color;  /**< Hovered background color */
-  button_color_t border_color; /**< Border color             */
+  uint32_t color;        /**< Normal background color  */
+  uint32_t hover_color;  /**< Hovered background color */
+  uint32_t border_color; /**< Border color             */
 } button_t;
 
 /**
@@ -38,8 +31,8 @@ typedef struct {
  * @param border_color Border color.
  */
 button_t* button_create(font_t *font, const char *text, int x, int y,
-                        button_color_t color, button_color_t hover_color,
-                        button_color_t border_color);
+                        uint32_t color, uint32_t hover_color,
+                        uint32_t border_color);
 
 /**
  * @brief Destroys a button.

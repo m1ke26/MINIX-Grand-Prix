@@ -1,5 +1,6 @@
 #include "track.h"
 #include "camera.h"
+#include "colors.h"
 #include "video-card.h"
 #include <stdlib.h>
 
@@ -56,7 +57,7 @@ void track_draw(void) {
             int map_y = cam_y + row;
             if (map_x >= 0 && map_x < track_width && map_y >= 0 && map_y < track_height) {
                 uint32_t color = collision_map[map_y * track_width + map_x];
-                if (color != 0x000000)
+                if (color != COLOR_BLACK)
                     vg_buf_draw_pixel(col, row, color);
             }
         }
