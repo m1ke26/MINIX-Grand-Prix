@@ -4,6 +4,7 @@
 #include <lcom/lcf.h>
 #include <stdbool.h>
 #include "car.h"
+#include "input.h"
 #include "start_menu.h"
 #include "pause_menu.h"
 
@@ -28,10 +29,7 @@ typedef struct {
             car_t *car;
             unsigned laps;
             unsigned seconds_elapsed;
-            bool key_w;
-            bool key_s;
-            bool key_a;
-            bool key_d;
+            game_input_t input;
             bool pause;
             pause_menu_t *pause_menu;
             int cursor_x;

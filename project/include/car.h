@@ -1,20 +1,36 @@
 #ifndef _CAR_H_
 #define _CAR_H_
 
+#include "input.h"
 #include "sprite.h"
 
-#define CAR_MAX_SPEED       7.0
-#define CAR_MAX_REV_SPEED  -2.5
-#define CAR_ACCEL           0.15
-#define CAR_BRAKE           0.20
-#define CAR_FRICTION        0.08
-#define CAR_TURN_RATE       3.5
-#define CAR_MIN_TURN_RATIO  0.3
+#define CAR_MAX_SPEED       5.0   // Maximum forward speed
+#define CAR_MAX_REV_SPEED  -1.5   // Maximum reverse speed
+#define CAR_ACCEL           0.15  // Acceleration rate 
+#define CAR_BRAKE           0.20  // Braking rate
+#define CAR_FRICTION        0.08  // Friction coefficient
+#define CAR_TURN_RATE       3.0   // Turn rate
+#define CAR_MIN_TURN_RATIO  0.3   // Minimum turn ratio
+#define CAR_MAX_SPEED_BOOST 7.0   // Maximum speed boost
+#define CAR_BOOST_ACCEL     0.30  // Boost acceleration
+#define CAR_BOOST_MAX       100.0 // Maximum boost amount
+#define CAR_BOOST_DRAIN     0.84  // Boost drain rate
+#define CAR_BOOST_RECHARGE  0.34  // Boost recharge rate
+#define GRIP_HIGH           0.85  // Normal grip level
+#define GRIP_LOW            0.08  // Low grip level
+#define GRIP_ENGAGE_RATE    0.35  // how fast grip drops when drifting
+#define GRIP_RECOVER_RATE   0.06  // how fast grip returns
+#define DRIFT_MIN_SPEED     2.0   // min speed to initiate drift
+
 
 typedef struct {
     double x, y;
     double speed;
     double angle; /* degrees, 0 = up */
+    double velocity_angle;  
+    double grip;            
+    bool is_drifting;       
+    double boost_amount;
     sprite_t *sprites[16];
 } car_t;
 
@@ -48,11 +64,8 @@ bool move_car(car_t *car);
 /**
     @brief Updates the physics of the car based on the given key presses.
     @param car Pointer to the car to be updated.
-    @param key_w Boolean indicating if the W key is pressed.
-    @param key_s Boolean indicating if the S key is pressed.
-    @param key_a Boolean indicating if the A key is pressed.
-    @param key_d Boolean indicating if the D key is pressed.
+    @param input Current gameplay input state.
 **/    
-void update_car_physics(car_t *car, bool key_w, bool key_s, bool key_a, bool key_d);
+void update_car_physics(car_t *car, const game_input_t *input);
 
 #endif /* _CAR_H_ */

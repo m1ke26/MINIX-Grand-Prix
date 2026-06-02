@@ -9,6 +9,18 @@
 #include <math.h>
 #include "kbc.h"
 #include "pause_menu.h"
+#include "hud.h"
+
+static void reset_game_input(game_input_t *input) {
+    if (input == NULL) return;
+
+    input->accelerate = false;
+    input->brake = false;
+    input->turn_left = false;
+    input->turn_right = false;
+    input->handbrake = false;
+    input->boost = false;
+}
 
 state_t* init_state() {
     state_t *state = malloc(sizeof(state_t));
@@ -35,6 +47,7 @@ void draw_state(state_t *state) {
             track_draw();
             draw_car(state->data.in_game.car);
             speedometer_draw(state->data.in_game.car->speed);
+            hud_draw_boost_indicator(state->data.in_game.car);
             if(state->data.in_game.pause){
                 vg_buf_desaturate(); // Grey out the frozen game world
                 pause_menu_draw(state->data.in_game.pause_menu, state->data.in_game.cursor_x, state->data.in_game.cursor_y);
@@ -44,8 +57,7 @@ void draw_state(state_t *state) {
         case STATE_GAME_OVER:
             break;
     }
-}
-
+}                         
 void destroy_state(state_t *state) {
     if (state == NULL) return;
     if (state->tag == STATE_IN_GAME) {
@@ -60,10 +72,7 @@ void state_enter_in_game(state_t *state, font_t *font) {
     track_init((xpm_map_t) track_xpm);
     camera_init(1600, 1200);
     state->data.in_game.car = create_car(800, 1000, 0, 0, (xpm_map_t *) car_xpms);
-    state->data.in_game.key_w = false;
-    state->data.in_game.key_s = false;
-    state->data.in_game.key_a = false;
-    state->data.in_game.key_d = false;
+    reset_game_input(&state->data.in_game.input);
     state->data.in_game.pause = false;
     state->data.in_game.cursor_x = 400;
     state->data.in_game.cursor_y = 300;
@@ -144,17 +153,23 @@ void handle_kbd_event(state_t *state, uint8_t scancode) {
             // Only handle WASD when not paused
             if(!state->data.in_game.pause) {
                 // Track Make codes (press) and Break codes (release) for WASD
-                if (scancode == W_MAKE) state->data.in_game.key_w = true;      // W Make
-                else if (scancode == W_BREAK) state->data.in_game.key_w = false; // W Break
+                if (scancode == W_MAKE) state->data.in_game.input.accelerate = true;
+                else if (scancode == W_BREAK) state->data.in_game.input.accelerate = false;
 
-                if (scancode == S_MAKE) state->data.in_game.key_s = true;      // S Make
-                else if (scancode == S_BREAK) state->data.in_game.key_s = false; // S Break
+                if (scancode == S_MAKE) state->data.in_game.input.brake = true;
+                else if (scancode == S_BREAK) state->data.in_game.input.brake = false;
 
-                if (scancode == A_MAKE) state->data.in_game.key_a = true;      // A Make
-                else if (scancode == A_BREAK) state->data.in_game.key_a = false; // A Break
+                if (scancode == A_MAKE) state->data.in_game.input.turn_left = true;
+                else if (scancode == A_BREAK) state->data.in_game.input.turn_left = false;
 
-                if (scancode == D_MAKE) state->data.in_game.key_d = true;      // D Make
-                else if (scancode == D_BREAK) state->data.in_game.key_d = false; // D Break
+                if (scancode == D_MAKE) state->data.in_game.input.turn_right = true;
+                else if (scancode == D_BREAK) state->data.in_game.input.turn_right = false;
+
+                if (scancode == SPACE_MAKE) state->data.in_game.input.handbrake = true;
+                else if (scancode == SPACE_BREAK) state->data.in_game.input.handbrake = false;
+
+                if (scancode == SHIFT_MAKE) state->data.in_game.input.boost = true;
+                else if (scancode == SHIFT_BREAK) state->data.in_game.input.boost = false;
             }
             break;
         case STATE_GAME_OVER:
@@ -170,11 +185,7 @@ void update_state(state_t *state) {
             break;
         case STATE_IN_GAME: {
             if (state->data.in_game.pause) break; // Skip physics and camera while paused
-            update_car_physics(state->data.in_game.car,
-                               state->data.in_game.key_w,
-                               state->data.in_game.key_s,
-                               state->data.in_game.key_a,
-                               state->data.in_game.key_d);
+            update_car_physics(state->data.in_game.car, &state->data.in_game.input);
             /* Center camera on the car */
             car_t *c = state->data.in_game.car;
             int idx = (int)((c->angle + 11.25) / 22.5) % 16;
