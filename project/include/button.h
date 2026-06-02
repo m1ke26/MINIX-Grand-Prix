@@ -18,6 +18,12 @@ typedef enum {
   BTN_SILVER     = 0xCCCCCC,
 } button_color_t;
 
+typedef enum {
+  BTN_SHAPE_RECT,
+  BTN_SHAPE_ARROW_LEFT,
+  BTN_SHAPE_ARROW_RIGHT
+} button_shape_t;
+
 typedef struct {
   int x, y;
   char text[100];
@@ -25,7 +31,9 @@ typedef struct {
   button_color_t color;        /**< Normal background color  */
   button_color_t hover_color;  /**< Hovered background color */
   button_color_t border_color; /**< Border color             */
+  button_shape_t shape; 
 } button_t;
+
 
 /**
  * @brief Creates a button drawn as a plain pixel rectangle.
@@ -39,7 +47,8 @@ typedef struct {
  */
 button_t* button_create(font_t *font, const char *text, int x, int y,
                         button_color_t color, button_color_t hover_color,
-                        button_color_t border_color);
+                        button_color_t border_color,
+                        button_shape_t shape);
 
 /**
  * @brief Destroys a button.

@@ -8,8 +8,21 @@ start_menu_t* start_menu_create(font_t *font) {
   sm->font = font;
   
   // Create buttons centered horizontally
-  sm->start_btn = button_create(font, "START", 300, 250, BTN_DARK_NAVY, BTN_LIGHT_NAVY, BTN_WHITE);
-  sm->exit_btn  = button_create(font, "EXIT",  300, 370, BTN_DARK_NAVY, BTN_LIGHT_NAVY, BTN_WHITE);
+  sm->start_btn = button_create(font, "START", 300, 250, BTN_DARK_NAVY, BTN_LIGHT_NAVY, BTN_WHITE, BTN_SHAPE_RECT);
+  sm->exit_btn  = button_create(font, "EXIT",  300, 330, BTN_DARK_NAVY, BTN_LIGHT_NAVY, BTN_WHITE, BTN_SHAPE_RECT);
+
+  // Car arrows
+  sm->car_left  = button_create(NULL, "", 5 ,270, 0x000000, 0x555555, 0x000000, BTN_SHAPE_ARROW_LEFT);
+  sm->car_right = button_create(NULL, "", 215, 270, 0x000000, 0x555555, 0x000000, BTN_SHAPE_ARROW_RIGHT);
+
+  // Track arrows
+  sm->track_left  = button_create(NULL, "", 555, 270, 0x000000, 0x555555, 0x000000, BTN_SHAPE_ARROW_LEFT);
+  sm->track_right = button_create(NULL, "", 765, 270, 0x000000, 0x555555, 0x000000, BTN_SHAPE_ARROW_RIGHT);
+
+  sm->car_index   = 0;
+  sm->track_index = 0;
+  sm->player_name[0] = '\0';
+  sm->name_len = 0;
 
   return sm;
 }
@@ -18,6 +31,10 @@ void start_menu_destroy(start_menu_t *sm) {
   if (sm == NULL) return;
   button_destroy(sm->start_btn);
   button_destroy(sm->exit_btn);
+  button_destroy(sm->car_left);
+  button_destroy(sm->car_right);
+  button_destroy(sm->track_left);
+  button_destroy(sm->track_right);
   free(sm);
 }
 
@@ -29,14 +46,45 @@ void start_menu_draw(start_menu_t *sm, int cursor_x, int cursor_y) {
 
   // 2. Draw Game Title
   if (sm->font != NULL)
-    draw_string_scaled(sm->font, "MINIX GRAND PRIX", 208, 150, 3, 0x0000ff);
+    draw_string_scaled(sm->font, "MINIX GRAND PRIX", 208, 100, 3, 0x0000ff);
 
   // 3. Draw Buttons (only if they exist)
   if (sm->start_btn != NULL)
     button_draw(sm->start_btn, button_is_hovered(sm->start_btn, cursor_x, cursor_y));
   if (sm->exit_btn != NULL)
     button_draw(sm->exit_btn, button_is_hovered(sm->exit_btn, cursor_x, cursor_y));
-
-  // 4. Draw cursor
+  if (sm->car_left != NULL)
+    button_draw(sm->car_left, button_is_hovered(sm->car_left, cursor_x,cursor_y));
+  if (sm->car_right != NULL)
+    button_draw(sm->car_right, button_is_hovered(sm->car_right, cursor_x,cursor_y));
+  if (sm->track_left != NULL)
+    button_draw(sm->track_left, button_is_hovered(sm->track_left, cursor_x,cursor_y));
+  if (sm->track_right != NULL)
+    button_draw(sm->track_right, button_is_hovered(sm->track_right, cursor_x,cursor_y));
+  
+  // 4. Player name
+  if (sm->font != NULL) {
+    draw_string_scaled(sm->font, "PLAYERNAME:", 320, 470, 2, 0x000000);
+    draw_string_scaled(sm->font, sm->player_name, 285, 510, 2, 0x000000);
+    vg_buf_draw_rect(285, 535, 240, 3, 0x000000);
+  }
+  // 5. Draw cursor
   vg_buf_draw_rect(cursor_x, cursor_y, 8, 8, 0xFFFFFF);
+}
+
+void start_menu_handle_key(start_menu_t *sm, char key) {
+  if (sm == NULL) return;
+
+  if (key == '\b') {
+    // backspace — apaga o último caracter
+    if (sm->name_len > 0) {
+      sm->name_len--;
+      sm->player_name[sm->name_len] = '\0';
+    }
+  } else if (sm->name_len < 15) {
+    // adiciona o caracter se ainda há espaço
+    sm->player_name[sm->name_len] = key;
+    sm->name_len++;
+    sm->player_name[sm->name_len] = '\0';
+  }
 }

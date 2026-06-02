@@ -9,6 +9,16 @@ typedef struct {
   font_t *font;
   button_t *start_btn;
   button_t *exit_btn;
+  button_t *car_left;
+  button_t *car_right;
+  int car_index; // car selected
+  sprite_t *car_sprite; // current car sprite
+  button_t *track_left;
+  button_t *track_right;
+  int track_index; // track selected
+  sprite_t *track_sprite; // current track sprite
+  char player_name[16];
+  int name_len;
 } start_menu_t;
 
 /**
@@ -28,5 +38,6 @@ void start_menu_destroy(start_menu_t *sm);
  * @param cursor_y Current mouse y position.
  */
 void start_menu_draw(start_menu_t *sm, int cursor_x, int cursor_y);
+void start_menu_handle_key(start_menu_t *sm, char key);
 
 #endif /* _START_MENU_H_ */
