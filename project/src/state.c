@@ -1,3 +1,4 @@
+#include "speedometer.h"
 #include "state.h"
 #include "start_menu.h"
 #include "car.h"
@@ -33,6 +34,7 @@ void draw_state(state_t *state) {
             // Always draw the game world first
             track_draw();
             draw_car(state->data.in_game.car);
+            speedometer_draw(state->data.in_game.car->speed);
             if(state->data.in_game.pause){
                 vg_buf_desaturate(); // Grey out the frozen game world
                 pause_menu_draw(state->data.in_game.pause_menu, state->data.in_game.cursor_x, state->data.in_game.cursor_y);
@@ -66,10 +68,12 @@ void state_enter_in_game(state_t *state, font_t *font) {
     state->data.in_game.cursor_x = 400;
     state->data.in_game.cursor_y = 300;
     state->data.in_game.pause_menu = pause_menu_create(font);
+    speedometer_init();
 }
 
 /* Tears down all in-game resources and transitions back to the start menu */
 void state_enter_start(state_t *state, font_t *font, int cursor_x, int cursor_y) {
+    speedometer_destroy();
     destroy_car(state->data.in_game.car);
     state->data.in_game.car = NULL;
     pause_menu_destroy(state->data.in_game.pause_menu);
