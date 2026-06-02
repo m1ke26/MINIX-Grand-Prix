@@ -1,4 +1,5 @@
 #include "font.h"
+#include "colors.h"
 #include <stdlib.h>
 #include <string.h>
 #include "video-card.h"
@@ -10,8 +11,8 @@ xpm_map_t create_xpm_font(int index) {
   if (xpm == NULL) return NULL;
 
   xpm[0] = strdup("8 8 2 1");
-  xpm[1] = strdup("  c #000000"); // 0 bit = transparent (Pure Black)
-  xpm[2] = strdup("X c #222222"); // 1 bit = crisp charcoal text (Dark Gray)  
+  xpm[1] = strdup("  c #000000"); // 0 bit = transparent
+  xpm[2] = strdup("X c #222222"); // 1 bit = font ink
 
   // Pull the 8 rows of bits for this specific character index
   uint8_t const *char_rows = font_bits[index];
@@ -101,7 +102,7 @@ void draw_string(font_t *font, const char *str, int x, int y, uint32_t color) {
       for (int row = 0; row < tile->height; row++) {
         for (int col = 0; col < tile->width; col++) {
           uint32_t pixel = tile->map[row * tile->width + col];
-          if (pixel != transp && pixel != 0x000000)
+          if (pixel != transp && pixel != COLOR_BLACK)
             vg_buf_draw_pixel(curr_x + col, y + row, color);
         }
       }
@@ -128,7 +129,7 @@ void draw_string_scaled(font_t *font, const char *str, int x, int y, int scale, 
       for (int row = 0; row < tile->height; row++) {
         for (int col = 0; col < tile->width; col++) {
           uint32_t pixel = tile->map[row * tile->width + col];
-          if (pixel != transp && pixel != 0x000000)
+          if (pixel != transp && pixel != COLOR_BLACK)
             vg_buf_draw_rect(curr_x + col * scale, y + row * scale, scale, scale, color);
         }
       }

@@ -1,4 +1,5 @@
 #include "sprite.h"
+#include "colors.h"
 #include "video-card.h"
 #include <stdlib.h>
 
@@ -51,7 +52,7 @@ void sprite_draw(sprite_t *sp, int x, int y) {
   for (int row = 0; row < sp->height; row++) {
     for (int col = 0; col < sp->width; col++) {
       uint32_t color = sp->map[row * sp->width + col];
-      if (color != transp && color != 0x000000)
+      if (color != transp && color != COLOR_BLACK)
         vg_buf_draw_pixel(x + col, y + row, color);
     }
   }

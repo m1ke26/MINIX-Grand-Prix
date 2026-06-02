@@ -4,8 +4,8 @@
 #include <string.h>
 
 button_t* button_create(font_t *font, const char *text, int x, int y,
-                        button_color_t color, button_color_t hover_color,
-                        button_color_t border_color) {
+                        uint32_t color, uint32_t hover_color,
+                        uint32_t border_color) {
   button_t *b = (button_t *) malloc(sizeof(button_t));
   if (b == NULL) return NULL;
 
@@ -29,10 +29,10 @@ void button_destroy(button_t *b) {
 void button_draw(button_t *b, bool hover) {
   if (b == NULL) return;
 
-  uint32_t bg = (uint32_t)(hover ? b->hover_color : b->color);
+  uint32_t bg = hover ? b->hover_color : b->color;
 
   /* Outer border */
-  vg_buf_draw_rect(b->x, b->y, BTN_W, BTN_H, (uint32_t)b->border_color);
+  vg_buf_draw_rect(b->x, b->y, BTN_W, BTN_H, b->border_color);
   /* Inner fill */
   vg_buf_draw_rect(b->x + BORDER, b->y + BORDER,
                    BTN_W - 2 * BORDER, BTN_H - 2 * BORDER, bg);
@@ -42,7 +42,7 @@ void button_draw(button_t *b, bool hover) {
     int text_w = (int)(strlen(b->text) * b->font->tile_size);
     int text_x = b->x + (BTN_W - text_w) / 2;
     int text_y = b->y + (BTN_H - (int)b->font->tile_size) / 2;
-    draw_string(b->font, b->text, text_x, text_y, (uint32_t)BTN_WHITE);
+    draw_string(b->font, b->text, text_x, text_y, COLOR_BUTTON_TEXT);
   }
 }
 

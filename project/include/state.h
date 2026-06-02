@@ -7,6 +7,8 @@
 #include "input.h"
 #include "start_menu.h"
 #include "pause_menu.h"
+#include "font.h"
+#include "race.h"
 
 extern bool running;
 
@@ -27,6 +29,8 @@ typedef struct {
 
         struct {
             car_t *car;
+            font_t *font;
+            race_t race;
             unsigned laps;
             unsigned seconds_elapsed;
             game_input_t input;
