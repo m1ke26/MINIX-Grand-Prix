@@ -3,6 +3,7 @@
 
 #include <lcom/lcf.h>
 #include "sprite.h"
+#include "car.h"
 
 #define SPEEDO_X 10
 #define SPEEDO_Y 440
@@ -17,7 +18,6 @@
 /* Angle range: -220 deg (speed=0) to 40 deg (speed=max), in degrees */
 #define NEEDLE_ANGLE_MIN (-220.0)
 #define NEEDLE_ANGLE_MAX (40.0)
-#define CAR_MAX_SPEED 7.0
 
 void speedometer_init();
 void speedometer_draw(float speed);
