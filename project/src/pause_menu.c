@@ -6,10 +6,8 @@ pause_menu_t* pause_menu_create(font_t *font) {
     if (pm == NULL) return NULL;
 
     pm->font = font;
-    pm->resume_btn = button_create(font, "RESUME", 300, 250,
-                                   COLOR_BUTTON_DARK_NAVY, COLOR_BUTTON_LIGHT_NAVY, COLOR_BUTTON_BORDER);
-    pm->exit_btn   = button_create(font, "EXIT",   300, 350,
-                                   COLOR_BUTTON_DARK_NAVY, COLOR_BUTTON_LIGHT_NAVY, COLOR_BUTTON_BORDER);
+    pm->resume_btn = button_create(font, "RESUME", 300, 250, BTN_DARK_NAVY, BTN_LIGHT_NAVY, BTN_WHITE, BTN_SHAPE_RECT);
+    pm->exit_btn   = button_create(font, "EXIT",   300, 350, BTN_DARK_NAVY, BTN_LIGHT_NAVY, BTN_WHITE, BTN_SHAPE_RECT);
 
     if (pm->resume_btn == NULL || pm->exit_btn == NULL) {
         pause_menu_destroy(pm);

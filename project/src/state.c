@@ -183,6 +183,11 @@ void handle_kbd_event(state_t *state, uint8_t scancode) {
 
     switch (state->tag) {
         case STATE_START:
+            if (state->data.start.menu != NULL) {
+                char c = kbd_scancode_to_char(scancode);
+                if (c != 0)
+                    start_menu_handle_key(state->data.start.menu, c);
+            }
             break;
         case STATE_IN_GAME:
             if(!race_has_started(&state->data.in_game.race)){

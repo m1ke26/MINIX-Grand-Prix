@@ -36,4 +36,6 @@ uint8_t (kbc_get_scancode)();
 bool (kbc_scancode_ready)();
 bool (kbc_has_error)();
 
+char kbd_scancode_to_char(uint8_t scancode);
+
 #endif

@@ -4,11 +4,27 @@
 #include "button.h"
 #include "font.h"
 #include "video-card.h"
+#include "car_pixmaps.h"
+#include "track_pixmap.h"
+#include "sprite.h"
+
+#define NUM_CARS   1
+#define NUM_TRACKS 1
 
 typedef struct {
   font_t *font;
   button_t *start_btn;
   button_t *exit_btn;
+  button_t *car_left;
+  button_t *car_right;
+  int car_index; // car selected
+  sprite_t *car_sprites[NUM_CARS];  // current car sprite
+  button_t *track_left;
+  button_t *track_right;
+  int track_index; // track selected
+  sprite_t *track_sprites[NUM_TRACKS]; // current track sprite
+  char player_name[16];
+  int name_len;
 } start_menu_t;
 
 /**
@@ -28,5 +44,16 @@ void start_menu_destroy(start_menu_t *sm);
  * @param cursor_y Current mouse y position.
  */
 void start_menu_draw(start_menu_t *sm, int cursor_x, int cursor_y);
+
+/**
+ * @brief Handles a keyboard input character for the player name field.
+ * Appends printable characters to the name or removes the last character on backspace.
+ * @param sm Pointer to the start menu.
+ * @param key ASCII character to process ('\b' for backspace).
+ */
+
+void start_menu_handle_key(start_menu_t *sm, char key);
+
+
 
 #endif /* _START_MENU_H_ */

@@ -11,14 +11,30 @@
 #define BTN_H    60
 #define BORDER    3
 
+typedef enum {
+  BTN_DARK_NAVY  = 0x333366, /**< Normal button background  */
+  BTN_LIGHT_NAVY = 0x5555AA, /**< Hovered button background */
+  BTN_WHITE      = 0xFFFFFF, /**< Border and label text     */
+  BTN_DARK_GRAY  = 0x555555,
+  BTN_SILVER     = 0xCCCCCC,
+} button_color_t;
+
+typedef enum {
+  BTN_SHAPE_RECT,
+  BTN_SHAPE_ARROW_LEFT,
+  BTN_SHAPE_ARROW_RIGHT
+} button_shape_t;
+
 typedef struct {
   int x, y;
   char text[100];
   font_t *font;
-  uint32_t color;        /**< Normal background color  */
-  uint32_t hover_color;  /**< Hovered background color */
-  uint32_t border_color; /**< Border color             */
+  button_color_t color;        /**< Normal background color  */
+  button_color_t hover_color;  /**< Hovered background color */
+  button_color_t border_color; /**< Border color             */
+  button_shape_t shape; 
 } button_t;
+
 
 /**
  * @brief Creates a button drawn as a plain pixel rectangle.
@@ -31,8 +47,9 @@ typedef struct {
  * @param border_color Border color.
  */
 button_t* button_create(font_t *font, const char *text, int x, int y,
-                        uint32_t color, uint32_t hover_color,
-                        uint32_t border_color);
+                        button_color_t color, button_color_t hover_color,
+                        button_color_t border_color,
+                        button_shape_t shape);
 
 /**
  * @brief Destroys a button.
