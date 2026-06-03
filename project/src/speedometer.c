@@ -58,7 +58,7 @@ void speedometer_draw(float speed) {
     /* 2. Calculate needle angle
        Speed 0   -> -220 deg (full left)
        Speed max ->   40 deg (full right) */
-    float t = speed / CAR_MAX_SPEED;
+    float t = fabs(speed) / CAR_MAX_SPEED;
     if (t > 1.0f) t = 1.0f;
     if (t < 0.0f) t = 0.0f;
 

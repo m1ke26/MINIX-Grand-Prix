@@ -1,4 +1,5 @@
 #include "start_menu.h"
+#include "colors.h"
 #include <stdlib.h>
 
 start_menu_t* start_menu_create(font_t *font) {
@@ -12,12 +13,12 @@ start_menu_t* start_menu_create(font_t *font) {
   sm->exit_btn  = button_create(font, "EXIT",  300, 330, BTN_DARK_NAVY, BTN_LIGHT_NAVY, BTN_WHITE, BTN_SHAPE_RECT);
 
   // Car arrows
-  sm->car_left  = button_create(NULL, "", 5 ,325, 0x000000, 0x555555, 0x000000, BTN_SHAPE_ARROW_LEFT);
-  sm->car_right = button_create(NULL, "", 215, 325, 0x000000, 0x555555, 0x000000, BTN_SHAPE_ARROW_RIGHT);
+  sm->car_left  = button_create(NULL, "", 5 ,325, COLOR_BLACK, BTN_DARK_GRAY, COLOR_BLACK, BTN_SHAPE_ARROW_LEFT);
+  sm->car_right = button_create(NULL, "", 215, 325, COLOR_BLACK, BTN_DARK_GRAY, COLOR_BLACK, BTN_SHAPE_ARROW_RIGHT);
 
   // Track arrows
-  sm->track_left  = button_create(NULL, "", 555, 325, 0x000000, 0x555555, 0x000000, BTN_SHAPE_ARROW_LEFT);
-  sm->track_right = button_create(NULL, "", 765, 325, 0x000000, 0x555555, 0x000000, BTN_SHAPE_ARROW_RIGHT);
+  sm->track_left  = button_create(NULL, "", 555, 325, COLOR_BLACK, BTN_DARK_GRAY, COLOR_BLACK, BTN_SHAPE_ARROW_LEFT);
+  sm->track_right = button_create(NULL, "", 765, 325, COLOR_BLACK, BTN_DARK_GRAY, COLOR_BLACK, BTN_SHAPE_ARROW_RIGHT);
 
   sm->car_index   = 0;
   sm->track_index = 0;
@@ -67,11 +68,11 @@ void start_menu_draw(start_menu_t *sm, int cursor_x, int cursor_y) {
   if (sm == NULL) return;
 
   // 1. Draw Background (Dark Blue)
-  vg_buf_draw_rect(0, 0, 800, 600, 0xB0BEC5);
+  vg_buf_draw_rect(0, 0, 800, 600, COLOR_MENU_BACKGROUND);
 
   // 2. Draw Game Title
   if (sm->font != NULL)
-    draw_string_scaled(sm->font, "MINIX GRAND PRIX", 208, 100, 3, 0x0000ff);
+    draw_string_scaled(sm->font, "MINIX GRAND PRIX", 208, 100, 3, COLOR_MENU_TITLE);
 
   // 3. Draw Buttons (only if they exist)
   if (sm->start_btn != NULL)
@@ -89,9 +90,9 @@ void start_menu_draw(start_menu_t *sm, int cursor_x, int cursor_y) {
   
   // 4. Player name
   if (sm->font != NULL) {
-    draw_string_scaled(sm->font, "PLAYERNAME:", 320, 470, 2, 0x000000);
-    draw_string_scaled(sm->font, sm->player_name, 285, 510, 2, 0x000000);
-    vg_buf_draw_rect(285, 535, 240, 3, 0x000000);
+    draw_string_scaled(sm->font, "PLAYERNAME:", 320, 470, 2, COLOR_MENU_TEXT);
+    draw_string_scaled(sm->font, sm->player_name, 285, 510, 2, COLOR_MENU_TEXT);
+    vg_buf_draw_rect(285, 535, 240, 3, COLOR_MENU_UNDERLINE);
   }
 
   // Car Sprite
@@ -105,13 +106,13 @@ void start_menu_draw(start_menu_t *sm, int cursor_x, int cursor_y) {
     draw_sprite_scaled_down(sm->track_sprites[sm->track_index], 595, 255, 10 );
 
   // Car Label
-  draw_string_scaled(sm->font, "<CAR1>", 75, 420, 2, 0x000000);
+  draw_string_scaled(sm->font, "<CAR1>", 75, 420, 2, COLOR_MENU_TEXT);
 
   // Track Label
-  draw_string_scaled(sm->font, "<TRACK1>", 600, 420, 2, 0x000000);
+  draw_string_scaled(sm->font, "<TRACK1>", 600, 420, 2, COLOR_MENU_TEXT);
 
   // 5. Draw cursor
-  vg_buf_draw_rect(cursor_x, cursor_y, 8, 8, 0xFFFFFF);
+  vg_buf_draw_rect(cursor_x, cursor_y, 8, 8, COLOR_CURSOR);
 }
 
 void start_menu_handle_key(start_menu_t *sm, char key) {
