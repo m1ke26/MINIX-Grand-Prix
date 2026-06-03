@@ -88,13 +88,13 @@ void start_menu_handle_key(start_menu_t *sm, char key) {
   if (sm == NULL) return;
 
   if (key == '\b') {
-    // backspace — apaga o último caracter
+    // backspace delete the last char
     if (sm->name_len > 0) {
       sm->name_len--;
       sm->player_name[sm->name_len] = '\0';
     }
   } else if (sm->name_len < 15) {
-    // adiciona o caracter se ainda há espaço
+    // put the new char if have space
     sm->player_name[sm->name_len] = key;
     sm->name_len++;
     sm->player_name[sm->name_len] = '\0';
