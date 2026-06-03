@@ -1,5 +1,4 @@
 #include "start_menu.h"
-#include "colors.h"
 #include <stdlib.h>
 
 start_menu_t* start_menu_create(font_t *font) {
@@ -68,19 +67,50 @@ void start_menu_draw(start_menu_t *sm, int cursor_x, int cursor_y) {
   if (sm == NULL) return;
 
   // 1. Draw Background (Dark Blue)
-  vg_buf_draw_rect(0, 0, 800, 600, COLOR_MENU_BACKGROUND);
+  vg_buf_draw_rect(0, 0, 800, 600, 0xB0BEC5);
 
   // 2. Draw Game Title
   if (sm->font != NULL)
-    draw_string_scaled(sm->font, "MINIX GRAND PRIX", 208, 150, 3, 0x0000ff);
+    draw_string_scaled(sm->font, "MINIX GRAND PRIX", 208, 100, 3, 0x0000ff);
 
   // 3. Draw Buttons (only if they exist)
   if (sm->start_btn != NULL)
     button_draw(sm->start_btn, button_is_hovered(sm->start_btn, cursor_x, cursor_y));
   if (sm->exit_btn != NULL)
     button_draw(sm->exit_btn, button_is_hovered(sm->exit_btn, cursor_x, cursor_y));
+  if (sm->car_left != NULL)
+    button_draw(sm->car_left, button_is_hovered(sm->car_left, cursor_x,cursor_y));
+  if (sm->car_right != NULL)
+    button_draw(sm->car_right, button_is_hovered(sm->car_right, cursor_x,cursor_y));
+  if (sm->track_left != NULL)
+    button_draw(sm->track_left, button_is_hovered(sm->track_left, cursor_x,cursor_y));
+  if (sm->track_right != NULL)
+    button_draw(sm->track_right, button_is_hovered(sm->track_right, cursor_x,cursor_y));
+  
+  // 4. Player name
+  if (sm->font != NULL) {
+    draw_string_scaled(sm->font, "PLAYERNAME:", 320, 470, 2, 0x000000);
+    draw_string_scaled(sm->font, sm->player_name, 285, 510, 2, 0x000000);
+    vg_buf_draw_rect(285, 535, 240, 3, 0x000000);
+  }
 
-  // 4. Draw cursor
+  // Car Sprite
+  if (sm->car_sprites[sm->car_index] != NULL) {
+    sprite_t *s = sm->car_sprites[sm->car_index];
+    draw_sprite_scaled_up(s, 75 - s->width  / 2 , 275- s->height / 2, 2);
+  }
+  
+  // Track Sprite
+   if (sm->track_sprites[sm->track_index] != NULL)
+    draw_sprite_scaled_down(sm->track_sprites[sm->track_index], 595, 255, 10 );
+
+  // Car Label
+  draw_string_scaled(sm->font, "<CAR1>", 75, 420, 2, 0x000000);
+
+  // Track Label
+  draw_string_scaled(sm->font, "<TRACK1>", 600, 420, 2, 0x000000);
+
+  // 5. Draw cursor
   vg_buf_draw_rect(cursor_x, cursor_y, 8, 8, 0xFFFFFF);
 }
 
@@ -88,17 +118,15 @@ void start_menu_handle_key(start_menu_t *sm, char key) {
   if (sm == NULL) return;
 
   if (key == '\b') {
-    // backspace delete the last char
+    // backspace — apaga o último caracter
     if (sm->name_len > 0) {
       sm->name_len--;
       sm->player_name[sm->name_len] = '\0';
     }
   } else if (sm->name_len < 15) {
-    // put the new char if have space
+    // adiciona o caracter se ainda há espaço
     sm->player_name[sm->name_len] = key;
     sm->name_len++;
     sm->player_name[sm->name_len] = '\0';
   }
 }
-
-
