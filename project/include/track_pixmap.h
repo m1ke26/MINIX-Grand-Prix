@@ -1330,4 +1330,9 @@ static xpm_row_t const track_xpm[] = {
 
 };
 
+#define TRACK_XPM_COUNT 1
+static xpm_row_t * const track_xpms[TRACK_XPM_COUNT] = {
+    (xpm_row_t *) track_xpm,
+};
+
 #endif /* _TRACK_PIXMAP_H_ */

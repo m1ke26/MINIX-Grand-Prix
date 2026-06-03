@@ -12,17 +12,27 @@ start_menu_t* start_menu_create(font_t *font) {
   sm->exit_btn  = button_create(font, "EXIT",  300, 330, BTN_DARK_NAVY, BTN_LIGHT_NAVY, BTN_WHITE, BTN_SHAPE_RECT);
 
   // Car arrows
-  sm->car_left  = button_create(NULL, "", 5 ,270, 0x000000, 0x555555, 0x000000, BTN_SHAPE_ARROW_LEFT);
-  sm->car_right = button_create(NULL, "", 215, 270, 0x000000, 0x555555, 0x000000, BTN_SHAPE_ARROW_RIGHT);
+  sm->car_left  = button_create(NULL, "", 5 ,325, 0x000000, 0x555555, 0x000000, BTN_SHAPE_ARROW_LEFT);
+  sm->car_right = button_create(NULL, "", 215, 325, 0x000000, 0x555555, 0x000000, BTN_SHAPE_ARROW_RIGHT);
 
   // Track arrows
-  sm->track_left  = button_create(NULL, "", 555, 270, 0x000000, 0x555555, 0x000000, BTN_SHAPE_ARROW_LEFT);
-  sm->track_right = button_create(NULL, "", 765, 270, 0x000000, 0x555555, 0x000000, BTN_SHAPE_ARROW_RIGHT);
+  sm->track_left  = button_create(NULL, "", 555, 325, 0x000000, 0x555555, 0x000000, BTN_SHAPE_ARROW_LEFT);
+  sm->track_right = button_create(NULL, "", 765, 325, 0x000000, 0x555555, 0x000000, BTN_SHAPE_ARROW_RIGHT);
 
   sm->car_index   = 0;
   sm->track_index = 0;
   sm->player_name[0] = '\0';
   sm->name_len = 0;
+
+  // Car Selector
+  for (int i = 0; i < NUM_CARS; i++) {
+    sm->car_sprites[i] = create_sprite((xpm_map_t) car_xpms[i]);
+  }
+
+  // Track Selector
+  for (int i = 0; i < NUM_TRACKS; i++) {
+    sm->track_sprites[i] = create_sprite((xpm_map_t) track_xpms[i]);
+}
 
   return sm;
 }
@@ -35,6 +45,21 @@ void start_menu_destroy(start_menu_t *sm) {
   button_destroy(sm->car_right);
   button_destroy(sm->track_left);
   button_destroy(sm->track_right);
+
+  for (int i = 0; i < NUM_CARS; i++) {
+    if (sm->car_sprites[i] != NULL) {
+      if (sm->car_sprites[i]->map) free(sm->car_sprites[i]->map);
+      free(sm->car_sprites[i]);
+    }
+  }
+
+  for (int i = 0; i < NUM_TRACKS; i++) {
+    if (sm->track_sprites[i] != NULL) {
+      if (sm->track_sprites[i]->map) free(sm->track_sprites[i]->map);
+      free(sm->track_sprites[i]);
+    }
+  }
+
   free(sm);
 }
 
@@ -68,6 +93,23 @@ void start_menu_draw(start_menu_t *sm, int cursor_x, int cursor_y) {
     draw_string_scaled(sm->font, sm->player_name, 285, 510, 2, 0x000000);
     vg_buf_draw_rect(285, 535, 240, 3, 0x000000);
   }
+
+  // Car Sprite
+  if (sm->car_sprites[sm->car_index] != NULL) {
+    sprite_t *s = sm->car_sprites[sm->car_index];
+    draw_sprite_scaled_up(s, 75 - s->width  / 2 , 275- s->height / 2, 2);
+  }
+  
+  // Track Sprite
+   if (sm->track_sprites[sm->track_index] != NULL)
+    draw_sprite_scaled_down(sm->track_sprites[sm->track_index], 595, 255, 10 );
+
+  // Car Label
+  draw_string_scaled(sm->font, "<CAR1>", 75, 420, 2, 0x000000);
+
+  // Track Label
+  draw_string_scaled(sm->font, "<TRACK1>", 600, 420, 2, 0x000000);
+
   // 5. Draw cursor
   vg_buf_draw_rect(cursor_x, cursor_y, 8, 8, 0xFFFFFF);
 }
@@ -88,3 +130,5 @@ void start_menu_handle_key(start_menu_t *sm, char key) {
     sm->player_name[sm->name_len] = '\0';
   }
 }
+
+
