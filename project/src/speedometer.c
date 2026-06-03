@@ -1,5 +1,6 @@
 #include "speedometer.h"
 #include "speedometer_pixmap.h"
+#include "colors.h"
 #include "video-card.h"
 #include <math.h>
 #include <stdlib.h>
@@ -72,13 +73,13 @@ void speedometer_draw(float speed) {
     int ey = py + (int)(NEEDLE_LEN * sin(angle_rad));
 
     /* Draw thick red needle (5 pixels wide) */
-    draw_line(px, py, ex, ey, 0xFF0000);
-    draw_line(px+1, py, ex+1, ey, 0xFF0000);
-    draw_line(px-1, py, ex-1, ey, 0xFF0000);
-    draw_line(px, py+1, ex, ey+1, 0xFF0000);
-    draw_line(px, py-1, ex, ey-1, 0xFF0000);
+    draw_line(px, py, ex, ey, COLOR_SPEEDO_NEEDLE);
+    draw_line(px+1, py, ex+1, ey, COLOR_SPEEDO_NEEDLE);
+    draw_line(px-1, py, ex-1, ey, COLOR_SPEEDO_NEEDLE);
+    draw_line(px, py+1, ex, ey+1, COLOR_SPEEDO_NEEDLE);
+    draw_line(px, py-1, ex, ey-1, COLOR_SPEEDO_NEEDLE);
 
     /* Draw pivot circle at base of needle */
-    draw_circle(px, py, 4, 0xCCCCCC);
+    draw_circle(px, py, 4, COLOR_SPEEDO_PIVOT);
 }
 
