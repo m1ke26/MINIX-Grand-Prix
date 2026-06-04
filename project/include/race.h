@@ -2,6 +2,7 @@
 #define _RACE_H_
 
 #include <stdbool.h>
+#include "track.h"
 
 typedef struct {
     bool countdown_started;
@@ -10,7 +11,8 @@ typedef struct {
     int total_laps;
     int seconds_elapsed;
     int ticks_elapsed;
-    int next_checkpoint;
+    terrain_type_t next_checkpoint;
+    bool checkpoint_armed;
 } race_t;
 
 /**
@@ -50,7 +52,7 @@ int race_countdown_seconds_left(const race_t *race);
 /**
  * @brief Handles checkpoint and lap updates based on car position and updates the race timer.
  */
-void race_check_checkpoints(race_t *race, double car_x, double car_y, int car_w, int car_h);
+void race_check_checkpoints(race_t *race, track_t *track, double car_x, double car_y, int car_w, int car_h);
 
 /**
  * @brief Checks if the race is finished.

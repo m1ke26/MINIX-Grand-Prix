@@ -15,7 +15,8 @@ void race_init(race_t *race) {
     race->total_laps = 3;
     race->seconds_elapsed = 0;
     race->ticks_elapsed = 0;
-    race->next_checkpoint = 1; // Hitting checkpoint 0 completes a lap, so next to hit is 1
+    race->next_checkpoint = CHECKPOINT_1;
+    race->checkpoint_armed = false;
 }
 
 void race_start_countdown(race_t *race) {
@@ -53,4 +54,35 @@ int race_countdown_seconds_left(const race_t *race) {
 
 bool race_is_finished(const race_t *race) {
     return race != NULL && race->current_lap > race->total_laps;
+}
+
+static void race_advance_checkpoint(race_t *race, terrain_type_t hit) {
+    if (hit == START) {
+        race->current_lap++;
+        race->next_checkpoint = CHECKPOINT_1;
+    } else if (hit == CHECKPOINT_1) {
+        race->next_checkpoint = CHECKPOINT_2;
+    } else if (hit == CHECKPOINT_2) {
+        race->next_checkpoint = CHECKPOINT_3;
+    } else if (hit == CHECKPOINT_3) {
+        race->next_checkpoint = START;
+    }
+}
+
+void race_check_checkpoints(race_t *race, track_t *track, double car_x, double car_y, int car_w, int car_h) {
+    if (race == NULL || track == NULL || race_is_finished(race))
+        return;
+
+    terrain_type_t hit = track_car_checkpoint(track, (int)car_x, (int)car_y, car_w, car_h);
+
+    if (hit == TERRAIN_ROAD) {
+        race->checkpoint_armed = true;
+        return;
+    }
+
+    if (!race->checkpoint_armed || hit != race->next_checkpoint)
+        return;
+
+    race->checkpoint_armed = false;
+    race_advance_checkpoint(race, hit);
 }

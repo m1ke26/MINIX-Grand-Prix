@@ -159,12 +159,23 @@ static void state_enter_in_game(state_t *state, font_t *font, int track_idx) {
 
     state->data.in_game.track = create_track((xpm_map_t) track_xpms[track_idx], (xpm_map_t) collision_xpms[track_idx]);
     state->data.in_game.camera = create_camera(state->data.in_game.track->info_trackmap.width, state->data.in_game.track->info_trackmap.height);
-    state->data.in_game.car = create_car(1290, 415, 0, 90, (xpm_map_t *) car_xpms);
+
+    int spawn_x = 1290;
+    int spawn_y = 415;
+    state->data.in_game.car = create_car(spawn_x, spawn_y, 0, 90, (xpm_map_t *) car_xpms);
     if (state->data.in_game.car != NULL) {
         int idx = (int)((state->data.in_game.car->angle + 11.25) / 22.5) % 16;
+        int car_w = state->data.in_game.car->sprites[idx]->width;
+        int car_h = state->data.in_game.car->sprites[idx]->height;
+
+        if (track_find_start_spawn(state->data.in_game.track, car_w, car_h, &spawn_x, &spawn_y)) {
+            state->data.in_game.car->x = spawn_x;
+            state->data.in_game.car->y = spawn_y;
+        }
+
         follow_camera(state->data.in_game.camera,
-                      (int)state->data.in_game.car->x + state->data.in_game.car->sprites[idx]->width / 2,
-                      (int)state->data.in_game.car->y + state->data.in_game.car->sprites[idx]->height / 2);
+                      (int)state->data.in_game.car->x + car_w / 2,
+                      (int)state->data.in_game.car->y + car_h / 2);
     }
     state->data.in_game.font = font;
     race_init(&state->data.in_game.race);
@@ -313,7 +324,8 @@ void update_state(state_t *state) {
             car_t *c = state->data.in_game.car;
             int idx = (int)((c->angle + 11.25) / 22.5) % 16;
             
-            //race_check_checkpoints(&state->data.in_game.race, c->x, c->y, c->sprites[idx]->width, c->sprites[idx]->height);
+            race_check_checkpoints(&state->data.in_game.race, state->data.in_game.track,
+                                   c->x, c->y, c->sprites[idx]->width, c->sprites[idx]->height);
 
             if (race_is_finished(&state->data.in_game.race)) {
                 state_enter_game_over(state, state->data.in_game.font, state->data.in_game.race.seconds_elapsed);

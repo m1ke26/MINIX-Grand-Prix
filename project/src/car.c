@@ -52,32 +52,26 @@ bool move_car(car_t *car, track_t *track) {
   if (new_y > 2217 - h) { new_y = 2217 - h; car->speed = 0; }
 
   // Track collision: check surface at center of new position
-  int terrain = collision_track(track, (int)new_x + w / 2, (int)new_y + h / 2);
+  terrain_type_t terrain = collision_track(track, (int)new_x + w / 2, (int)new_y + h / 2);
 
-  if (terrain == 1) { /* blocked */
-    // Try sliding along X axis only
-    int tx = collision_track(track, (int)new_x + w / 2, (int)car->y + h / 2);
-    if (tx != 1) {
+  if (terrain == TERRAIN_BLOCKED) {
+    terrain_type_t tx = collision_track(track, (int)new_x + w / 2, (int)car->y + h / 2);
+    if (tx != TERRAIN_BLOCKED) {
       car->x = new_x;
-      if (tx == 2) car->speed *= 0.95;
-    }
-    // Try sliding along Y axis only
-    else {
-      int ty = collision_track(track, (int)car->x + w / 2, (int)new_y + h / 2);
-      if (ty != 1) {
+      if (tx == TERRAIN_SLOW) car->speed *= 0.95;
+    } else {
+      terrain_type_t ty = collision_track(track, (int)car->x + w / 2, (int)new_y + h / 2);
+      if (ty != TERRAIN_BLOCKED) {
         car->y = new_y;
-        if (ty == 2) car->speed *= 0.95;
-      }
-      // Can't move at all - stop
-      else {
+        if (ty == TERRAIN_SLOW) car->speed *= 0.95;
+      } else {
         car->speed = 0;
       }
     }
   } else {
     car->x = new_x;
     car->y = new_y;
-    // Slow zone: reduce speed gradually
-    if (terrain == 2) car->speed *= 0.95;
+    if (terrain == TERRAIN_SLOW) car->speed *= 0.95;
   }
 
   return true;
