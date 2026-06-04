@@ -1,6 +1,5 @@
 #include "speedometer.h"
 #include "speedometer_pixmap.h"
-#include "colors.h"
 #include "video-card.h"
 #include <math.h>
 #include <stdlib.h>
@@ -16,17 +15,15 @@ void speedometer_destroy() {
     speedo_sprite = NULL;
 }
 
-/* Draw sprite skipping only transparent, allowing black */
 static void sprite_draw_full(sprite_t *sp, int x, int y) {
     if (sp == NULL || sp->map == NULL) return;
     uint32_t transp = xpm_transparency_color(XPM_8_8_8);
-    for (int row = 0; row < sp->height; row++) {
+    for (int row = 0; row < sp->height; row++)
         for (int col = 0; col < sp->width; col++) {
             uint32_t color = sp->map[row * sp->width + col];
             if (color != transp)
                 vg_buf_draw_pixel(x + col, y + row, color);
         }
-    }
 }
 
 static void draw_line(int x0, int y0, int x1, int y1, uint32_t color) {
@@ -43,23 +40,19 @@ static void draw_line(int x0, int y0, int x1, int y1, uint32_t color) {
 }
 
 static void draw_circle(int cx, int cy, int r, uint32_t color) {
-    for (int dy = -r; dy <= r; dy++) {
-        for (int dx = -r; dx <= r; dx++) {
+    for (int dy = -r; dy <= r; dy++)
+        for (int dx = -r; dx <= r; dx++)
             if (dx*dx + dy*dy <= r*r)
                 vg_buf_draw_pixel(cx + dx, cy + dy, color);
-        }
-    }
 }
 
 void speedometer_draw(float speed) {
-    /* 1. Draw the dial background (no needle, transparent bg) */
     if (speedo_sprite != NULL)
         sprite_draw_full(speedo_sprite, SPEEDO_X, SPEEDO_Y);
 
-    /* 2. Calculate needle angle
-       Speed 0   -> -220 deg (full left)
-       Speed max ->   40 deg (full right) */
-    float t = fabs(speed) / CAR_MAX_SPEED;
+    /* Use absolute value so reverse also shows on the needle */
+    float abs_speed = speed < 0.0f ? -speed : speed;
+    float t = abs_speed / CAR_MAX_SPEED_BOOST;
     if (t > 1.0f) t = 1.0f;
     if (t < 0.0f) t = 0.0f;
 
@@ -72,14 +65,11 @@ void speedometer_draw(float speed) {
     int ex = px + (int)(NEEDLE_LEN * cos(angle_rad));
     int ey = py + (int)(NEEDLE_LEN * sin(angle_rad));
 
-    /* Draw thick red needle (5 pixels wide) */
-    draw_line(px, py, ex, ey, COLOR_SPEEDO_NEEDLE);
-    draw_line(px+1, py, ex+1, ey, COLOR_SPEEDO_NEEDLE);
-    draw_line(px-1, py, ex-1, ey, COLOR_SPEEDO_NEEDLE);
-    draw_line(px, py+1, ex, ey+1, COLOR_SPEEDO_NEEDLE);
-    draw_line(px, py-1, ex, ey-1, COLOR_SPEEDO_NEEDLE);
+    draw_line(px, py, ex, ey, 0xFF0000);
+    draw_line(px+1, py, ex+1, ey, 0xFF0000);
+    draw_line(px-1, py, ex-1, ey, 0xFF0000);
+    draw_line(px, py+1, ex, ey+1, 0xFF0000);
+    draw_line(px, py-1, ex, ey-1, 0xFF0000);
 
-    /* Draw pivot circle at base of needle */
-    draw_circle(px, py, 4, COLOR_SPEEDO_PIVOT);
+    draw_circle(px, py, 4, 0xCCCCCC);
 }
-

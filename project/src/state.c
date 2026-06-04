@@ -13,6 +13,7 @@
 #include "cursor.h"
 #include "rtc.h"
 #include "tracks_pixmaps.h"
+#include "minimap.h"
 
 
 
@@ -41,6 +42,7 @@ static void state_exit_in_game(state_t *state) {
 
     destroy_track(state->data.in_game.track);
     destroy_camera(state->data.in_game.camera);
+    minimap_destroy();
 }
 
 static void state_exit_current(state_t *state) {
@@ -101,6 +103,7 @@ void draw_state(state_t *state)
             draw_car(state->data.in_game.car, state->data.in_game.camera->cam_x, state->data.in_game.camera->cam_y);
             speedometer_draw(state->data.in_game.car->speed);
             hud_draw_boost_indicator(state->data.in_game.car);
+            minimap_draw((int)state->data.in_game.car->x, (int)state->data.in_game.car->y);
 
             if(!race_has_started(&state->data.in_game.race)){
                 if (race_countdown_started(&state->data.in_game.race)) {
@@ -175,6 +178,7 @@ static void state_enter_in_game(state_t *state, font_t *font, int track_idx) {
     state->data.in_game.pause = false;
     state->data.in_game.pause_menu = pause_menu_create(font);
     speedometer_init();
+    minimap_init(track_idx, state->data.in_game.track);
 }
 
 /* Tears down all in-game resources and transitions back to the start menu */
