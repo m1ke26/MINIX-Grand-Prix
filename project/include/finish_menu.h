@@ -11,7 +11,7 @@
 
 typedef struct finish_menu {
     font_t *font;
-    unsigned final_time;
+    unsigned final_ticks;
     int lap_times[16];
     int lap_count;
 } finish_menu_t;
