@@ -1,5 +1,7 @@
+#include <stdio.h>
 #include "speedometer.h"
 #include "state.h"
+#include "finish_menu.h"
 #include "colors.h"
 #include "start_menu.h"
 #include "car.h"
@@ -55,6 +57,8 @@ static void state_exit_current(state_t *state) {
             state_exit_in_game(state);
             break;
         case STATE_GAME_OVER:
+            finish_menu_destroy(state->data.game_over.menu);
+            state->data.game_over.menu = NULL;
             break;
     }
 }
@@ -127,6 +131,9 @@ void draw_state(state_t *state)
             }
             break;
         case STATE_GAME_OVER:
+            if (state->data.game_over.menu != NULL) {
+                finish_menu_draw(state->data.game_over.menu);
+            }
             break;
     }
 }
@@ -198,13 +205,12 @@ void state_enter_start(state_t *state, font_t *font) {
     state->data.start.menu = start_menu_create(font);
 }
 
-void state_enter_game_over(state_t *state, font_t *font, unsigned final_time) {
-    if (state == NULL) return;
+void state_enter_game_over(state_t *state, font_t *font, const race_t *race) {
+    if (state == NULL || race == NULL) return;
 
     state_exit_current(state);
     state->tag = STATE_GAME_OVER;
-    state->data.game_over.final_time = final_time;
-    rtc_read_date(&state->data.game_over.date);
+    state->data.game_over.menu = finish_menu_create(font, race);
 }
 
 void handle_mouse_event(state_t *state, struct packet *pp, int cursor_x, int cursor_y) {
@@ -300,6 +306,9 @@ void handle_kbd_event(state_t *state, uint8_t scancode) {
         case STATE_LOADING:
             break;
         case STATE_GAME_OVER:
+            if (state->data.game_over.menu != NULL && finish_menu_handle_key(state->data.game_over.menu, scancode)) {
+                state_enter_start(state, state->data.game_over.menu->font);
+            }
             break;
     }
 }
@@ -338,7 +347,7 @@ void update_state(state_t *state) {
             }
 
             if (race_is_finished(&state->data.in_game.race)) {
-                state_enter_game_over(state, state->data.in_game.font, state->data.in_game.race.seconds_elapsed);
+                state_enter_game_over(state, state->data.in_game.font, &state->data.in_game.race);
                 break;
             }
 

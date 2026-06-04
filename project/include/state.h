@@ -11,6 +11,7 @@
 #include "pause_menu.h"
 #include "font.h"
 #include "race.h"
+#include "finish_menu.h"
 #include "rtc.h"
 #include "cursor.h"
 
@@ -54,8 +55,7 @@ typedef struct
 
         struct
         {
-            unsigned final_time;
-            rtc_date date;
+            finish_menu_t *menu;
         } game_over;
     } data;
 } state_t;
@@ -121,8 +121,8 @@ void state_enter_start(state_t *state, font_t *font);
  *
  * @param state Pointer to the current game state.
  * @param font  The font to use for game over menu.
- * @param final_time The final race time in seconds.
+ * @param race  The completed race, used to populate lap times.
  */
-void state_enter_game_over(state_t *state, font_t *font, unsigned final_time);
+void state_enter_game_over(state_t *state, font_t *font, const race_t *race);
 
 #endif /* _STATE_H_ */

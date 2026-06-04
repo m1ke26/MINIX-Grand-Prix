@@ -17,6 +17,9 @@ void race_init(race_t *race) {
     race->ticks_elapsed = 0;
     race->next_checkpoint = CHECKPOINT_1;
     race->checkpoint_armed = true;
+    race->last_lap_ticks = 0;
+    for (int i = 0; i < 16; i++)
+        race->lap_times[i] = 0;
 }
 
 void race_start_countdown(race_t *race) {
@@ -58,6 +61,10 @@ bool race_is_finished(const race_t *race) {
 
 static void race_advance_checkpoint(race_t *race, terrain_type_t hit) {
     if (hit == START) {
+        if (race->current_lap <= 16) {
+            race->lap_times[race->current_lap - 1] = race->ticks_elapsed - race->last_lap_ticks;
+        }
+        race->last_lap_ticks = race->ticks_elapsed;
         race->current_lap++;
         race->next_checkpoint = CHECKPOINT_1;
     } else if (hit == CHECKPOINT_1) {

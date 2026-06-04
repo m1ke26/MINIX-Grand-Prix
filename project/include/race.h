@@ -13,6 +13,8 @@ typedef struct {
     int ticks_elapsed;
     terrain_type_t next_checkpoint;
     bool checkpoint_armed;
+    int lap_times[16];
+    int last_lap_ticks;
 } race_t;
 
 /**
