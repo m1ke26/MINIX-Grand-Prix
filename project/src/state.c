@@ -133,16 +133,11 @@ void draw_state(state_t *state)
                 break;
             }
             break;
-<<<<<<< HEAD
         case STATE_GAME_OVER:
             if (state->data.game_over.menu != NULL) {
                 finish_menu_draw(state->data.game_over.menu);
             }
-=======
-        case STATE_GAME_OVER: {
->>>>>>> leaderboard-storing
             break;
-        }
     }
 }
 
@@ -172,15 +167,28 @@ void state_enter_loading(state_t *state, font_t *font) {
     if (username != NULL && username[0] != '\0') {
         strncpy(state->data.loading.username, username, sizeof(state->data.loading.username) - 1);
         state->data.loading.username[sizeof(state->data.loading.username) - 1] = '\0';
+
+        // Strip any trailing newlines, carriage returns, or whitespace
+        int len = strlen(state->data.loading.username);
+        while (len > 0 && (state->data.loading.username[len - 1] == '\n' ||
+                            state->data.loading.username[len - 1] == '\r' ||
+                            state->data.loading.username[len - 1] == ' ')) {
+            state->data.loading.username[--len] = '\0';
+        }
     } else {
-        strcpy(state->data.loading.username, "Player");
-    }
-    
+    strcpy(state->data.loading.username, "Player");
+}
     state->data.loading.drawn = false;
 }
 
 static void state_enter_in_game(state_t *state, font_t *font, int track_idx, int car_idx, const char *username) {
     if (state == NULL) return;
+
+    // Copy username to local BEFORE touching state->data (union overlap!)
+    char local_username[16] = {0};
+    if (username != NULL) {
+        strncpy(local_username, username, sizeof(local_username) - 1);
+    }
 
     state->tag = STATE_IN_GAME;
 
@@ -208,15 +216,11 @@ static void state_enter_in_game(state_t *state, font_t *font, int track_idx, int
     }
     state->data.in_game.font = font;
     state->data.in_game.track_index = track_idx;
-    
-    // Store username
-    if (username != NULL) {
-        strncpy(state->data.in_game.username, username, sizeof(state->data.in_game.username) - 1);
-        state->data.in_game.username[sizeof(state->data.in_game.username) - 1] = '\0';
-    } else {
-        state->data.in_game.username[0] = '\0';
-    }
-    
+
+    // Now safe — copy from local, not from the union that was just overwritten
+    strncpy(state->data.in_game.username, local_username, sizeof(state->data.in_game.username) - 1);
+    state->data.in_game.username[sizeof(state->data.in_game.username) - 1] = '\0';
+
     race_init(&state->data.in_game.race);
     reset_game_input(&state->data.in_game.input);
     state->data.in_game.pause = false;
@@ -233,26 +237,26 @@ void state_enter_start(state_t *state, font_t *font) {
     state->data.start.menu = start_menu_create(font);
 }
 
-void state_enter_game_over(state_t *state, font_t *font, unsigned final_time, const char *username, int track_index) {
-    if (state == NULL) return;
+void state_enter_game_over(state_t *state, font_t *font, const race_t *race) {
+     if (state == NULL) return;
+
+    // Save BEFORE exit
+    char saved_username[16] = {0};
+    int saved_track_index = 0;
+    if (state->tag == STATE_IN_GAME) {
+        strncpy(saved_username, state->data.in_game.username, sizeof(saved_username) - 1);
+        saved_track_index = state->data.in_game.track_index;
+    }
 
     state_exit_current(state);
     state->tag = STATE_GAME_OVER;
-    state->data.game_over.final_time = final_time;
-    rtc_read_date(&state->data.game_over.date);
-    
-    // Store username and track
-    if (username != NULL) {
-        strncpy(state->data.game_over.username, username, sizeof(state->data.game_over.username) - 1);
-        state->data.game_over.username[sizeof(state->data.game_over.username) - 1] = '\0';
-    } else {
-        state->data.game_over.username[0] = '\0';
-    }
-    state->data.game_over.track_index = track_index;
-    
-    // Save time to file
-    if (username != NULL) {
-        leaderboard_save_time(username, final_time, track_index, state->data.game_over.date);
+    state->data.game_over.menu = finish_menu_create(font, race);
+
+    // Now safe to use the saved values
+    if (race != NULL && saved_username[0] != '\0') {
+        rtc_date date;
+        rtc_read_date(&date);
+        leaderboard_save_time(saved_username, race->seconds_elapsed, saved_track_index, date);
     }
 }
 
@@ -311,12 +315,11 @@ void handle_kbd_event(state_t *state, uint8_t scancode) {
 
     switch (state->tag) {
         case STATE_START:
-            if (state->data.start.menu != NULL) {
-                char c = kbd_scancode_to_char(scancode);
-                if (c != 0)
-                    start_menu_handle_key(state->data.start.menu, c);
-            }
+            if (scancode == 0xE0 || scancode == 0xE1) break; // skip prefix bytes
+            char c = kbd_scancode_to_char(scancode);
+            if (c != 0) start_menu_handle_key(state->data.start.menu, c);
             break;
+
         case STATE_IN_GAME:
             if(!race_has_started(&state->data.in_game.race)){
                 if (scancode == ENTER_MAKE) race_start_countdown(&state->data.in_game.race);
@@ -391,8 +394,7 @@ void update_state(state_t *state) {
             }
 
             if (race_is_finished(&state->data.in_game.race)) {
-                state_enter_game_over(state, state->data.in_game.font, state->data.in_game.race.seconds_elapsed,
-                                      state->data.in_game.username, state->data.in_game.track_index);
+                state_enter_game_over(state, state->data.in_game.font, &state->data.in_game.race);
                 break;
             }
 

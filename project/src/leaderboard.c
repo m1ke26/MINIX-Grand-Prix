@@ -1,21 +1,48 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
+#include <stdbool.h>
+#include <errno.h>
+#include <unistd.h>
+#include <limits.h>
 #include "leaderboard.h"
 
-#define LEADERBOARD_FILE "leaderboard.dat"
+// 1. Changed extension to .txt
+#define LEADERBOARD_FILE "/home/lcom/labs/grupo_2leic01_2/project/leaderboard.txt"
 #define MAX_ENTRIES 100
 
 void leaderboard_save_time(const char *username, unsigned time, int track_index, rtc_date date) {
     if (username == NULL) return;
+    if (username[0] == '\0') return; // don't save empty names
     
     leaderboard_entry_t entries[MAX_ENTRIES];
     int count = 0;
     
     // Load existing entries
-    FILE *file = fopen(LEADERBOARD_FILE, "rb");
+    FILE *file = fopen(LEADERBOARD_FILE, "r");
     if (file != NULL) {
-        count = fread(entries, sizeof(leaderboard_entry_t), MAX_ENTRIES, file);
+        char line[256];
+        while (count < MAX_ENTRIES && fgets(line, sizeof(line), file) != NULL) {
+            int temp_day = 0, temp_month = 0, temp_year = 0;
+            unsigned temp_time = 0;
+            int temp_track = 0;
+            char temp_name[MAX_USERNAME_LEN] = {0};
+
+            // Try quoted username first, then fallback to unquoted single-token names.
+            if (sscanf(line, "\"%15[^\"]\" %u %d %d %d %d", temp_name, &temp_time, &temp_track,
+                       &temp_day, &temp_month, &temp_year) == 6 ||
+                sscanf(line, "%15s %u %d %d %d %d", temp_name, &temp_time, &temp_track,
+                       &temp_day, &temp_month, &temp_year) == 6) {
+                strncpy(entries[count].username, temp_name, MAX_USERNAME_LEN - 1);
+                entries[count].username[MAX_USERNAME_LEN - 1] = '\0';
+                entries[count].time = temp_time;
+                entries[count].track_index = temp_track;
+                entries[count].date.day = (uint8_t)temp_day;
+                entries[count].date.month = (uint8_t)temp_month;
+                entries[count].date.year = (uint8_t)temp_year;
+                count++;
+            }
+        }
         fclose(file);
     }
     
@@ -42,10 +69,29 @@ void leaderboard_save_time(const char *username, unsigned time, int track_index,
         count++;
     }
     
-    // Save back to file
-    file = fopen(LEADERBOARD_FILE, "wb");
+    // Save back to file 
+    file = fopen(LEADERBOARD_FILE, "w");
+    if (file == NULL) {
+        file = fopen(LEADERBOARD_FILE, "w+");
+    }
+    
     if (file != NULL) {
-        fwrite(entries, sizeof(leaderboard_entry_t), count, file);
+        for (int i = 0; i < count; i++) {
+            fprintf(file, "\"%s\" %u %d %d %d %d\n",
+                    entries[i].username,
+                    entries[i].time,
+                    entries[i].track_index,
+                    entries[i].date.day,
+                    entries[i].date.month,
+                    entries[i].date.year);
+        }
         fclose(file);
+    } else {
+        int err = errno;
+        fprintf(stderr, "leaderboard: failed to open '%s' for writing: %s\n", LEADERBOARD_FILE, strerror(err));
+        char cwd[PATH_MAX];
+        if (getcwd(cwd, sizeof(cwd)) != NULL) {
+            fprintf(stderr, "leaderboard: current working directory is '%s'\n", cwd);
+        }
     }
 }
