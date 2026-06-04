@@ -5,7 +5,7 @@
 #define COLOR_WHITE              0xFFFFFF
 #define COLOR_BLUE               0x0000FF
 
-#define COLOR_MENU_BACKGROUND    0xB0BEC5
+#define COLOR_MENU_BACKGROUND    0x5C7A63
 #define COLOR_MENU_TITLE         COLOR_BLUE
 #define COLOR_CURSOR             COLOR_WHITE
 #define COLOR_MENU_TEXT          COLOR_BLACK

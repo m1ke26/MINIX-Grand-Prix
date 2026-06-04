@@ -9,6 +9,8 @@
 #include "kbc.h"
 #include "pause_menu.h"
 #include "hud.h"
+#include "cursor.h"
+
 
 static void reset_game_input(game_input_t *input) {
     if (input == NULL) return;
@@ -68,6 +70,12 @@ void draw_state(state_t *state) {
     switch (state->tag) {
         case STATE_START:
             start_menu_draw(state->data.start.menu, state->data.start.cursor_x, state->data.start.cursor_y);
+            // Draw the selected car sprite as the mouse cursor (always on top)
+            if (state->data.start.menu != NULL) {
+                int ci = state->data.start.menu->car_index;
+                draw_cursor(state->data.start.menu->car_sprites[ci],
+                            state->data.start.cursor_x, state->data.start.cursor_y, 2);
+            }
             break;
         case STATE_IN_GAME:
             //Clear the screen
@@ -90,6 +98,10 @@ void draw_state(state_t *state) {
             if(state->data.in_game.pause){
                 vg_buf_desaturate(); // Grey out the frozen game world
                 pause_menu_draw(state->data.in_game.pause_menu, state->data.in_game.cursor_x, state->data.in_game.cursor_y);
+                // Draw the car sprite as cursor on the pause menu too
+                if (state->data.in_game.car != NULL)
+                    draw_cursor(state->data.in_game.car->sprites[0],
+                                state->data.in_game.cursor_x, state->data.in_game.cursor_y, 2);
                 break;
             }
             break;

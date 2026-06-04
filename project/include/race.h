@@ -6,6 +6,9 @@
 typedef struct {
     bool countdown_started;
     int countdown_ticks;
+    int current_lap; // For future use, not currently implemented´
+    int total_laps; // For future use, not currently implemented
+    int seconds_elapsed; // For future use, not currently implemented
 } race_t;
 
 /**
