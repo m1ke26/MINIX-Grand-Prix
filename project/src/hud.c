@@ -40,3 +40,19 @@ void hud_draw_race_countdown(font_t *font, int seconds_left) {
   vg_buf_draw_rect(332, 190, 136, 104, COLOR_HUD_PANEL);
   hud_draw_centered_text(font, text, 214, 8, COLOR_COUNTDOWN_TEXT);
 }
+
+void hud_draw_lap_counter(font_t *font, int current_lap, int total_laps) {
+  char text[20];
+  snprintf(text, sizeof(text), "Laps:%d/%d", current_lap, total_laps);
+  
+  hud_draw_centered_text(font, text, 20, 2, COLOR_WHITE);
+}
+
+void hud_draw_timer(font_t *font, unsigned time_elapsed) {
+  int mins = time_elapsed / 60;
+  int secs = time_elapsed % 60;
+  char text[12];
+  snprintf(text, sizeof(text), "Time: %02d:%02d", mins, secs);
+
+  hud_draw_centered_text(font, text, 60, 2, COLOR_WHITE);
+}

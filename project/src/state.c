@@ -10,7 +10,9 @@
 #include "pause_menu.h"
 #include "hud.h"
 #include "cursor.h"
-#include "tracks_pixmaps.h"
+#include "rtc.h"
+#include "track_pixmaps.h"
+
 
 
 static void reset_game_input(game_input_t *input) {
@@ -64,8 +66,7 @@ state_t *init_state()
         return NULL;
 
     state->tag = STATE_START;
-    state->data.start.cursor_x = 400;
-    state->data.start.cursor_y = 300;
+    state->cursor = create_cursor(NULL, 400, 300, 2);
     state->data.start.menu = NULL;
     return state;
 }
@@ -77,12 +78,12 @@ void draw_state(state_t *state)
 
     switch (state->tag) {
         case STATE_START:
-            start_menu_draw(state->data.start.menu, state->data.start.cursor_x, state->data.start.cursor_y);
+            start_menu_draw(state->data.start.menu, state->cursor->x, state->cursor->y);
             // Draw the selected car sprite as the mouse cursor (always on top)
-            if (state->data.start.menu != NULL) {
+            if (state->data.start.menu != NULL && state->cursor != NULL) {
                 int ci = state->data.start.menu->car_index;
-                draw_cursor(state->data.start.menu->car_sprites[ci],
-                            state->data.start.cursor_x, state->data.start.cursor_y, 2);
+                update_cursor_sprite(state->cursor, state->data.start.menu->car_sprites[ci]);
+                draw_cursor(state->cursor);
             }
             break;
         case STATE_LOADING:
@@ -99,6 +100,7 @@ void draw_state(state_t *state)
             draw_car(state->data.in_game.car, state->data.in_game.camera->cam_x, state->data.in_game.camera->cam_y);
             speedometer_draw(state->data.in_game.car->speed);
             hud_draw_boost_indicator(state->data.in_game.car);
+
             if(!race_has_started(&state->data.in_game.race)){
                 if (race_countdown_started(&state->data.in_game.race)) {
                     hud_draw_race_countdown(state->data.in_game.font,
@@ -109,13 +111,18 @@ void draw_state(state_t *state)
                 }
                 break;
             }
+            if(race_has_started( &state->data.in_game.race)){
+                hud_draw_lap_counter(state->data.in_game.font, state->data.in_game.race.current_lap, state->data.in_game.race.total_laps);
+                hud_draw_timer(state->data.in_game.font, state->data.in_game.race.seconds_elapsed);
+            }
             if(state->data.in_game.pause){
                 vg_buf_desaturate(); // Grey out the frozen game world
-                pause_menu_draw(state->data.in_game.pause_menu, state->data.in_game.cursor_x, state->data.in_game.cursor_y);
+                pause_menu_draw(state->data.in_game.pause_menu, state->cursor->x, state->cursor->y);
                 // Draw the car sprite as cursor on the pause menu too
-                if (state->data.in_game.car != NULL)
-                    draw_cursor(state->data.in_game.car->sprites[0],
-                                state->data.in_game.cursor_x, state->data.in_game.cursor_y, 2);
+                if (state->data.in_game.car != NULL && state->cursor != NULL) {
+                    update_cursor_sprite(state->cursor, state->data.in_game.car->sprites[0]);
+                    draw_cursor(state->cursor);
+                }
                 break;
             }
             break;
@@ -127,6 +134,10 @@ void draw_state(state_t *state)
 void destroy_state(state_t *state) {
     if (state == NULL) return;
     state_exit_current(state);
+    if (state->cursor != NULL) {
+        destroy_cursor(state->cursor);
+        state->cursor = NULL;
+    }
     free(state);
 }
 
@@ -161,73 +172,54 @@ static void state_enter_in_game(state_t *state) {
     race_init(&state->data.in_game.race);
     reset_game_input(&state->data.in_game.input);
     state->data.in_game.pause = false;
-    state->data.in_game.cursor_x = 400;
-    state->data.in_game.cursor_y = 300;
     state->data.in_game.pause_menu = pause_menu_create(font);
     speedometer_init();
 }
 
 /* Tears down all in-game resources and transitions back to the start menu */
-void state_enter_start(state_t *state, font_t *font, int cursor_x, int cursor_y) {
+void state_enter_start(state_t *state, font_t *font) {
     if (state == NULL) return;
 
     state_exit_current(state);
     state->tag = STATE_START;
-    state->data.start.cursor_x = cursor_x;
-    state->data.start.cursor_y = cursor_y;
     state->data.start.menu = start_menu_create(font);
 }
 
-void handle_mouse_event(state_t *state, struct packet *pp, int cursor_x, int cursor_y)
-{
-    if (state == NULL || pp == NULL)
-        return;
+void state_enter_game_over(state_t *state, font_t *font, unsigned final_time) {
+    if (state == NULL) return;
 
-    static bool last_lb = false;
-    bool lb_click = pp->lb && !last_lb;
-    last_lb = pp->lb;
+    state_exit_current(state);
+    state->tag = STATE_GAME_OVER;
+    state->data.game_over.final_time = final_time;
+    rtc_read_date(&state->data.game_over.date);
+}
+
+void handle_mouse_event(state_t *state, struct packet *pp, int cursor_x, int cursor_y) {
+    if (state == NULL) return;
 
     switch (state->tag) {
         case STATE_START:
-            state->data.start.cursor_x = cursor_x;
-            state->data.start.cursor_y = cursor_y;
-
-            // Check for Left Click trigger (edge-triggered)
-            if (lb_click) {
-                if (state->data.start.menu != NULL) {
-                    if (button_is_hovered(state->data.start.menu->start_btn, cursor_x, cursor_y)) {
-                        font_t *font = state->data.start.menu->font;
-                        state_enter_loading(state, font);
-                    }
-                    else if (button_is_hovered(state->data.start.menu->exit_btn, cursor_x, cursor_y)) {
-                        running = false;
-                    }
-                    else if (button_is_hovered(state->data.start.menu->track_left, cursor_x, cursor_y)) {
-                        start_menu_change_track(state->data.start.menu, -1);
-                    }
-                    else if (button_is_hovered(state->data.start.menu->track_right, cursor_x, cursor_y)) {
-                        start_menu_change_track(state->data.start.menu, 1);
-                    }
-                    else if (button_is_hovered(state->data.start.menu->car_left, cursor_x, cursor_y)) {
-                        start_menu_change_car(state->data.start.menu, -1);
-                    }
-                    else if (button_is_hovered(state->data.start.menu->car_right, cursor_x, cursor_y)) {
-                        start_menu_change_car(state->data.start.menu, 1);
-                    }
+            
+            // Check for Left Click
+            if (pp->lb) { 
+                if (button_is_hovered(state->data.start.menu->start_btn, cursor_x, cursor_y)) {
+                    font_t *font = state->data.start.menu->font;
+                    state_enter_in_game(state, font);
+                } 
+                else if (button_is_hovered(state->data.start.menu->exit_btn, cursor_x, cursor_y)) {
+                    running = false;
                 }
             }
             break;
 
         case STATE_IN_GAME:
-            state->data.in_game.cursor_x = cursor_x;
-            state->data.in_game.cursor_y = cursor_y;
-            if(lb_click && state->data.in_game.pause && state->data.in_game.pause_menu != NULL) {
+            if(pp->lb && state->data.in_game.pause && state->data.in_game.pause_menu != NULL) {
                 if(button_is_hovered(state->data.in_game.pause_menu->resume_btn, cursor_x, cursor_y)) {
                     state->data.in_game.pause = false;
                 }
                 else if (button_is_hovered(state->data.in_game.pause_menu->exit_btn, cursor_x, cursor_y)) {
                     font_t *font = state->data.in_game.pause_menu->font;
-                    state_enter_start(state, font, cursor_x, cursor_y);
+                    state_enter_start(state, font);
                 }
             }
             break;
@@ -298,16 +290,26 @@ void update_state(state_t *state) {
             }
             break;
         case STATE_IN_GAME: {
-            if (!race_has_started(&state->data.in_game.race)) {
-                race_update(&state->data.in_game.race);
-                break;
-            }
-            if (state->data.in_game.pause) break;
-            update_car_physics(state->data.in_game.car, &state->data.in_game.input, state->data.in_game.track);
+            if (state->data.in_game.pause) break; // Skip physics and camera while paused
+            
+            // Update the race (either countdown ticks or elapsed race ticks)
+            race_update(&state->data.in_game.race);
+
+            // Skip physics and checkpoint updates if the countdown is still running
+            if (!race_has_started(&state->data.in_game.race)) break;
+
+            update_car_physics(state->data.in_game.car, &state->data.in_game.input);
             car_t *c = state->data.in_game.car;
             int idx = (int)((c->angle + 11.25) / 22.5) % 16;
-            follow_camera(state->data.in_game.camera,
-                          (int)c->x + c->sprites[idx]->width / 2,
+            
+            race_check_checkpoints(&state->data.in_game.race, c->x, c->y, c->sprites[idx]->width, c->sprites[idx]->height);
+
+            if (race_is_finished(&state->data.in_game.race)) {
+                state_enter_game_over(state, state->data.in_game.font, state->data.in_game.race.seconds_elapsed);
+                break;
+            }
+
+            camera_follow((int)c->x + c->sprites[idx]->width / 2,
                           (int)c->y + c->sprites[idx]->height / 2);
             break;
         }

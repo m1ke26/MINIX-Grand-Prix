@@ -9,6 +9,8 @@
 #include "button.h"
 #include "state.h"
 #include "track.h"
+#include "cursor.h"
+
 
 bool running = true;
 int main(int argc, char *argv[]) {
@@ -23,8 +25,7 @@ int main(int argc, char *argv[]) {
 
 int (proj_main_loop)(int argc, char *argv[]) {
   uint8_t bit_no_timer, bit_no_kbd, bit_no_mouse;
-  int cursor_x = 400;
-  int cursor_y = 300;
+  
 
   if (timer_subscribe_int(&bit_no_timer)) return 1;
   if (kbd_subscribe_int(&bit_no_kbd)) return 1;
@@ -48,6 +49,10 @@ int (proj_main_loop)(int argc, char *argv[]) {
   state->data.start.menu = start_menu_create(font);
   if (state->data.start.menu == NULL) { font_destroy(font); destroy_state(state); return 1;}
 
+  if (state->cursor != NULL && state->data.start.menu != NULL) {
+    int ci = state->data.start.menu->car_index;
+    update_cursor_sprite(state->cursor, state->data.start.menu->car_sprites[ci]);
+  }
 
   int ipc_status;
   message msg;
@@ -84,14 +89,10 @@ int (proj_main_loop)(int argc, char *argv[]) {
           mouse_sync_and_parse(&pp);
           if (mouse_get_byte_count() == 3) {
             mouse_set_byte_count(0);
-            cursor_x += pp.delta_x;
-            cursor_y -= pp.delta_y;
-            if (cursor_x < 0)   cursor_x = 0;
-            if (cursor_x > 799) cursor_x = 799;
-            if (cursor_y < 0)   cursor_y = 0;
-            if (cursor_y > 599) cursor_y = 599;
-
-            handle_mouse_event(state, &pp, cursor_x, cursor_y);
+            if (state->cursor != NULL) {
+              move_cursor(state->cursor, pp.delta_x, pp.delta_y);
+              handle_mouse_event(state, &pp, state->cursor->x, state->cursor->y);
+            }
           }
         }
         break;

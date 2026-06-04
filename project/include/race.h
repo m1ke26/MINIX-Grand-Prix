@@ -6,9 +6,11 @@
 typedef struct {
     bool countdown_started;
     int countdown_ticks;
-    int current_lap; // For future use, not currently implemented´
-    int total_laps; // For future use, not currently implemented
-    int seconds_elapsed; // For future use, not currently implemented
+    int current_lap;
+    int total_laps;
+    int seconds_elapsed;
+    int ticks_elapsed;
+    int next_checkpoint;
 } race_t;
 
 /**
@@ -44,5 +46,16 @@ bool race_countdown_started(const race_t *race);
  * @returns The number of seconds left in the countdown.
  */
 int race_countdown_seconds_left(const race_t *race);
+
+/**
+ * @brief Handles checkpoint and lap updates based on car position and updates the race timer.
+ */
+void race_check_checkpoints(race_t *race, double car_x, double car_y, int car_w, int car_h);
+
+/**
+ * @brief Checks if the race is finished.
+ * @returns true if current_lap > total_laps, false otherwise.
+ */
+bool race_is_finished(const race_t *race);
 
 #endif /* _RACE_H_ */
