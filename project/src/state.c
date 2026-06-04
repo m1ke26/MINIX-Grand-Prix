@@ -5,11 +5,12 @@
 #include "track.h"
 #include "camera.h"
 #include "car_pixmaps.h"
-#include "track_pixmap.h"
 #include "kbc.h"
 #include "pause_menu.h"
 #include "hud.h"
 #include "cursor.h"
+#include "track2_xpm.h"
+#include "collision2_xpm.h"
 
 
 static void reset_game_input(game_input_t *input) {
@@ -35,7 +36,8 @@ static void state_exit_in_game(state_t *state) {
     pause_menu_destroy(state->data.in_game.pause_menu);
     state->data.in_game.pause_menu = NULL;
 
-    track_free();
+    destroy_track(state->data.in_game.track);
+    destroy_camera(state->data.in_game.camera);
 }
 
 static void state_exit_current(state_t *state) {
@@ -53,9 +55,11 @@ static void state_exit_current(state_t *state) {
     }
 }
 
-state_t* init_state() {
+state_t *init_state()
+{
     state_t *state = malloc(sizeof(state_t));
-    if (state == NULL) return NULL;
+    if (state == NULL)
+        return NULL;
 
     state->tag = STATE_START;
     state->data.start.cursor_x = 400;
@@ -64,8 +68,10 @@ state_t* init_state() {
     return state;
 }
 
-void draw_state(state_t *state) {
-    if (state == NULL) return;
+void draw_state(state_t *state)
+{
+    if (state == NULL)
+        return;
 
     switch (state->tag) {
         case STATE_START:
@@ -78,11 +84,9 @@ void draw_state(state_t *state) {
             }
             break;
         case STATE_IN_GAME:
-            //Clear the screen
-            vg_buf_clear();
-            // Always draw the game world first
-            track_draw();
-            draw_car(state->data.in_game.car);
+            // Draw track and car with camera offset
+            draw_track(state->data.in_game.track, state->data.in_game.camera->cam_x, state->data.in_game.camera->cam_y);
+            draw_car(state->data.in_game.car, state->data.in_game.camera->cam_x, state->data.in_game.camera->cam_y);
             speedometer_draw(state->data.in_game.car->speed);
             hud_draw_boost_indicator(state->data.in_game.car);
             if(!race_has_started(&state->data.in_game.race)){
@@ -108,7 +112,8 @@ void draw_state(state_t *state) {
         case STATE_GAME_OVER:
             break;
     }
-}                         
+}
+
 void destroy_state(state_t *state) {
     if (state == NULL) return;
     state_exit_current(state);
@@ -122,12 +127,13 @@ void state_enter_in_game(state_t *state, font_t *font) {
     state_exit_current(state);
     state->tag = STATE_IN_GAME;
 
-    track_init((xpm_map_t) track_xpm);
-    camera_init(1600, 1200);
-    state->data.in_game.car = create_car(800, 1000, 0, 0, (xpm_map_t *) car_xpms);
+    state->data.in_game.track = create_track((xpm_map_t) track2_xpm, (xpm_map_t) collision2_xpm);
+    state->data.in_game.camera = create_camera(state->data.in_game.track->info_trackmap.width, state->data.in_game.track->info_trackmap.height);
+    state->data.in_game.car = create_car(1290, 415, 0, 90, (xpm_map_t *) car_xpms);
     if (state->data.in_game.car != NULL) {
         int idx = (int)((state->data.in_game.car->angle + 11.25) / 22.5) % 16;
-        camera_follow((int)state->data.in_game.car->x + state->data.in_game.car->sprites[idx]->width / 2,
+        follow_camera(state->data.in_game.camera,
+                      (int)state->data.in_game.car->x + state->data.in_game.car->sprites[idx]->width / 2,
                       (int)state->data.in_game.car->y + state->data.in_game.car->sprites[idx]->height / 2);
     }
     state->data.in_game.font = font;
@@ -151,26 +157,28 @@ void state_enter_start(state_t *state, font_t *font, int cursor_x, int cursor_y)
     state->data.start.menu = start_menu_create(font);
 }
 
-void handle_mouse_event(state_t *state, struct packet *pp, int cursor_x, int cursor_y) {
-    if (state == NULL) return;
+void handle_mouse_event(state_t *state, struct packet *pp, int cursor_x, int cursor_y)
+{
+    if (state == NULL)
+        return;
 
     switch (state->tag) {
         case STATE_START:
             state->data.start.cursor_x = cursor_x;
             state->data.start.cursor_y = cursor_y;
-            
+
             // Check for Left Click
-            if (pp->lb) { 
+            if (pp->lb) {
                 if (button_is_hovered(state->data.start.menu->start_btn, cursor_x, cursor_y)) {
                     font_t *font = state->data.start.menu->font;
                     state_enter_in_game(state, font);
-                } 
+                }
                 else if (button_is_hovered(state->data.start.menu->exit_btn, cursor_x, cursor_y)) {
                     running = false;
                 }
             }
             break;
-            
+
         case STATE_IN_GAME:
             state->data.in_game.cursor_x = cursor_x;
             state->data.in_game.cursor_y = cursor_y;
@@ -184,7 +192,7 @@ void handle_mouse_event(state_t *state, struct packet *pp, int cursor_x, int cur
                 }
             }
             break;
-            
+
         case STATE_GAME_OVER:
             break;
     }
@@ -203,18 +211,14 @@ void handle_kbd_event(state_t *state, uint8_t scancode) {
             break;
         case STATE_IN_GAME:
             if(!race_has_started(&state->data.in_game.race)){
-                // Ignore all other inputs until the game has started
                 if (scancode == ENTER_MAKE) race_start_countdown(&state->data.in_game.race);
                 break;
             }
-            // Allow pausing the game with ESC
             if (scancode == ESC_MAKE) {
                 state->data.in_game.pause = !state->data.in_game.pause;
                 break;
             }
-            // Only handle WASD when not paused
             if(!state->data.in_game.pause) {
-                // Track Make codes (press) and Break codes (release) for WASD
                 if (scancode == W_MAKE) state->data.in_game.input.accelerate = true;
                 else if (scancode == W_BREAK) state->data.in_game.input.accelerate = false;
 
@@ -250,11 +254,12 @@ void update_state(state_t *state) {
                 race_update(&state->data.in_game.race);
                 break;
             }
-            if (state->data.in_game.pause) break; // Skip physics and camera while paused
-            update_car_physics(state->data.in_game.car, &state->data.in_game.input);
+            if (state->data.in_game.pause) break;
+            update_car_physics(state->data.in_game.car, &state->data.in_game.input, state->data.in_game.track);
             car_t *c = state->data.in_game.car;
             int idx = (int)((c->angle + 11.25) / 22.5) % 16;
-            camera_follow((int)c->x + c->sprites[idx]->width / 2,
+            follow_camera(state->data.in_game.camera,
+                          (int)c->x + c->sprites[idx]->width / 2,
                           (int)c->y + c->sprites[idx]->height / 2);
             break;
         }

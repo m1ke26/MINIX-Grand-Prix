@@ -1,137 +1,75 @@
 #include "track.h"
-#include "camera.h"
-#include "colors.h"
-#include "video-card.h"
 #include <stdlib.h>
+#include "video-card.h"
 
-static sprite_t *track_sprite = NULL;
-static uint32_t *collision_map = NULL;
-static uint16_t track_width = 0;
-static uint16_t track_height = 0;
+track_t *create_track(xpm_map_t track, xpm_map_t collision)
+{
+    track_t *new_track = (track_t *)malloc(sizeof(track_t)); /*reserva memória para a struct track */
+    if (new_track == NULL)                                   /* se falhar, sai*/
+        return NULL;
 
-/* Classify a pixel color into a surface type */
-static surface_t classify_color(uint32_t color) {
-    uint8_t r = (color >> 16) & 0xFF;
-    uint8_t g = (color >> 8) & 0xFF;
-    uint8_t b = color & 0xFF;
-
-    /* Grass: olive-green with low blue. (g-b) is the key: grass has ~85+, edge pixels have <15 */
-    if (g > r && g > b && (g - b) > 55)
-        return SURFACE_BLOCKED;
-
-    /* Sand/beige: warm tones, R and G high, B much lower */
-    if (r > 120 && g > 90 && b < g && (r - b) > 40 && (g - b) > 30)
-        return SURFACE_SLOW;
-
-    /* Everything else (asphalt, curbs, markings, red/white) = road */
-    return SURFACE_ROAD;
+    new_track->pix_trackmap = xpm_load(track, XPM_8_8_8, &new_track->info_trackmap);
+    /* carrega o map visual */
+    new_track->pix_collisionmap = xpm_load(collision, XPM_8_8_8, &new_track->info_collisionmap);
+    /* carrega o mapa de colisão*/
+    return new_track;
 }
 
-static bool is_road_color(uint32_t color) {
-    return classify_color(color) != SURFACE_BLOCKED;
-}
-
-int (track_init)(xpm_map_t track_xpm) {
-    track_sprite = create_sprite(track_xpm);
-    if (track_sprite == NULL) return 1;
-
-    track_width = track_sprite->width;
-    track_height = track_sprite->height;
-
-    /* The collision map is just the sprite's pixel data */
-    collision_map = track_sprite->map;
-
-    return 0;
-}
-
-void track_draw(void) {
-    if (track_sprite == NULL || collision_map == NULL) return;
-
-    int cam_x = camera_get_x();
-    int cam_y = camera_get_y();
-
-    /* Only draw the visible 800x600 portion of the map */
-    for (int row = 0; row < SCREEN_HEIGHT; row++) {
-        for (int col = 0; col < SCREEN_WIDTH; col++) {
-            int map_x = cam_x + col;
-            int map_y = cam_y + row;
-            if (map_x >= 0 && map_x < track_width && map_y >= 0 && map_y < track_height) {
-                uint32_t color = collision_map[map_y * track_width + map_x];
-                if (color != COLOR_BLACK)
-                    vg_buf_draw_pixel(col, row, color);
-            }
+void draw_track(track_t *track, int cam_x, int cam_y)
+{
+    for (int y = 0; y < 600; y++)
+    {
+        for (int x = 0; x < 800; x++)
+        {
+            int map_x = cam_x + x;
+            /*
+            cam_x e onde a camera esta no mapa, vai de 0 a 2156
+            x e o pixel do ecra, vai de 0 a 799, 800 pixeis, do 800x600 ecra do minix
+            cam_x esta limitado a 2156 para q que o pixel chegar ao 799 e somar ao 2156
+            n ultrapassa o limite do mapa q tem comprimento maximo de 2956px
+            map_x <= 2156
+            */
+            int map_y = cam_y + y;
+            /*
+            cam_y e onde a camera esta no mapa, vai de 0 a 1617
+            y e o pixel do ecra, vai de 0 a 599, 600 pixeis, do 800x600 ecra do minix
+            cam_y esta limitado a 1617 para q que o pixel chegar ao 599 e somar ao 1617
+            n ultrapassa o limite do mapa q tem altura maxima de 2217px
+            map_y <= 2217
+            */
+            int pos = (map_y * track->info_trackmap.width + map_x) * 3;                                                                 /*calcula onde esta o 1º byte do pixel no pix_collisionmap, é vezes 3 pq cada pixel ocupa 3 bytes*/
+            uint32_t color = ((track->pix_trackmap[pos]) + (track->pix_trackmap[pos + 1] << 8) + (track->pix_trackmap[pos + 2] << 16)); /*junta os 3 bytes separados numa unica cor em formato 0X00RRGGBB*/
+            /*
+            pos = azul (B), fica nos bits 0-7 (sem shift)
+            pos + 1 = verde (G), fica nos bits 8-15 (<< 8)
+            post + 2 = vermelho (R), fica nos bist 16-23 (<< 16)
+            */
+            vg_buf_draw_pixel(x, y, color); /* tirada do double_buffer.c do zé, pinta um pixel na pos (x,y) com a cor dada*/
         }
     }
 }
 
-bool (track_is_on_road)(int x, int y) {
-    if (collision_map == NULL) return true;  /* No track loaded = no collision */
-    if (x < 0 || x >= track_width || y < 0 || y >= track_height) return false;
+int collision_track(track_t *track, int car_x, int car_y)
+{
+    int pos = (car_y * track->info_collisionmap.width + car_x) * 3;
+    uint32_t color = ((track->pix_collisionmap[pos]) + (track->pix_collisionmap[pos + 1] << 8) + (track->pix_collisionmap[pos + 2] << 16));
 
-    uint32_t color = collision_map[y * track_width + x];
-    return is_road_color(color);
-}
-
-bool (track_car_on_road)(int x, int y, int width, int height) {
-    /* Shrink collision box to 60% of sprite size (centered) */
-    int margin_x = width / 5;
-    int margin_y = height / 5;
-    int cx = x + margin_x;
-    int cy = y + margin_y;
-    int cw = width - 2 * margin_x;
-    int ch = height - 2 * margin_y;
-
-    if (!track_is_on_road(cx, cy)) return false;
-    if (!track_is_on_road(cx + cw - 1, cy)) return false;
-    if (!track_is_on_road(cx, cy + ch - 1)) return false;
-    if (!track_is_on_road(cx + cw - 1, cy + ch - 1)) return false;
-    if (!track_is_on_road(cx + cw / 2, cy)) return false;
-    if (!track_is_on_road(cx + cw / 2, cy + ch - 1)) return false;
-    if (!track_is_on_road(cx, cy + ch / 2)) return false;
-    if (!track_is_on_road(cx + cw - 1, cy + ch / 2)) return false;
-
-    return true;
-}
-
-surface_t (track_get_surface)(int x, int y) {
-    if (collision_map == NULL) return SURFACE_ROAD;
-    if (x < 0 || x >= track_width || y < 0 || y >= track_height) return SURFACE_BLOCKED;
-
-    uint32_t color = collision_map[y * track_width + x];
-    return classify_color(color);
-}
-
-surface_t (track_car_surface)(int x, int y, int width, int height) {
-    /* Shrink collision box to 60% of sprite size (centered) to avoid
-       transparent corners hitting grass */
-    int margin_x = width / 5;
-    int margin_y = height / 5;
-    int cx = x + margin_x;
-    int cy = y + margin_y;
-    int cw = width - 2 * margin_x;
-    int ch = height - 2 * margin_y;
-
-    int points[][2] = {
-        {cx, cy}, {cx + cw - 1, cy},                       /* top corners */
-        {cx, cy + ch - 1}, {cx + cw - 1, cy + ch - 1},     /* bottom corners */
-        {cx + cw / 2, cy}, {cx + cw / 2, cy + ch - 1},     /* top/bottom mid */
-        {cx, cy + ch / 2}, {cx + cw - 1, cy + ch / 2}       /* left/right mid */
-    };
-
-    surface_t worst = SURFACE_ROAD;
-    for (int i = 0; i < 8; i++) {
-        surface_t s = track_get_surface(points[i][0], points[i][1]);
-        if (s > worst) worst = s;  /* BLOCKED > SLOW > ROAD */
+    if (color == 0xff0000) /*vermelho*/
+    {
+        return 1;
     }
-    return worst;
+    if (color == 0x000000) /*preto*/
+    {
+        return 0;
+    }
+    if (color == 0xffff00) /*amarelo*/
+    {
+        return 2;
+    }
+    return 0;
 }
 
-void track_free(void) {
-    if (track_sprite != NULL) {
-        destroy_sprite(track_sprite);
-        track_sprite = NULL;
-    }
-    collision_map = NULL;
-    track_width = 0;
-    track_height = 0;
+void destroy_track(track_t *track)
+{
+    free(track); /* liberta a memoria alocada pelo create_track */
 }

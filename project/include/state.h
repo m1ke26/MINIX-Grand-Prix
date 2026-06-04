@@ -6,22 +6,28 @@
 #include "car.h"
 #include "input.h"
 #include "start_menu.h"
+#include "camera.h"
+#include "track.h"
 #include "pause_menu.h"
 #include "font.h"
 #include "race.h"
 
 extern bool running;
 
-typedef enum {
+typedef enum
+{
     STATE_START,
     STATE_IN_GAME,
     STATE_GAME_OVER
 } state_tag_t;
 
-typedef struct {
+typedef struct
+{
     state_tag_t tag;
-    union {
-        struct {
+    union
+    {
+        struct
+        {
             int cursor_x;
             int cursor_y;
             start_menu_t *menu;
@@ -29,6 +35,8 @@ typedef struct {
 
         struct {
             car_t *car;
+            track_t *track;
+            camera_t *camera;
             font_t *font;
             race_t race;
             game_input_t input;
@@ -38,7 +46,8 @@ typedef struct {
             int cursor_y;
         } in_game;
 
-        struct {
+        struct
+        {
             unsigned final_time;
             unsigned laps_done;
         } game_over;
@@ -49,7 +58,7 @@ typedef struct {
     @brief Initializes the game state to the starting screen.
     @return Pointer to the initialized game state.
 **/
-state_t* init_state();
+state_t *init_state();
 
 /**
     @brief Draws the current state on the screen, including all relevant elements based on the state tag.
@@ -64,7 +73,7 @@ void draw_state(state_t *state);
 void destroy_state(state_t *state);
 
 /**
-    @brief Updates the game state based on user input and game events. This function should be called in the main game loop.    
+    @brief Updates the game state based on user input and game events. This function should be called in the main game loop.
     @param state Pointer to the current game state.
 **/
 void update_state(state_t *state);
@@ -75,7 +84,7 @@ void update_state(state_t *state);
     @param pp Pointer to the packet containing the mouse event.
     @param cursor_x The x-coordinate of the mouse cursor.
     @param cursor_y The y-coordinate of the mouse cursor.
-**/  
+**/
 void handle_mouse_event(state_t *state, struct packet *pp, int cursor_x, int cursor_y);
 
 /**
@@ -87,7 +96,8 @@ void handle_kbd_event(state_t *state, uint8_t scancode);
 
 /**
  * @brief Transitions the game to the in-game state.
- * 
+ *
+ * @param state Pointer to the current game state.
  * @param font The font to use for pause menu rendering.
  */
 void state_enter_in_game(state_t *state, font_t *font);

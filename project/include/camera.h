@@ -3,37 +3,40 @@
 
 #include <lcom/lcf.h>
 
-#define SCREEN_WIDTH  800
-#define SCREEN_HEIGHT 600
+/**
+ * @brief Structure that holds the camera state for viewport scrolling.
+ */
+typedef struct
+{
+    int cam_x; /**< @brief Current X position of the camera (top-left corner) */
+    int max_x; /**< @brief Maximum X position (map_width - screen_width) */
+    int cam_y; /**< @brief Current Y position of the camera (top-left corner) */
+    int max_y; /**< @brief Maximum Y position (map_height - screen_height) */
 
-typedef struct {
-    int x, y;           /* top-left corner of the viewport in world coordinates */
-    int map_width;      /* total map width */
-    int map_height;     /* total map height */
 } camera_t;
 
 /**
- * @brief Initializes the camera with the map dimensions.
- * @param map_w Map width in pixels.
- * @param map_h Map height in pixels.
+ * @brief Creates a camera with calculated limits based on the map size.
+ * @param map_width Width of the map in pixels.
+ * @param map_height Height of the map in pixels.
+ * @return Pointer to the created camera, or NULL on failure.
  */
-void camera_init(int map_w, int map_h);
+camera_t *create_camera(int map_width, int map_height);
 
 /**
- * @brief Centers the camera on a target position (e.g. the car).
- * @param target_x X coordinate of the target (world space).
- * @param target_y Y coordinate of the target (world space).
+ * @brief Updates the camera position to follow the car, keeping it centered on screen.
+ * @details Centers the camera on the car position and clamps to map boundaries.
+ * @param camera Pointer to the camera.
+ * @param car_x X coordinate of the car.
+ * @param car_y Y coordinate of the car.
  */
-void camera_follow(int target_x, int target_y);
+void follow_camera(camera_t *camera, int car_x, int car_y);
 
 /**
- * @brief Returns the camera X offset (for drawing).
+ * @brief Destroys the camera and frees allocated memory.
+ * @param camera Pointer to the camera to be destroyed.
  */
-int camera_get_x(void);
+void destroy_camera(camera_t *camera);
 
-/**
- * @brief Returns the camera Y offset (for drawing).
- */
-int camera_get_y(void);
+#endif
 
-#endif /* _CAMERA_H_ */

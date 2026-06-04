@@ -1,66 +1,52 @@
 #ifndef _TRACK_H_
 #define _TRACK_H_
 
-#include "sprite.h"
-
-/** Surface types for speed calculation */
-typedef enum {
-    SURFACE_ROAD,    /* asphalt - full speed */
-    SURFACE_SLOW,    /* sand/curbs/markings - reduced speed */
-    SURFACE_BLOCKED  /* grass - can't drive */
-} surface_t;
+#include <lcom/lcf.h>
 
 /**
- * @brief Returns the surface type at a given position.
- * @param x X coordinate.
- * @param y Y coordinate.
- * @return Surface type at that pixel.
+ * @brief Structure that holds the track data (visual map and collision map).
  */
-surface_t track_get_surface(int x, int y);
+typedef struct
+{
+    xpm_image_t info_trackmap; /**< @brief Info (width, height) of the visual map */
+    uint8_t *pix_trackmap;     /**< @brief Pixel data of the visual map */
+
+    xpm_image_t info_collisionmap; /**< @brief Info (width, height) of the collision map */
+    uint8_t *pix_collisionmap;     /**< @brief Pixel data of the collision map */
+
+} track_t;
 
 /**
- * @brief Returns the slowest surface under the car's bounding box.
- * @param x Top-left X of the car.
- * @param y Top-left Y of the car.
- * @param width Width of the car sprite.
- * @param height Height of the car sprite.
- * @return The worst (slowest) surface type found.
+ * @brief Creates a track by loading the visual and collision XPM maps.
+ * @param track XPM data for the visual map.
+ * @param collision XPM data for the collision map.
+ * @return Pointer to the created track, or NULL on failure.
  */
-surface_t track_car_surface(int x, int y, int width, int height);
+track_t *create_track(xpm_map_t track, xpm_map_t collision);
 
 /**
- * @brief Initializes the track by loading the XPM and building the collision map.
- * @param xpm XPM map of the track.
- * @return 0 on success, non-zero otherwise.
+ * @brief Draws the visible portion of the track on the screen.
+ * @details For each screen pixel (x,y), fetches the corresponding pixel at (cam_x + x, cam_y + y) from the visual map.
+ * @param track Pointer to the track.
+ * @param cam_x X coordinate of the camera (top-left corner of the visible area).
+ * @param cam_y Y coordinate of the camera (top-left corner of the visible area).
  */
-int track_init(xpm_map_t track_xpm);
+void draw_track(track_t *track, int cam_x, int cam_y);
 
 /**
- * @brief Draws the track on the back buffer.
+ * @brief Checks the terrain type at a given position on the collision map.
+ * @param track Pointer to the track.
+ * @param car_x X coordinate to check.
+ * @param car_y Y coordinate to check.
+ * @return 0 if road (black), 1 if blocked (red), 2 if slow (yellow).
  */
-void track_draw(void);
+int collision_track(track_t *track, int car_x, int car_y);
 
 /**
- * @brief Checks if a single pixel position is on the road (driveable surface).
- * @param x X coordinate.
- * @param y Y coordinate.
- * @return true if on road, false otherwise.
+ * @brief Destroys the track and frees allocated memory.
+ * @param track Pointer to the track to be destroyed.
  */
-bool track_is_on_road(int x, int y);
+void destroy_track(track_t *track);
 
-/**
- * @brief Checks if a car's bounding box is entirely on the road.
- * @param x Top-left X of the car.
- * @param y Top-left Y of the car.
- * @param width Width of the car sprite.
- * @param height Height of the car sprite.
- * @return true if all corners are on road, false otherwise.
- */
-bool track_car_on_road(int x, int y, int width, int height);
+#endif
 
-/**
- * @brief Frees memory used by the track.
- */
-void track_free(void);
-
-#endif /* _TRACK_H_ */

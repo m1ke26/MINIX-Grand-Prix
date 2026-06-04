@@ -1,6 +1,4 @@
 #include "car.h"
-#include "track.h"
-#include "camera.h"
 #include <stdlib.h>
 #include <math.h>
 
@@ -16,7 +14,7 @@ car_t* create_car(double x, double y, double speed, double angle, xpm_map_t xpms
   car->velocity_angle = angle;
   car->grip = GRIP_HIGH;
   car->is_drifting = false;
-  
+
   for (int i = 0; i < 16; i++) {
     car->sprites[i] = create_sprite(xpms[i]);
   }
@@ -24,10 +22,10 @@ car_t* create_car(double x, double y, double speed, double angle, xpm_map_t xpms
   return car;
 }
 
-bool move_car(car_t *car) {
+bool move_car(car_t *car, track_t *track) {
   if (car == NULL) return false;
 
- // Blend velocity_angle toward car->angle based on grip
+  // Blend velocity_angle toward car->angle based on grip
   double angle_diff = car->angle - car->velocity_angle;
   while (angle_diff > 180.0) angle_diff -= 360.0;
   while (angle_diff < -180.0) angle_diff += 360.0;
@@ -47,28 +45,28 @@ bool move_car(car_t *car) {
   int w = car->sprites[idx]->width;
   int h = car->sprites[idx]->height;
 
-  // Map border clamping (track collision handles the rest)
+  // Map border clamping
   if (new_x < 0) { new_x = 0; car->speed = 0; }
-  if (new_x > 1600 - w) { new_x = 1600 - w; car->speed = 0; }
+  if (new_x > 2956 - w) { new_x = 2956 - w; car->speed = 0; }
   if (new_y < 0) { new_y = 0; car->speed = 0; }
-  if (new_y > 1200 - h) { new_y = 1200 - h; car->speed = 0; }
+  if (new_y > 2217 - h) { new_y = 2217 - h; car->speed = 0; }
 
-  // Track collision: check surface at new position
-  surface_t surface = track_car_surface((int)new_x, (int)new_y, w, h);
+  // Track collision: check surface at center of new position
+  int terrain = collision_track(track, (int)new_x + w / 2, (int)new_y + h / 2);
 
-  if (surface == SURFACE_BLOCKED) {
+  if (terrain == 1) { /* blocked */
     // Try sliding along X axis only
-    surface_t sx = track_car_surface((int)new_x, (int)car->y, w, h);
-    if (sx != SURFACE_BLOCKED) {
+    int tx = collision_track(track, (int)new_x + w / 2, (int)car->y + h / 2);
+    if (tx != 1) {
       car->x = new_x;
-      if (sx == SURFACE_SLOW) car->speed *= 0.95;
+      if (tx == 2) car->speed *= 0.95;
     }
     // Try sliding along Y axis only
     else {
-      surface_t sy = track_car_surface((int)car->x, (int)new_y, w, h);
-      if (sy != SURFACE_BLOCKED) {
+      int ty = collision_track(track, (int)car->x + w / 2, (int)new_y + h / 2);
+      if (ty != 1) {
         car->y = new_y;
-        if (sy == SURFACE_SLOW) car->speed *= 0.95;
+        if (ty == 2) car->speed *= 0.95;
       }
       // Can't move at all - stop
       else {
@@ -79,7 +77,7 @@ bool move_car(car_t *car) {
     car->x = new_x;
     car->y = new_y;
     // Slow zone: reduce speed gradually
-    if (surface == SURFACE_SLOW) car->speed *= 0.95;
+    if (terrain == 2) car->speed *= 0.95;
   }
 
   return true;
@@ -95,14 +93,11 @@ void destroy_car(car_t *car) {
   free(car);
 }
 
-void draw_car(car_t *car) {
+void draw_car(car_t *car, int cam_x, int cam_y) {
   if (car == NULL) return;
-  // Calculate which sprite to use based on angle (0 to 7)
-  // Angle: 0 = Up, 45 = Up-Right, 90 = Right, etc.
   int idx = (int)((car->angle + 11.25) / 22.5) % 16;
-  // Draw relative to camera position
-  int screen_x = (int)car->x - camera_get_x();
-  int screen_y = (int)car->y - camera_get_y();
+  int screen_x = (int)car->x - cam_x;
+  int screen_y = (int)car->y - cam_y;
   sprite_draw(car->sprites[idx], screen_x, screen_y);
 }
 
@@ -130,10 +125,9 @@ static void update_speed(car_t *car, bool accelerate, bool brake, bool boost_act
 
     if (car->speed > max_speed) car->speed = max_speed;
   } else if (brake) {
-    car->speed -= CAR_BRAKE; 
-    if (car->speed < CAR_MAX_REV_SPEED) car->speed = CAR_MAX_REV_SPEED; 
+    car->speed -= CAR_BRAKE;
+    if (car->speed < CAR_MAX_REV_SPEED) car->speed = CAR_MAX_REV_SPEED;
   } else {
-    // Natural deceleration / drag when keys are released
     if (car->speed > CAR_FRICTION) car->speed -= CAR_FRICTION;
     else if (car->speed < -CAR_FRICTION) car->speed += CAR_FRICTION;
     else car->speed = 0;
@@ -145,19 +139,17 @@ static void update_angle(car_t *car, bool turn_left, bool turn_right) {
 
   double direction = (car->speed > 0) ? 1.0 : -1.0;
   double speed_ratio = fabs(car->speed) / CAR_MAX_SPEED;
-  
+
   if (speed_ratio < CAR_MIN_TURN_RATIO) {
-    speed_ratio = CAR_MIN_TURN_RATIO; 
+    speed_ratio = CAR_MIN_TURN_RATIO;
   }
 
-  // Turn faster when drifting so angle pulls away from velocity_angle
   double drift_multiplier = car->is_drifting ? 1.6 : 1.0;
   double turn_rate = CAR_TURN_RATE * direction * speed_ratio * drift_multiplier;
 
   if (turn_left) car->angle -= turn_rate;
   if (turn_right) car->angle += turn_rate;
 
-  // Normalize angle between 0 and 360 degrees
   if (car->angle < 0) car->angle += 360.0;
   if (car->angle >= 360.0) car->angle -= 360.0;
 }
@@ -172,12 +164,12 @@ static void update_drift(car_t *car, bool handbrake) {
   }
 }
 
-void update_car_physics(car_t *car, const game_input_t *input) {
+void update_car_physics(car_t *car, const game_input_t *input, track_t *track) {
   if (car == NULL || input == NULL) return;
 
   bool boost_active = update_boost(car, input->boost);
   update_speed(car, input->accelerate, input->brake, boost_active);
   update_angle(car, input->turn_left, input->turn_right);
-  move_car(car);
+  move_car(car, track);
   update_drift(car, input->handbrake);
 }

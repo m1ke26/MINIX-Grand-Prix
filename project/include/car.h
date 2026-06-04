@@ -1,12 +1,13 @@
 #ifndef _CAR_H_
 #define _CAR_H_
 
+#include "track.h"
 #include "input.h"
 #include "sprite.h"
 
 #define CAR_MAX_SPEED       5.0   // Maximum forward speed
 #define CAR_MAX_REV_SPEED  -1.5   // Maximum reverse speed
-#define CAR_ACCEL           0.15  // Acceleration rate 
+#define CAR_ACCEL           0.15  // Acceleration rate
 #define CAR_BRAKE           0.20  // Braking rate
 #define CAR_FRICTION        0.08  // Friction coefficient
 #define CAR_TURN_RATE       3.0   // Turn rate
@@ -27,9 +28,9 @@ typedef struct {
     double x, y;
     double speed;
     double angle; /* degrees, 0 = up */
-    double velocity_angle;  
-    double grip;            
-    bool is_drifting;       
+    double velocity_angle;
+    double grip;
+    bool is_drifting;
     double boost_amount;
     sprite_t *sprites[16];
 } car_t;
@@ -42,30 +43,30 @@ typedef struct {
     @param angle The angle of the car.
     @param xpms Array of xpm maps for the car sprites.
     @return Pointer to the new car.
-**/    
+**/
 car_t* create_car(double x, double y, double speed, double angle, xpm_map_t xpms[]);
 /**
     @brief Destroys the car and frees any allocated resources.
     @param car Pointer to the car to be destroyed.
-**/    
+**/
 void destroy_car(car_t *car);
 
 /**
     @brief Draws the car on the screen.
     @param car Pointer to the car to be drawn.
-**/    
-void draw_car(car_t *car);
+**/
+void draw_car(car_t *car, int cam_x, int cam_y);
 /**
     @brief Moves the car based on its speed and angle.
     @param car Pointer to the car to be moved.
     @return True if the car was moved successfully, false otherwise.
-**/    
-bool move_car(car_t *car);
+**/
+bool move_car(car_t *car, track_t *track);
 /**
     @brief Updates the physics of the car based on the given key presses.
     @param car Pointer to the car to be updated.
     @param input Current gameplay input state.
-**/    
-void update_car_physics(car_t *car, const game_input_t *input);
+**/
+void update_car_physics(car_t *car, const game_input_t *input, track_t *track);
 
 #endif /* _CAR_H_ */

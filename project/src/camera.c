@@ -1,30 +1,48 @@
 #include "camera.h"
+#include <stdlib.h>
 
-static camera_t cam = {0, 0, 0, 0};
+camera_t *create_camera(int map_width, int map_height)
+{
+    camera_t *new_camera = (camera_t *)malloc(sizeof(camera_t)); /*reserva memória para a struct camera */
+    if (new_camera == NULL)                                      /* se falhar, sai*/
+        return NULL;
 
-void camera_init(int map_w, int map_h) {
-    cam.x = 0;
-    cam.y = 0;
-    cam.map_width = map_w;
-    cam.map_height = map_h;
+    new_camera->cam_x = 0;
+    new_camera->cam_y = 0;
+
+    new_camera->max_x = map_width - 800;  /*2156*/
+    new_camera->max_y = map_height - 600; /*2217*/
+
+    return new_camera;
 }
 
-void camera_follow(int target_x, int target_y) {
-    /* Center the camera on the target */
-    cam.x = target_x - SCREEN_WIDTH / 2;
-    cam.y = target_y - SCREEN_HEIGHT / 2;
+void follow_camera(camera_t *camera, int car_x, int car_y)
+{
+    camera->cam_x = car_x - 400;
+    camera->cam_y = car_y - 300;
 
-    /* Clamp so camera doesn't go outside the map */
-    if (cam.x < 0) cam.x = 0;
-    if (cam.y < 0) cam.y = 0;
-    if (cam.x > cam.map_width - SCREEN_WIDTH) cam.x = cam.map_width - SCREEN_WIDTH;
-    if (cam.y > cam.map_height - SCREEN_HEIGHT) cam.y = cam.map_height - SCREEN_HEIGHT;
+    if (camera->cam_x < 0)
+    {
+        camera->cam_x = 0;
+    }
+
+    if (camera->cam_y < 0)
+    {
+        camera->cam_y = 0;
+    }
+
+    if (camera->cam_x > camera->max_x)
+    {
+        camera->cam_x = camera->max_x;
+    }
+
+    if (camera->cam_y > camera->max_y)
+    {
+        camera->cam_y = camera->max_y;
+    }
 }
 
-int camera_get_x(void) {
-    return cam.x;
-}
-
-int camera_get_y(void) {
-    return cam.y;
+void destroy_camera(camera_t *camera)
+{
+    free(camera); /* liberta a memoria alocada pelo create_camera */
 }
