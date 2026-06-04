@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <math.h>
 
-car_t* create_car(double x, double y, double speed, double angle, xpm_map_t xpms[]) {
+car_t* create_car(double x, double y, double speed, double angle, xpm_map_t xpms[], int num_sprites) {
   car_t *car = (car_t *) malloc(sizeof(car_t));
   if (car == NULL) return NULL;
 
@@ -14,8 +14,9 @@ car_t* create_car(double x, double y, double speed, double angle, xpm_map_t xpms
   car->velocity_angle = angle;
   car->grip = GRIP_HIGH;
   car->is_drifting = false;
+  car->num_sprites = num_sprites;
 
-  for (int i = 0; i < 16; i++) {
+  for (int i = 0; i < num_sprites; i++) {
     car->sprites[i] = create_sprite(xpms[i]);
   }
 
@@ -41,7 +42,9 @@ bool move_car(car_t *car, track_t *track) {
   double new_x = car->x + car->speed * sin(radians);
   double new_y = car->y - car->speed * cos(radians);
 
-  int idx = (int)((car->angle + 11.25) / 22.5) % 16;
+  double step = 360.0 / car->num_sprites;
+  int raw_idx = (int)((car->angle + step / 2.0) / step) % car->num_sprites;
+  int idx = (raw_idx + car->num_sprites * 3 / 4) % car->num_sprites;
   int w = car->sprites[idx]->width;
   int h = car->sprites[idx]->height;
 
@@ -85,7 +88,7 @@ bool move_car(car_t *car, track_t *track) {
 
 void destroy_car(car_t *car) {
   if (car == NULL) return;
-  for (int i = 0; i < 16; i++) {
+  for (int i = 0; i < car->num_sprites; i++) {
     if (car->sprites[i] != NULL) {
       destroy_sprite(car->sprites[i]);
     }
@@ -95,7 +98,9 @@ void destroy_car(car_t *car) {
 
 void draw_car(car_t *car, int cam_x, int cam_y) {
   if (car == NULL) return;
-  int idx = (int)((car->angle + 11.25) / 22.5) % 16;
+  double step = 360.0 / car->num_sprites;
+  int raw_idx = (int)((car->angle + step / 2.0) / step) % car->num_sprites;
+  int idx = (raw_idx + car->num_sprites * 3 / 4) % car->num_sprites;
   int screen_x = (int)car->x - cam_x;
   int screen_y = (int)car->y - cam_y;
   sprite_draw(car->sprites[idx], screen_x, screen_y);

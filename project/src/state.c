@@ -5,6 +5,7 @@
 #include "track.h"
 #include "camera.h"
 #include "car_pixmaps.h"
+#include "police_pixmaps.h"
 #include "kbc.h"
 #include "pause_menu.h"
 #include "hud.h"
@@ -129,9 +130,11 @@ void state_enter_in_game(state_t *state, font_t *font) {
 
     state->data.in_game.track = create_track((xpm_map_t) track2_xpm, (xpm_map_t) collision2_xpm);
     state->data.in_game.camera = create_camera(state->data.in_game.track->info_trackmap.width, state->data.in_game.track->info_trackmap.height);
-    state->data.in_game.car = create_car(1290, 415, 0, 90, (xpm_map_t *) car_xpms);
+    state->data.in_game.car = create_car(1290, 415, 0, 90, (xpm_map_t *) police_xpms, POLICE_XPM_COUNT);
     if (state->data.in_game.car != NULL) {
-        int idx = (int)((state->data.in_game.car->angle + 11.25) / 22.5) % 16;
+        double step = 360.0 / state->data.in_game.car->num_sprites;
+        int raw_idx = (int)((state->data.in_game.car->angle + step / 2.0) / step) % state->data.in_game.car->num_sprites;
+        int idx = (raw_idx + state->data.in_game.car->num_sprites * 3 / 4) % state->data.in_game.car->num_sprites;
         follow_camera(state->data.in_game.camera,
                       (int)state->data.in_game.car->x + state->data.in_game.car->sprites[idx]->width / 2,
                       (int)state->data.in_game.car->y + state->data.in_game.car->sprites[idx]->height / 2);
@@ -257,7 +260,9 @@ void update_state(state_t *state) {
             if (state->data.in_game.pause) break;
             update_car_physics(state->data.in_game.car, &state->data.in_game.input, state->data.in_game.track);
             car_t *c = state->data.in_game.car;
-            int idx = (int)((c->angle + 11.25) / 22.5) % 16;
+            double step = 360.0 / c->num_sprites;
+            int raw_idx = (int)((c->angle + step / 2.0) / step) % c->num_sprites;
+            int idx = (raw_idx + c->num_sprites * 3 / 4) % c->num_sprites;
             follow_camera(state->data.in_game.camera,
                           (int)c->x + c->sprites[idx]->width / 2,
                           (int)c->y + c->sprites[idx]->height / 2);

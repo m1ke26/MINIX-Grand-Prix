@@ -32,7 +32,8 @@ typedef struct {
     double grip;
     bool is_drifting;
     double boost_amount;
-    sprite_t *sprites[16];
+    int num_sprites;
+    sprite_t *sprites[48];
 } car_t;
 
 /**
@@ -44,7 +45,7 @@ typedef struct {
     @param xpms Array of xpm maps for the car sprites.
     @return Pointer to the new car.
 **/
-car_t* create_car(double x, double y, double speed, double angle, xpm_map_t xpms[]);
+car_t* create_car(double x, double y, double speed, double angle, xpm_map_t xpms[], int num_sprites);
 /**
     @brief Destroys the car and frees any allocated resources.
     @param car Pointer to the car to be destroyed.
