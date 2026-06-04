@@ -7,12 +7,16 @@
 #include "kbc.h"
 
 
-static void draw_centered_text(font_t *font, const char *text, int y, int scale, uint32_t color) {
-    if (font == NULL || text == NULL) return;
 
-    int width = (int) strlen(text) * 8 * scale;
-    int x = (SCREEN_WIDTH - width) / 2;
-    draw_string_scaled(font, text, x, y, scale, color);
+
+
+static void format_ticks(char *out, size_t out_size, unsigned ticks) {
+    const unsigned TICKS_PER_SECOND = 60;
+    unsigned total_seconds = ticks / TICKS_PER_SECOND;
+    unsigned mins = total_seconds / 60;
+    unsigned secs = total_seconds % 60;
+    unsigned ms = (ticks % TICKS_PER_SECOND) * 1000 / TICKS_PER_SECOND;
+    snprintf(out, out_size, "%02u:%02u.%03u", mins, secs, ms);
 }
 
 finish_menu_t *finish_menu_create(font_t *font, const race_t *race) {
@@ -22,7 +26,7 @@ finish_menu_t *finish_menu_create(font_t *font, const race_t *race) {
     if (menu == NULL) return NULL;
 
     menu->font = font;
-    menu->final_time = race->seconds_elapsed;
+    menu->final_ticks = race->ticks_elapsed;
     menu->lap_count = race->current_lap - 1;
     if (menu->lap_count > race->total_laps)
         menu->lap_count = race->total_laps;
@@ -47,16 +51,15 @@ void finish_menu_draw(const finish_menu_t *menu) {
 
     char line[64];
     for (int i = 0; i < menu->lap_count; i++) {
-        int lap_secs = menu->lap_times[i] / 60;
-        int mins = lap_secs / 60;
-        int secs = lap_secs % 60;
-        snprintf(line, sizeof(line), "Lap %d: %02d:%02d", i + 1, mins, secs);
+        char lap_time_str[32];
+        format_ticks(lap_time_str, sizeof(lap_time_str), menu->lap_times[i]);
+        snprintf(line, sizeof(line), "Lap %d: %s", i + 1, lap_time_str);
         draw_string_scaled(menu->font, line, 220, 160 + i * 32, 2, COLOR_WHITE);
     }
 
-    int total_mins = menu->final_time / 60;
-    int total_secs = menu->final_time % 60;
-    snprintf(line, sizeof(line), "Total Time: %02d:%02d", total_mins, total_secs);
+    char total_time_str[32];
+    format_ticks(total_time_str, sizeof(total_time_str), menu->final_ticks);
+    snprintf(line, sizeof(line), "Total Time: %s", total_time_str);
     draw_string_scaled(menu->font, line, 220, 160 + menu->lap_count * 32 + 24, 2, COLOR_WHITE);
     draw_centered_text(menu->font, "PRESS ENTER TO CONTINUE", 520, 2, COLOR_WHITE);
 }
