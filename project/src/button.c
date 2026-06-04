@@ -71,13 +71,25 @@ void button_draw(button_t *b, bool hover) {
     
 bool button_is_hovered(button_t *b, int x, int y) {
   if (b == NULL) return false;
+
   if (b->shape == BTN_SHAPE_RECT) {
     return (x >= b->x && x < b->x + BTN_W &&
             y >= b->y && y < b->y + BTN_H);
-  } else {
-    int s = BTN_H / 2;
-    return (x >= b->x     && x <= b->x + s &&
-            y >= b->y - s && y <= b->y + s);
   }
+
+  int s = BTN_H / 2;
+  int dy = y - b->y;
+  if (dy < -s || dy > s) {
+    return false;
+  }
+
+  if (b->shape == BTN_SHAPE_ARROW_LEFT) {
+    int dx = x - b->x;
+    return (dx >= 0 && dx < s && abs(dy) <= dx);
+  }
+
+  /* BTN_SHAPE_ARROW_RIGHT */
+  int dx = x - b->x;
+  return (dx >= 0 && dx < s && abs(dy) <= (s - 1 - dx));
 }
 
