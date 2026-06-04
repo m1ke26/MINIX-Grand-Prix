@@ -14,6 +14,9 @@
 #include "cursor.h"
 #include "rtc.h"
 #include "tracks_pixmaps.h"
+#include "leaderboard.h"
+#include <string.h>
+#include <stdio.h>
 
 
 
@@ -130,11 +133,16 @@ void draw_state(state_t *state)
                 break;
             }
             break;
+<<<<<<< HEAD
         case STATE_GAME_OVER:
             if (state->data.game_over.menu != NULL) {
                 finish_menu_draw(state->data.game_over.menu);
             }
+=======
+        case STATE_GAME_OVER: {
+>>>>>>> leaderboard-storing
             break;
+        }
     }
 }
 
@@ -152,16 +160,26 @@ void state_enter_loading(state_t *state, font_t *font) {
     if (state == NULL) return;
     int track_idx = state->data.start.menu->track_index;
     int car_idx = state->data.start.menu->car_index;
+    const char *username = state->data.start.menu->player_name;
 
     state_exit_current(state);
     state->tag = STATE_LOADING;
     state->data.loading.font = font;
     state->data.loading.track_index = track_idx;
     state->data.loading.car_index = car_idx;
+    
+    // Store username
+    if (username != NULL && username[0] != '\0') {
+        strncpy(state->data.loading.username, username, sizeof(state->data.loading.username) - 1);
+        state->data.loading.username[sizeof(state->data.loading.username) - 1] = '\0';
+    } else {
+        strcpy(state->data.loading.username, "Player");
+    }
+    
     state->data.loading.drawn = false;
 }
 
-static void state_enter_in_game(state_t *state, font_t *font, int track_idx, int car_idx) {
+static void state_enter_in_game(state_t *state, font_t *font, int track_idx, int car_idx, const char *username) {
     if (state == NULL) return;
 
     state->tag = STATE_IN_GAME;
@@ -189,6 +207,16 @@ static void state_enter_in_game(state_t *state, font_t *font, int track_idx, int
                       (int)state->data.in_game.car->y + car_h / 2);
     }
     state->data.in_game.font = font;
+    state->data.in_game.track_index = track_idx;
+    
+    // Store username
+    if (username != NULL) {
+        strncpy(state->data.in_game.username, username, sizeof(state->data.in_game.username) - 1);
+        state->data.in_game.username[sizeof(state->data.in_game.username) - 1] = '\0';
+    } else {
+        state->data.in_game.username[0] = '\0';
+    }
+    
     race_init(&state->data.in_game.race);
     reset_game_input(&state->data.in_game.input);
     state->data.in_game.pause = false;
@@ -205,12 +233,27 @@ void state_enter_start(state_t *state, font_t *font) {
     state->data.start.menu = start_menu_create(font);
 }
 
-void state_enter_game_over(state_t *state, font_t *font, const race_t *race) {
-    if (state == NULL || race == NULL) return;
+void state_enter_game_over(state_t *state, font_t *font, unsigned final_time, const char *username, int track_index) {
+    if (state == NULL) return;
 
     state_exit_current(state);
     state->tag = STATE_GAME_OVER;
-    state->data.game_over.menu = finish_menu_create(font, race);
+    state->data.game_over.final_time = final_time;
+    rtc_read_date(&state->data.game_over.date);
+    
+    // Store username and track
+    if (username != NULL) {
+        strncpy(state->data.game_over.username, username, sizeof(state->data.game_over.username) - 1);
+        state->data.game_over.username[sizeof(state->data.game_over.username) - 1] = '\0';
+    } else {
+        state->data.game_over.username[0] = '\0';
+    }
+    state->data.game_over.track_index = track_index;
+    
+    // Save time to file
+    if (username != NULL) {
+        leaderboard_save_time(username, final_time, track_index, state->data.game_over.date);
+    }
 }
 
 void handle_mouse_event(state_t *state, struct packet *pp, int cursor_x, int cursor_y) {
@@ -323,7 +366,8 @@ void update_state(state_t *state) {
             if (state->data.loading.drawn) {
                 state_enter_in_game(state, state->data.loading.font,
                                     state->data.loading.track_index,
-                                    state->data.loading.car_index);
+                                    state->data.loading.car_index,
+                                    state->data.loading.username);
             }
             break;
         case STATE_IN_GAME: {
@@ -347,7 +391,8 @@ void update_state(state_t *state) {
             }
 
             if (race_is_finished(&state->data.in_game.race)) {
-                state_enter_game_over(state, state->data.in_game.font, &state->data.in_game.race);
+                state_enter_game_over(state, state->data.in_game.font, state->data.in_game.race.seconds_elapsed,
+                                      state->data.in_game.username, state->data.in_game.track_index);
                 break;
             }
 

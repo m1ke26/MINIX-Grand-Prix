@@ -39,6 +39,7 @@ typedef struct
             font_t *font;
             int track_index;
             int car_index;
+            char username[16];
             bool drawn;
         } loading;
 
@@ -51,6 +52,8 @@ typedef struct
             game_input_t input;
             bool pause;
             pause_menu_t *pause_menu;
+            char username[16];
+            int track_index;
         } in_game;
 
         struct
