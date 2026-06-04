@@ -90,14 +90,18 @@ void destroy_car(car_t *car) {
   free(car);
 }
 
-void draw_car(car_t *car, int cam_x, int cam_y) {
-  if (car == NULL) return;
-  double step = 360.0 / car->num_sprites;
-  int raw_idx = (int)((car->angle + step / 2.0) / step) % car->num_sprites;
-  int idx = (raw_idx + car->num_sprites * 3 / 4) % car->num_sprites;
+void draw_car(car_t *car, int cam_x, int cam_y, int idx) {
+ 
   int screen_x = (int)car->x - cam_x;
   int screen_y = (int)car->y - cam_y;
   sprite_draw(car->sprites[idx], screen_x, screen_y);
+}
+
+int car_sprite_index(car_t *car) {
+  if (car == NULL) return 0;
+  double step = 360.0 / car->num_sprites;
+  int raw_idx = (int)((car->angle + step / 2.0) / step) % car->num_sprites;
+  return (raw_idx + car->num_sprites * 3 / 4) % car->num_sprites;
 }
 
 static bool update_boost(car_t *car, bool boost_pressed) {

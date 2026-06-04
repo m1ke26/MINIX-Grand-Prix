@@ -1,6 +1,26 @@
 #include "track.h"
+#include <stdbool.h>
 #include <stdlib.h>
 #include "video-card.h"
+
+bool terrain_is_race_checkpoint(terrain_type_t t) {
+    return t == START || t == CHECKPOINT_1 || t == CHECKPOINT_2 || t == CHECKPOINT_3;
+}
+
+static uint32_t track_collision_color(track_t *track, int map_x, int map_y) {
+    if (track == NULL)
+        return 0;
+
+    int w = track->info_collisionmap.width;
+    int h = track->info_collisionmap.height;
+    if (map_x < 0 || map_y < 0 || map_x >= w || map_y >= h)
+        return 0;
+
+    int pos = (map_y * w + map_x) * 3;
+    return (uint32_t)track->pix_collisionmap[pos]
+         + ((uint32_t)track->pix_collisionmap[pos + 1] << 8)
+         + ((uint32_t)track->pix_collisionmap[pos + 2] << 16);
+}
 
 track_t *create_track(xpm_map_t track, xpm_map_t collision)
 {
@@ -51,42 +71,25 @@ void draw_track(track_t *track, int cam_x, int cam_y)
 
 terrain_type_t collision_track(track_t *track, int car_x, int car_y)
 {
-    int pos = (car_y * track->info_collisionmap.width + car_x) * 3;
-    uint32_t color = ((track->pix_collisionmap[pos]) + (track->pix_collisionmap[pos + 1] << 8) + (track->pix_collisionmap[pos + 2] << 16));
+    uint32_t color = track_collision_color(track, car_x, car_y);
 
-    if (color == TERRAIN_BLOCKED) /*vermelho*/
+    if (color == (uint32_t)TERRAIN_BLOCKED) /*vermelho*/
     {
         return TERRAIN_BLOCKED;
     }
-    if (color == TERRAIN_ROAD) /*preto*/
-    {
+    if (color == (uint32_t)TERRAIN_ROAD)
         return TERRAIN_ROAD;
-    }
-    if (color == TERRAIN_SLOW) /*amarelo*/
-    {
+    if (color == (uint32_t)TERRAIN_SLOW)
         return TERRAIN_SLOW;
-    }
-    if (color == START) /*verde*/
-    {
+    if (color == (uint32_t)START)
         return START;
-    }
-    if (color == CHECKPOINT_1) /*ciano*/
-    {
+    if (color == (uint32_t)CHECKPOINT_1)
         return CHECKPOINT_1;
-    }
-    if (color == CHECKPOINT_2) /*magenta*/
-    {
+    if (color == (uint32_t)CHECKPOINT_2)
         return CHECKPOINT_2;
-    }
-    if (color == CHECKPOINT_3) /*azul*/
-    {
+    if (color == (uint32_t)CHECKPOINT_3)
         return CHECKPOINT_3;
-    }
     return TERRAIN_ROAD;
-}
-
-static bool is_race_checkpoint(terrain_type_t t) {
-    return t == START || t == CHECKPOINT_1 || t == CHECKPOINT_2 || t == CHECKPOINT_3;
 }
 
 bool track_find_start_spawn(track_t *track, int car_w, int car_h, int *spawn_x, int *spawn_y) {
@@ -106,7 +109,7 @@ bool track_find_start_spawn(track_t *track, int car_w, int car_h, int *spawn_x, 
                 + ((uint32_t)track->pix_collisionmap[pos + 1] << 8)
                 + ((uint32_t)track->pix_collisionmap[pos + 2] << 16);
 
-            if (color == (uint32_t)START) {
+            if (color == (uint32_t) START) {
                 sum_x += x;
                 sum_y += y;
                 count++;
@@ -136,19 +139,15 @@ terrain_type_t track_car_checkpoint(track_t *track, int car_x, int car_y, int ca
     if (track == NULL || car_w <= 0 || car_h <= 0)
         return TERRAIN_ROAD;
 
-    //4 corners + center of the car
-    int samples[5][2] = {
-        {car_x + car_w / 2, car_y + car_h / 2},
-        {car_x, car_y},
-        {car_x + car_w - 1, car_y},
-        {car_x, car_y + car_h - 1},
-        {car_x + car_w - 1, car_y + car_h - 1},
-    };
-
-    for (int i = 0; i < 5; i++) {
-        terrain_type_t t = collision_track(track, samples[i][0], samples[i][1]);
-        if (is_race_checkpoint(t))
-            return t;
+    /* 3x3 grid over the car box — large sprites miss thin checkpoint strips otherwise. */
+    for (int row = 0; row < 3; row++) {
+        for (int col = 0; col < 3; col++) {
+            int px = car_x + (car_w - 1) * col / 2;
+            int py = car_y + (car_h - 1) * row / 2;
+            terrain_type_t t = collision_track(track, px, py);
+            if (terrain_is_race_checkpoint(t))
+                return t;
+        }
     }
     return TERRAIN_ROAD;
 }

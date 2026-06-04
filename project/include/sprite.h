@@ -53,6 +53,6 @@ void draw_sprite_scaled_down(sprite_t *s, int x, int y, int scale);
  * @param scale Upscale factor (e.g. 2 = draws at 2 times of original size).
  */
 
-void draw_sprite_scaled_up(sprite_t *s, int x, int y, int scale);
+void draw_sprite_scaled_up(sprite_t *s, int x, int y, double scale);
 
 #endif /* _SPRITE_H_ */

@@ -26,6 +26,9 @@ typedef enum {
     CHECKPOINT_3 = 0x0000FF
 } terrain_type_t;
 
+/** True for START and CHECKPOINT_1..3 (lap progression zones). */
+bool terrain_is_race_checkpoint(terrain_type_t t);
+
 /**
  * @brief Creates a track by loading the visual and collision XPM maps.
  * @param track XPM data for the visual map.

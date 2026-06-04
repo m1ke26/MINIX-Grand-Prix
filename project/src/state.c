@@ -5,8 +5,7 @@
 #include "car.h"
 #include "track.h"
 #include "camera.h"
-#include "car_pixmaps.h"
-#include "police_pixmaps.h"
+#include "vehicles.h"
 #include "kbc.h"
 #include "pause_menu.h"
 #include "hud.h"
@@ -98,7 +97,7 @@ void draw_state(state_t *state)
         case STATE_IN_GAME:
             // Draw track and car with camera offset
             draw_track(state->data.in_game.track, state->data.in_game.camera->cam_x, state->data.in_game.camera->cam_y);
-            draw_car(state->data.in_game.car, state->data.in_game.camera->cam_x, state->data.in_game.camera->cam_y);
+            draw_car(state->data.in_game.car, state->data.in_game.camera->cam_x, state->data.in_game.camera->cam_y, car_sprite_index(state->data.in_game.car));
             speedometer_draw(state->data.in_game.car->speed);
             hud_draw_boost_indicator(state->data.in_game.car);
 
@@ -145,24 +144,39 @@ void destroy_state(state_t *state) {
 void state_enter_loading(state_t *state, font_t *font) {
     if (state == NULL) return;
     int track_idx = state->data.start.menu->track_index;
+    int car_idx = state->data.start.menu->car_index;
 
     state_exit_current(state);
     state->tag = STATE_LOADING;
     state->data.loading.font = font;
     state->data.loading.track_index = track_idx;
+    state->data.loading.car_index = car_idx;
     state->data.loading.drawn = false;
 }
 
-static void state_enter_in_game(state_t *state, font_t *font, int track_idx) {
+static void state_enter_in_game(state_t *state, font_t *font, int track_idx, int car_idx) {
     if (state == NULL) return;
 
     state->tag = STATE_IN_GAME;
 
+    const vehicle_def_t *vehicle = vehicle_get(car_idx);
+
     state->data.in_game.track = create_track((xpm_map_t) track_xpms[track_idx], (xpm_map_t) collision_xpms[track_idx]);
     state->data.in_game.camera = create_camera(state->data.in_game.track->info_trackmap.width, state->data.in_game.track->info_trackmap.height);
-    state->data.in_game.car = create_car(1290, 415, 0, 90, (xpm_map_t *) car_xpms);
+
+    int spawn_x = 1290;
+    int spawn_y = 415;
+    state->data.in_game.car = create_car(spawn_x, spawn_y, 0, 90, vehicle->xpms, vehicle->num_sprites);
     if (state->data.in_game.car != NULL) {
-        int idx = (int)((state->data.in_game.car->angle + 11.25) / 22.5) % 16;
+        int idx = car_sprite_index(state->data.in_game.car);
+        int car_w = state->data.in_game.car->sprites[idx]->width;
+        int car_h = state->data.in_game.car->sprites[idx]->height;
+
+        if (track_find_start_spawn(state->data.in_game.track, car_w, car_h, &spawn_x, &spawn_y)) {
+            state->data.in_game.car->x = spawn_x;
+            state->data.in_game.car->y = spawn_y;
+        }
+
         follow_camera(state->data.in_game.camera,
                       (int)state->data.in_game.car->x + car_w / 2,
                       (int)state->data.in_game.car->y + car_h / 2);
@@ -298,7 +312,9 @@ void update_state(state_t *state) {
             break;
         case STATE_LOADING:
             if (state->data.loading.drawn) {
-                state_enter_in_game(state, state->data.loading.font, state->data.loading.track_index);
+                state_enter_in_game(state, state->data.loading.font,
+                                    state->data.loading.track_index,
+                                    state->data.loading.car_index);
             }
             break;
         case STATE_IN_GAME: {
@@ -307,15 +323,19 @@ void update_state(state_t *state) {
             // Update the race (either countdown ticks or elapsed race ticks)
             race_update(&state->data.in_game.race);
 
-            // Skip physics and checkpoint updates if the countdown is still running
-            if (!race_has_started(&state->data.in_game.race)) break;
+            if (!race_countdown_started(&state->data.in_game.race))
+                break;
 
             update_car_physics(state->data.in_game.car, &state->data.in_game.input, state->data.in_game.track);
+
             car_t *c = state->data.in_game.car;
-            int idx = (int)((c->angle + 11.25) / 22.5) % 16;
-            
-            race_check_checkpoints(&state->data.in_game.race, state->data.in_game.track,
-                                   c->x, c->y, c->sprites[idx]->width, c->sprites[idx]->height);
+            if (c == NULL) break;
+            int idx = car_sprite_index(c);
+
+            if (race_has_started(&state->data.in_game.race)) {
+                race_check_checkpoints(&state->data.in_game.race, state->data.in_game.track,
+                                       c->x, c->y, c->sprites[idx]->width, c->sprites[idx]->height);
+            }
 
             if (race_is_finished(&state->data.in_game.race)) {
                 state_enter_game_over(state, state->data.in_game.font, state->data.in_game.race.seconds_elapsed);

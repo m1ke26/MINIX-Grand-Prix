@@ -26,9 +26,9 @@ start_menu_t* start_menu_create(font_t *font) {
   sm->player_name[0] = '\0';
   sm->name_len = 0;
 
-  // Car Selector
+  // Car Selector (preview uses first sprite of each vehicle)
   for (int i = 0; i < NUM_CARS; i++) {
-    sm->car_sprites[i] = create_sprite((xpm_map_t) car_xpms[i]);
+    sm->car_sprites[i] = create_sprite(vehicle_preview_xpm(i));
   }
 
   // Track Selector — preload small track previews (takes < 0.03s total)
@@ -97,7 +97,7 @@ void start_menu_draw(start_menu_t *sm, int cursor_x, int cursor_y) {
   // Car Sprite
   if (sm->car_sprites[sm->car_index] != NULL) {
     sprite_t *s = sm->car_sprites[sm->car_index];
-    draw_sprite_scaled_up(s, 75 - s->width  / 2 , 275- s->height / 2, 2);
+    draw_sprite_scaled_up(s, 100 - s->width  / 2 , 300 - s->height / 2, 1.5);
   }
   
   // Track Sprite
@@ -106,7 +106,7 @@ void start_menu_draw(start_menu_t *sm, int cursor_x, int cursor_y) {
 
   // Car Label
   char car_label[16];
-  sprintf(car_label, "<CAR%d>", sm->car_index + 1);
+  sprintf(car_label, "<%s>", vehicle_get(sm->car_index)->label);
   draw_string_scaled(sm->font, car_label, 75, 420, 2, COLOR_MENU_TEXT);
 
   // Track Label

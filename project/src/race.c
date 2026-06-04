@@ -16,7 +16,7 @@ void race_init(race_t *race) {
     race->seconds_elapsed = 0;
     race->ticks_elapsed = 0;
     race->next_checkpoint = CHECKPOINT_1;
-    race->checkpoint_armed = false;
+    race->checkpoint_armed = true;
 }
 
 void race_start_countdown(race_t *race) {
@@ -75,7 +75,8 @@ void race_check_checkpoints(race_t *race, track_t *track, double car_x, double c
 
     terrain_type_t hit = track_car_checkpoint(track, (int)car_x, (int)car_y, car_w, car_h);
 
-    if (hit == TERRAIN_ROAD) {
+    /* Re-arm after leaving any checkpoint zone (road, slow, etc. — not only black). */
+    if (!terrain_is_race_checkpoint(hit)) {
         race->checkpoint_armed = true;
         return;
     }

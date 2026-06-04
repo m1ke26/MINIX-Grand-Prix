@@ -37,6 +37,7 @@ typedef struct
         {
             font_t *font;
             int track_index;
+            int car_index;
             bool drawn;
         } loading;
 

@@ -74,7 +74,7 @@ void draw_sprite_scaled_down(sprite_t *s, int x, int y, int scale) {
   }
 }
 
-void draw_sprite_scaled_up(sprite_t *s, int x, int y, int scale) {
+void draw_sprite_scaled_up(sprite_t *s, int x, int y, double scale) {
   if (s == NULL || s->map == NULL) return;
   if (scale <= 0) return;
 

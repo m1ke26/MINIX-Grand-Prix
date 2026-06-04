@@ -55,8 +55,11 @@ void destroy_car(car_t *car);
 /**
     @brief Draws the car on the screen.
     @param car Pointer to the car to be drawn.
+    @param cam_x Camera x-coordinate.
+    @param cam_y Camera y-coordinate.
+    @param sprite_idx Index of the sprite to draw.
 **/
-void draw_car(car_t *car, int cam_x, int cam_y);
+void draw_car(car_t *car, int cam_x, int cam_y, int sprite_idx);
 /**
     @brief Moves the car based on its speed and angle.
     @param car Pointer to the car to be moved.
@@ -69,5 +72,12 @@ bool move_car(car_t *car, track_t *track);
     @param input Current gameplay input state.
 **/
 void update_car_physics(car_t *car, const game_input_t *input, track_t *track);
+
+/**
+ * @brief Returns the index of the sprite to use for the car based on its current angle.
+ * @param car Pointer to the car.
+ * @return Index of the sprite to use for drawing the car.
+ */
+int car_sprite_index(car_t *car);
 
 #endif /* _CAR_H_ */

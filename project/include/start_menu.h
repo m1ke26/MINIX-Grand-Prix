@@ -4,11 +4,11 @@
 #include "button.h"
 #include "font.h"
 #include "video-card.h"
-#include "car_pixmaps.h"
+#include "vehicles.h"
 #include "tracks_pixmaps.h"
 #include "sprite.h"
 
-#define NUM_CARS   1
+#define NUM_CARS   NUM_VEHICLES
 #define NUM_TRACKS 3
 
 typedef struct {
