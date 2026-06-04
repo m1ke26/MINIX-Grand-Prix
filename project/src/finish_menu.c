@@ -7,13 +7,8 @@
 #include "kbc.h"
 
 
-static void draw_centered_text(font_t *font, const char *text, int y, int scale, uint32_t color) {
-    if (font == NULL || text == NULL) return;
 
-    int width = (int) strlen(text) * 8 * scale;
-    int x = (SCREEN_WIDTH - width) / 2;
-    draw_string_scaled(font, text, x, y, scale, color);
-}
+
 
 finish_menu_t *finish_menu_create(font_t *font, const race_t *race) {
     if (font == NULL || race == NULL) return NULL;

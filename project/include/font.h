@@ -139,4 +139,15 @@ void draw_string(font_t *font, const char *str, int x, int y, uint32_t color);
  */
 void draw_string_scaled(font_t *font, const char *str, int x, int y, int scale, uint32_t color);
 
+/**
+ * @brief Draws a string centered horizontally on the screen.
+ * @param font Pointer to the font to use for rendering.
+ * @param text Null-terminated string to draw.
+ * @param y Y coordinate of the top of the text.
+ * @param scale Scale factor for the text (e.g. 2 = double size).
+ * @param color Color of the text in 0xRRGGBB format.
+ */
+
+void draw_centered_text(font_t *font, const char *text, int y, int scale, uint32_t color);
+
 #endif /* _FONT_H_ */
