@@ -16,7 +16,7 @@ void race_init(race_t *race) {
     race->seconds_elapsed = 0;
     race->ticks_elapsed = 0;
     race->next_checkpoint = CHECKPOINT_1;
-    race->checkpoint_armed = true;
+    race->checkpoint_armed = false;
     race->last_lap_ticks = 0;
     for (int i = 0; i < 16; i++)
         race->lap_times[i] = 0;
