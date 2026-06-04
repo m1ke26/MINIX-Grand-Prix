@@ -97,7 +97,7 @@ void start_menu_draw(start_menu_t *sm, int cursor_x, int cursor_y) {
   // Car Sprite
   if (sm->car_sprites[sm->car_index] != NULL) {
     sprite_t *s = sm->car_sprites[sm->car_index];
-    draw_sprite_scaled_up(s, 100 - s->width  / 2 , 300 - s->height / 2, 1.5);
+    draw_sprite_scaled_up(s, 90 - s->width  / 2 , 300 - s->height / 2 , 1.5);
   }
   
   // Track Sprite
@@ -107,7 +107,10 @@ void start_menu_draw(start_menu_t *sm, int cursor_x, int cursor_y) {
   // Car Label
   char car_label[16];
   sprintf(car_label, "<%s>", vehicle_get(sm->car_index)->label);
-  draw_string_scaled(sm->font, car_label, 75, 420, 2, COLOR_MENU_TEXT);
+  int car_label_len = (int)strlen(car_label);
+  int char_width = 8 * 2; // 8px base width * scale 2
+  int car_label_x = 120 - (car_label_len * char_width) / 2;
+  draw_string_scaled(sm->font, car_label, car_label_x, 420, 2, COLOR_MENU_TEXT);
 
   // Track Label
   char track_label[16];
