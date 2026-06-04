@@ -12,7 +12,7 @@ void race_init(race_t *race) {
     race->countdown_started = false;
     race->countdown_ticks = 0;
     race->current_lap = 1;
-    race->total_laps = 3;
+    race->total_laps = 1;
     race->seconds_elapsed = 0;
     race->ticks_elapsed = 0;
     race->next_checkpoint = CHECKPOINT_1;

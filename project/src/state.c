@@ -14,6 +14,9 @@
 #include "cursor.h"
 #include "rtc.h"
 #include "tracks_pixmaps.h"
+#include "leaderboard.h"
+#include <string.h>
+#include <stdio.h>
 
 
 
@@ -152,17 +155,40 @@ void state_enter_loading(state_t *state, font_t *font) {
     if (state == NULL) return;
     int track_idx = state->data.start.menu->track_index;
     int car_idx = state->data.start.menu->car_index;
+    const char *username = state->data.start.menu->player_name;
 
     state_exit_current(state);
     state->tag = STATE_LOADING;
     state->data.loading.font = font;
     state->data.loading.track_index = track_idx;
     state->data.loading.car_index = car_idx;
+    
+    // Store username
+    if (username != NULL && username[0] != '\0') {
+        strncpy(state->data.loading.username, username, sizeof(state->data.loading.username) - 1);
+        state->data.loading.username[sizeof(state->data.loading.username) - 1] = '\0';
+
+        // Strip any trailing newlines, carriage returns, or whitespace
+        int len = strlen(state->data.loading.username);
+        while (len > 0 && (state->data.loading.username[len - 1] == '\n' ||
+                            state->data.loading.username[len - 1] == '\r' ||
+                            state->data.loading.username[len - 1] == ' ')) {
+            state->data.loading.username[--len] = '\0';
+        }
+    } else {
+    strcpy(state->data.loading.username, "Player");
+}
     state->data.loading.drawn = false;
 }
 
-static void state_enter_in_game(state_t *state, font_t *font, int track_idx, int car_idx) {
+static void state_enter_in_game(state_t *state, font_t *font, int track_idx, int car_idx, const char *username) {
     if (state == NULL) return;
+
+    // Copy username to local BEFORE touching state->data (union overlap!)
+    char local_username[16] = {0};
+    if (username != NULL) {
+        strncpy(local_username, username, sizeof(local_username) - 1);
+    }
 
     state->tag = STATE_IN_GAME;
 
@@ -189,6 +215,12 @@ static void state_enter_in_game(state_t *state, font_t *font, int track_idx, int
                       (int)state->data.in_game.car->y + car_h / 2);
     }
     state->data.in_game.font = font;
+    state->data.in_game.track_index = track_idx;
+
+    // Now safe — copy from local, not from the union that was just overwritten
+    strncpy(state->data.in_game.username, local_username, sizeof(state->data.in_game.username) - 1);
+    state->data.in_game.username[sizeof(state->data.in_game.username) - 1] = '\0';
+
     race_init(&state->data.in_game.race);
     reset_game_input(&state->data.in_game.input);
     state->data.in_game.pause = false;
@@ -206,11 +238,26 @@ void state_enter_start(state_t *state, font_t *font) {
 }
 
 void state_enter_game_over(state_t *state, font_t *font, const race_t *race) {
-    if (state == NULL || race == NULL) return;
+     if (state == NULL) return;
+
+    // Save BEFORE exit
+    char saved_username[16] = {0};
+    int saved_track_index = 0;
+    if (state->tag == STATE_IN_GAME) {
+        strncpy(saved_username, state->data.in_game.username, sizeof(saved_username) - 1);
+        saved_track_index = state->data.in_game.track_index;
+    }
 
     state_exit_current(state);
     state->tag = STATE_GAME_OVER;
     state->data.game_over.menu = finish_menu_create(font, race);
+
+    // Now safe to use the saved values
+    if (race != NULL && saved_username[0] != '\0') {
+        rtc_date date;
+        rtc_read_date(&date);
+        leaderboard_save_time(saved_username, race->seconds_elapsed, saved_track_index, date);
+    }
 }
 
 void handle_mouse_event(state_t *state, struct packet *pp, int cursor_x, int cursor_y) {
@@ -268,12 +315,11 @@ void handle_kbd_event(state_t *state, uint8_t scancode) {
 
     switch (state->tag) {
         case STATE_START:
-            if (state->data.start.menu != NULL) {
-                char c = kbd_scancode_to_char(scancode);
-                if (c != 0)
-                    start_menu_handle_key(state->data.start.menu, c);
-            }
+            if (scancode == 0xE0 || scancode == 0xE1) break; // skip prefix bytes
+            char c = kbd_scancode_to_char(scancode);
+            if (c != 0) start_menu_handle_key(state->data.start.menu, c);
             break;
+
         case STATE_IN_GAME:
             if(!race_has_started(&state->data.in_game.race)){
                 if (scancode == ENTER_MAKE) race_start_countdown(&state->data.in_game.race);
@@ -323,7 +369,8 @@ void update_state(state_t *state) {
             if (state->data.loading.drawn) {
                 state_enter_in_game(state, state->data.loading.font,
                                     state->data.loading.track_index,
-                                    state->data.loading.car_index);
+                                    state->data.loading.car_index,
+                                    state->data.loading.username);
             }
             break;
         case STATE_IN_GAME: {
