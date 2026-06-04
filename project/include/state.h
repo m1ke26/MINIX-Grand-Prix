@@ -17,6 +17,7 @@ extern bool running;
 typedef enum
 {
     STATE_START,
+    STATE_LOADING,
     STATE_IN_GAME,
     STATE_GAME_OVER
 } state_tag_t;
@@ -32,6 +33,13 @@ typedef struct
             int cursor_y;
             start_menu_t *menu;
         } start;
+
+        struct
+        {
+            font_t *font;
+            int track_index;
+            bool drawn;
+        } loading;
 
         struct {
             car_t *car;
@@ -95,12 +103,12 @@ void handle_mouse_event(state_t *state, struct packet *pp, int cursor_x, int cur
 void handle_kbd_event(state_t *state, uint8_t scancode);
 
 /**
- * @brief Transitions the game to the in-game state.
+ * @brief Transitions the game to the loading state before starting the race.
  *
  * @param state Pointer to the current game state.
- * @param font The font to use for pause menu rendering.
+ * @param font The font to use for rendering the loading screen.
  */
-void state_enter_in_game(state_t *state, font_t *font);
+void state_enter_loading(state_t *state, font_t *font);
 
 /**
  * @brief Transitions the game back to the start-menu state, freeing in-game resources.

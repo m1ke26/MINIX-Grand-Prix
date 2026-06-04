@@ -1,5 +1,6 @@
 #include "speedometer.h"
 #include "state.h"
+#include "colors.h"
 #include "start_menu.h"
 #include "car.h"
 #include "track.h"
@@ -9,8 +10,7 @@
 #include "pause_menu.h"
 #include "hud.h"
 #include "cursor.h"
-#include "track2_xpm.h"
-#include "collision2_xpm.h"
+#include "tracks_pixmaps.h"
 
 
 static void reset_game_input(game_input_t *input) {
@@ -47,6 +47,8 @@ static void state_exit_current(state_t *state) {
         case STATE_START:
             state_exit_start(state);
             break;
+        case STATE_LOADING:
+            break;
         case STATE_IN_GAME:
             state_exit_in_game(state);
             break;
@@ -82,6 +84,14 @@ void draw_state(state_t *state)
                 draw_cursor(state->data.start.menu->car_sprites[ci],
                             state->data.start.cursor_x, state->data.start.cursor_y, 2);
             }
+            break;
+        case STATE_LOADING:
+            vg_buf_clear();
+            vg_buf_draw_rect(0, 0, 800, 600, COLOR_MENU_BACKGROUND); // Dark blueish background
+            if (state->data.loading.font != NULL) {
+                draw_string_scaled(state->data.loading.font, "LOADING MAP...", 260, 280, 3, COLOR_MENU_TEXT);
+            }
+            state->data.loading.drawn = true;
             break;
         case STATE_IN_GAME:
             // Draw track and car with camera offset
@@ -120,14 +130,25 @@ void destroy_state(state_t *state) {
     free(state);
 }
 
-/* Encapsulates the full setup needed when transitioning to the in-game state */
-void state_enter_in_game(state_t *state, font_t *font) {
+void state_enter_loading(state_t *state, font_t *font) {
     if (state == NULL) return;
+    int track_idx = state->data.start.menu->track_index;
 
     state_exit_current(state);
+    state->tag = STATE_LOADING;
+    state->data.loading.font = font;
+    state->data.loading.track_index = track_idx;
+    state->data.loading.drawn = false;
+}
+
+static void state_enter_in_game(state_t *state) {
+    if (state == NULL) return;
+    int track_idx = state->data.loading.track_index;
+    font_t *font = state->data.loading.font;
+
     state->tag = STATE_IN_GAME;
 
-    state->data.in_game.track = create_track((xpm_map_t) track2_xpm, (xpm_map_t) collision2_xpm);
+    state->data.in_game.track = create_track((xpm_map_t) track_xpms[track_idx], (xpm_map_t) collision_xpms[track_idx]);
     state->data.in_game.camera = create_camera(state->data.in_game.track->info_trackmap.width, state->data.in_game.track->info_trackmap.height);
     state->data.in_game.car = create_car(1290, 415, 0, 90, (xpm_map_t *) car_xpms);
     if (state->data.in_game.car != NULL) {
@@ -159,22 +180,40 @@ void state_enter_start(state_t *state, font_t *font, int cursor_x, int cursor_y)
 
 void handle_mouse_event(state_t *state, struct packet *pp, int cursor_x, int cursor_y)
 {
-    if (state == NULL)
+    if (state == NULL || pp == NULL)
         return;
+
+    static bool last_lb = false;
+    bool lb_click = pp->lb && !last_lb;
+    last_lb = pp->lb;
 
     switch (state->tag) {
         case STATE_START:
             state->data.start.cursor_x = cursor_x;
             state->data.start.cursor_y = cursor_y;
 
-            // Check for Left Click
-            if (pp->lb) {
-                if (button_is_hovered(state->data.start.menu->start_btn, cursor_x, cursor_y)) {
-                    font_t *font = state->data.start.menu->font;
-                    state_enter_in_game(state, font);
-                }
-                else if (button_is_hovered(state->data.start.menu->exit_btn, cursor_x, cursor_y)) {
-                    running = false;
+            // Check for Left Click trigger (edge-triggered)
+            if (lb_click) {
+                if (state->data.start.menu != NULL) {
+                    if (button_is_hovered(state->data.start.menu->start_btn, cursor_x, cursor_y)) {
+                        font_t *font = state->data.start.menu->font;
+                        state_enter_loading(state, font);
+                    }
+                    else if (button_is_hovered(state->data.start.menu->exit_btn, cursor_x, cursor_y)) {
+                        running = false;
+                    }
+                    else if (button_is_hovered(state->data.start.menu->track_left, cursor_x, cursor_y)) {
+                        start_menu_change_track(state->data.start.menu, -1);
+                    }
+                    else if (button_is_hovered(state->data.start.menu->track_right, cursor_x, cursor_y)) {
+                        start_menu_change_track(state->data.start.menu, 1);
+                    }
+                    else if (button_is_hovered(state->data.start.menu->car_left, cursor_x, cursor_y)) {
+                        start_menu_change_car(state->data.start.menu, -1);
+                    }
+                    else if (button_is_hovered(state->data.start.menu->car_right, cursor_x, cursor_y)) {
+                        start_menu_change_car(state->data.start.menu, 1);
+                    }
                 }
             }
             break;
@@ -182,7 +221,7 @@ void handle_mouse_event(state_t *state, struct packet *pp, int cursor_x, int cur
         case STATE_IN_GAME:
             state->data.in_game.cursor_x = cursor_x;
             state->data.in_game.cursor_y = cursor_y;
-            if(pp->lb && state->data.in_game.pause && state->data.in_game.pause_menu != NULL) {
+            if(lb_click && state->data.in_game.pause && state->data.in_game.pause_menu != NULL) {
                 if(button_is_hovered(state->data.in_game.pause_menu->resume_btn, cursor_x, cursor_y)) {
                     state->data.in_game.pause = false;
                 }
@@ -193,6 +232,8 @@ void handle_mouse_event(state_t *state, struct packet *pp, int cursor_x, int cur
             }
             break;
 
+        case STATE_LOADING:
+            break;
         case STATE_GAME_OVER:
             break;
     }
@@ -238,6 +279,8 @@ void handle_kbd_event(state_t *state, uint8_t scancode) {
                 else if (scancode == SHIFT_BREAK) state->data.in_game.input.boost = false;
             }
             break;
+        case STATE_LOADING:
+            break;
         case STATE_GAME_OVER:
             break;
     }
@@ -248,6 +291,11 @@ void update_state(state_t *state) {
 
     switch (state->tag) {
         case STATE_START:
+            break;
+        case STATE_LOADING:
+            if (state->data.loading.drawn) {
+                state_enter_in_game(state);
+            }
             break;
         case STATE_IN_GAME: {
             if (!race_has_started(&state->data.in_game.race)) {

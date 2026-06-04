@@ -5,11 +5,11 @@
 #include "font.h"
 #include "video-card.h"
 #include "car_pixmaps.h"
-#include "track_pixmap.h"
+#include "tracks_pixmaps.h"
 #include "sprite.h"
 
 #define NUM_CARS   1
-#define NUM_TRACKS 1
+#define NUM_TRACKS 3
 
 typedef struct {
   font_t *font;
@@ -54,6 +54,14 @@ void start_menu_draw(start_menu_t *sm, int cursor_x, int cursor_y);
 
 void start_menu_handle_key(start_menu_t *sm, char key);
 
+/**
+ * @brief Cycles the track selection by delta (+1 or -1). Frees old preview, loads new.
+ */
+void start_menu_change_track(start_menu_t *sm, int delta);
 
+/**
+ * @brief Cycles the car selection by delta (+1 or -1).
+ */
+void start_menu_change_car(start_menu_t *sm, int delta);
 
 #endif /* _START_MENU_H_ */
