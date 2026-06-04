@@ -15,6 +15,16 @@ static surface_t classify_color(uint32_t color) {
     uint8_t g = (color >> 8) & 0xFF;
     uint8_t b = color & 0xFF;
 
+    /* Checkpoints (based on distinct colors on the track map/mask) */
+    if (r > 200 && g < 50 && b < 50)
+        return SURFACE_CHECKPOINT_0;
+    if (g > 200 && r < 50 && b < 50)
+        return SURFACE_CHECKPOINT_1;
+    if (b > 200 && r < 50 && g < 50)
+        return SURFACE_CHECKPOINT_2;
+    if (r > 200 && g > 200 && b < 50)
+        return SURFACE_CHECKPOINT_3;
+
     /* Grass: olive-green with low blue. (g-b) is the key: grass has ~85+, edge pixels have <15 */
     if (g > r && g > b && (g - b) > 55)
         return SURFACE_BLOCKED;
@@ -125,6 +135,32 @@ surface_t (track_car_surface)(int x, int y, int width, int height) {
     }
     return worst;
 }
+
+bool track_car_touches_surface(int x, int y, int width, int height, surface_t surface) {
+    int margin_x = width / 5;
+    int margin_y = height / 5;
+    int cx = x + margin_x;
+    int cy = y + margin_y;
+    int cw = width - 2 * margin_x;
+    int ch = height - 2 * margin_y;
+
+    int points[][2] = {
+        {cx, cy}, {cx + cw - 1, cy},
+        {cx, cy + ch - 1}, {cx + cw - 1, cy + ch - 1},
+        {cx + cw / 2, cy}, {cx + cw / 2, cy + ch - 1},
+        {cx, cy + ch / 2}, {cx + cw - 1, cy + ch / 2},
+        {cx + cw / 2, cy + ch / 2}
+    };
+
+    for (int i = 0; i < 9; i++) {
+        if (track_get_surface(points[i][0], points[i][1]) == surface) {
+            return true;
+        }
+    }
+    return false;
+}
+
+
 
 void track_free(void) {
     if (track_sprite != NULL) {

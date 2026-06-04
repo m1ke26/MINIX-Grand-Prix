@@ -3,18 +3,48 @@
 
 #include "sprite.h"
 
+typedef struct {
+  sprite_t *sprite;
+  int x, y;
+  int scale;
+} cursor_t;
+
 /**
- * @brief Draws a sprite as the mouse cursor, centered on the given position.
- *
- * The sprite is scaled down by the given factor and drawn so that its
- * centre coincides with (cursor_x, cursor_y).  Should be called as the
- * very last draw operation each frame so the cursor is always on top.
- *
- * @param sp       Sprite to use as the cursor image.
- * @param cursor_x X position of the mouse cursor.
- * @param cursor_y Y position of the mouse cursor.
- * @param scale    Downscale factor (e.g. 2 = half size).
+ * @brief Initializes the cursor with the given sprite, position, and scale.
+ * @param sprite Pointer to the sprite to use for the cursor.
+ * @param x Initial x-coordinate of the cursor.
+ * @param y Initial y-coordinate of the cursor.
+ * @param scale Initial scale of the cursor.
+ * @return Pointer to the initialized cursor structure.
  */
-void draw_cursor(sprite_t *sp, int cursor_x, int cursor_y, int scale);
+cursor_t* create_cursor(sprite_t *sprite, int x, int y, int scale);
+
+/**
+ * @brief Destroys the cursor and frees any allocated resources.
+ * @param cursor Pointer to the cursor to be destroyed.
+ */
+void destroy_cursor(cursor_t *cursor);
+
+/**
+ * @brief Moves the cursor by the specified deltas in the x and y directions.
+ * @param cursor Pointer to the cursor to be moved.
+ * @param dx Change in x-coordinate.
+ * @param dy Change in y-coordinate.
+ */
+void move_cursor(cursor_t *cursor, int dx, int dy);
+
+/**
+ * @brief Draws the cursor on the screen at its current position, applying scaling if necessary.
+ *
+ * @param cursor Pointer to the cursor structure containing the sprite and its properties.
+ */
+void draw_cursor(cursor_t *cursor);
+
+/**
+ * @brief Updates the sprite used by the cursor without destroying the old one.
+ * @param cursor Pointer to the cursor.
+ * @param new_sprite Pointer to the new sprite to use.
+ */
+void update_cursor_sprite(cursor_t *cursor, sprite_t *new_sprite);
 
 #endif /* _CURSOR_H_ */

@@ -5,9 +5,13 @@
 
 /** Surface types for speed calculation */
 typedef enum {
-    SURFACE_ROAD,    /* asphalt - full speed */
-    SURFACE_SLOW,    /* sand/curbs/markings - reduced speed */
-    SURFACE_BLOCKED  /* grass - can't drive */
+    SURFACE_ROAD,          /* asphalt - full speed */
+    SURFACE_SLOW,          /* sand/curbs/markings - reduced speed */
+    SURFACE_BLOCKED,       /* grass - can't drive */
+    SURFACE_CHECKPOINT_0,  /* Start/Finish line */
+    SURFACE_CHECKPOINT_1,  /* Checkpoint 1 */
+    SURFACE_CHECKPOINT_2,  /* Checkpoint 2 */
+    SURFACE_CHECKPOINT_3   /* Checkpoint 3 */
 } surface_t;
 
 /**
@@ -57,6 +61,18 @@ bool track_is_on_road(int x, int y);
  * @return true if all corners are on road, false otherwise.
  */
 bool track_car_on_road(int x, int y, int width, int height);
+
+/**
+ * @brief Checks if a car's bounding box is touching a specific surface type.
+ * @param x Top-left X of the car.
+ * @param y Top-left Y of the car.
+ * @param width Width of the car sprite.
+ * @param height Height of the car sprite.
+ * @param surface Surface type to check.
+ * @return true if touching, false otherwise.
+ */
+bool track_car_touches_surface(int x, int y, int width, int height, surface_t surface);
+
 
 /**
  * @brief Frees memory used by the track.
