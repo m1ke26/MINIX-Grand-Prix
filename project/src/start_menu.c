@@ -33,7 +33,7 @@ start_menu_t* start_menu_create(font_t *font) {
   // Track Selector
   for (int i = 0; i < NUM_TRACKS; i++) {
     sm->track_sprites[i] = create_sprite((xpm_map_t) track_xpms[i]);
-}
+  }
 
   return sm;
 }
@@ -49,15 +49,13 @@ void start_menu_destroy(start_menu_t *sm) {
 
   for (int i = 0; i < NUM_CARS; i++) {
     if (sm->car_sprites[i] != NULL) {
-      if (sm->car_sprites[i]->map) free(sm->car_sprites[i]->map);
-      free(sm->car_sprites[i]);
+      destroy_sprite(sm->car_sprites[i]);
     }
   }
 
   for (int i = 0; i < NUM_TRACKS; i++) {
     if (sm->track_sprites[i] != NULL) {
-      if (sm->track_sprites[i]->map) free(sm->track_sprites[i]->map);
-      free(sm->track_sprites[i]);
+      destroy_sprite(sm->track_sprites[i]);
     }
   }
 
@@ -111,8 +109,6 @@ void start_menu_draw(start_menu_t *sm, int cursor_x, int cursor_y) {
   // Track Label
   draw_string_scaled(sm->font, "<TRACK1>", 600, 420, 2, COLOR_MENU_TEXT);
 
-  // 5. Draw cursor
-  vg_buf_draw_rect(cursor_x, cursor_y, 8, 8, COLOR_CURSOR);
 }
 
 void start_menu_handle_key(start_menu_t *sm, char key) {

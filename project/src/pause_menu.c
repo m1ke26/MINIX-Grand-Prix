@@ -37,7 +37,4 @@ void pause_menu_draw(pause_menu_t *pm, int cursor_x, int cursor_y) {
         button_draw(pm->resume_btn, button_is_hovered(pm->resume_btn, cursor_x, cursor_y));
     if (pm->exit_btn != NULL)
         button_draw(pm->exit_btn, button_is_hovered(pm->exit_btn, cursor_x, cursor_y));
-
-    // Draw cursor
-    vg_buf_draw_rect(cursor_x, cursor_y, 8, 8, COLOR_CURSOR);
 }

@@ -31,8 +31,6 @@ typedef struct {
             car_t *car;
             font_t *font;
             race_t race;
-            unsigned laps;
-            unsigned seconds_elapsed;
             game_input_t input;
             bool pause;
             pause_menu_t *pause_menu;
