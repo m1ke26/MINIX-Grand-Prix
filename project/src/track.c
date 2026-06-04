@@ -54,29 +54,38 @@ int collision_track(track_t *track, int car_x, int car_y)
     int pos = (car_y * track->info_collisionmap.width + car_x) * 3;
     uint32_t color = ((track->pix_collisionmap[pos]) + (track->pix_collisionmap[pos + 1] << 8) + (track->pix_collisionmap[pos + 2] << 16));
 
-    if (color == 0xff0000) /*vermelho*/
-    {
-        return 1;
-    }
     if (color == 0x000000) /*preto*/
     {
         return 0;
     }
+    if (color == 0xff0000) /*vermelho*/
+    {
+        return 1;
+    }
     if (color == 0xffff00) /*amarelo*/
     {
         return 2;
+    }
+    if (color == 0x00ff00) /*verde, checkpoint 1*/
+    {
+        return 3;
+    }
+    if (color == 0x0000ff) /*azul, checkpoint 2*/
+    {
+        return 4;
+    }
+    if (color == 0xff00ff) /*magenta, checkpoint 3*/
+    {
+        return 5;
+    }
+    if (color == 0x00ffff) /*ciano, checkpoint 4*/
+    {
+        return 6;
     }
     return 0;
 }
 
 void destroy_track(track_t *track)
 {
-    if (track == NULL) return;
-    if (track->pix_trackmap != NULL) {
-        free(track->pix_trackmap);
-    }
-    if (track->pix_collisionmap != NULL) {
-        free(track->pix_collisionmap);
-    }
     free(track); /* liberta a memoria alocada pelo create_track */
 }
