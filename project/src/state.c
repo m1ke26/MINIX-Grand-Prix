@@ -196,19 +196,32 @@ void handle_mouse_event(state_t *state, struct packet *pp, int cursor_x, int cur
     if (state == NULL) return;
 
     switch (state->tag) {
-        case STATE_START:
-            
-            // Check for Left Click
-            if (pp->lb) { 
-                if (button_is_hovered(state->data.start.menu->start_btn, cursor_x, cursor_y)) {
-                    font_t *font = state->data.start.menu->font;
-                    state_enter_in_game(state, font, state->data.start.menu->track_index);
-                } 
-                else if (button_is_hovered(state->data.start.menu->exit_btn, cursor_x, cursor_y)) {
-                    running = false;
-                }
+        case STATE_START: {
+            start_menu_t *menu = state->data.start.menu;
+            if (menu == NULL) break;
+
+            if (!pp->lb) break;
+
+            if (button_is_hovered(menu->start_btn, cursor_x, cursor_y)) {
+                state_enter_loading(state, menu->font);
+            }
+            else if (button_is_hovered(menu->exit_btn, cursor_x, cursor_y)) {
+                running = false;
+            }
+            else if (button_is_hovered(menu->car_left, cursor_x, cursor_y)) {
+                start_menu_change_car(menu, -1);
+            }
+            else if (button_is_hovered(menu->car_right, cursor_x, cursor_y)) {
+                start_menu_change_car(menu, 1);
+            }
+            else if (button_is_hovered(menu->track_left, cursor_x, cursor_y)) {
+                start_menu_change_track(menu, -1);
+            }
+            else if (button_is_hovered(menu->track_right, cursor_x, cursor_y)) {
+                start_menu_change_track(menu, 1);
             }
             break;
+        }
 
         case STATE_IN_GAME:
             if(pp->lb && state->data.in_game.pause && state->data.in_game.pause_menu != NULL) {
