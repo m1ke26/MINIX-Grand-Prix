@@ -16,6 +16,7 @@ typedef struct
 
 } track_t;
 
+
 /**
  * @brief Creates a track by loading the visual and collision XPM maps.
  * @param track XPM data for the visual map.

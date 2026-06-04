@@ -11,7 +11,7 @@
 #include "hud.h"
 #include "cursor.h"
 #include "rtc.h"
-#include "track_pixmaps.h"
+#include "tracks_pixmaps.h"
 
 
 
@@ -152,10 +152,8 @@ void state_enter_loading(state_t *state, font_t *font) {
     state->data.loading.drawn = false;
 }
 
-static void state_enter_in_game(state_t *state) {
+static void state_enter_in_game(state_t *state, font_t *font, int track_idx) {
     if (state == NULL) return;
-    int track_idx = state->data.loading.track_index;
-    font_t *font = state->data.loading.font;
 
     state->tag = STATE_IN_GAME;
 
@@ -204,7 +202,7 @@ void handle_mouse_event(state_t *state, struct packet *pp, int cursor_x, int cur
             if (pp->lb) { 
                 if (button_is_hovered(state->data.start.menu->start_btn, cursor_x, cursor_y)) {
                     font_t *font = state->data.start.menu->font;
-                    state_enter_in_game(state, font);
+                    state_enter_in_game(state, font, state->data.start.menu->track_index);
                 } 
                 else if (button_is_hovered(state->data.start.menu->exit_btn, cursor_x, cursor_y)) {
                     running = false;
@@ -286,7 +284,7 @@ void update_state(state_t *state) {
             break;
         case STATE_LOADING:
             if (state->data.loading.drawn) {
-                state_enter_in_game(state);
+                state_enter_in_game(state, state->data.loading.font, state->data.loading.track_index);
             }
             break;
         case STATE_IN_GAME: {
@@ -298,19 +296,21 @@ void update_state(state_t *state) {
             // Skip physics and checkpoint updates if the countdown is still running
             if (!race_has_started(&state->data.in_game.race)) break;
 
-            update_car_physics(state->data.in_game.car, &state->data.in_game.input);
+            update_car_physics(state->data.in_game.car, &state->data.in_game.input, state->data.in_game.track);
             car_t *c = state->data.in_game.car;
             int idx = (int)((c->angle + 11.25) / 22.5) % 16;
             
-            race_check_checkpoints(&state->data.in_game.race, c->x, c->y, c->sprites[idx]->width, c->sprites[idx]->height);
+            //race_check_checkpoints(&state->data.in_game.race, c->x, c->y, c->sprites[idx]->width, c->sprites[idx]->height);
 
             if (race_is_finished(&state->data.in_game.race)) {
                 state_enter_game_over(state, state->data.in_game.font, state->data.in_game.race.seconds_elapsed);
                 break;
             }
 
-            camera_follow((int)c->x + c->sprites[idx]->width / 2,
+            follow_camera(state->data.in_game.camera,
+                          (int)c->x + c->sprites[idx]->width / 2,
                           (int)c->y + c->sprites[idx]->height / 2);
+
             break;
         }
         case STATE_GAME_OVER:

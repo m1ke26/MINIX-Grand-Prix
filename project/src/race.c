@@ -50,23 +50,6 @@ int race_countdown_seconds_left(const race_t *race) {
     return (race->countdown_ticks + TIMER_TICKS_PER_SECOND - 1) / TIMER_TICKS_PER_SECOND;
 }
 
-void race_check_checkpoints(race_t *race, double car_x, double car_y, int car_w, int car_h) {
-    if (race == NULL || !race_has_started(race)) return;
-
-
-    // The next checkpoint surface type is derived from the checkpoint index (SURFACE_CHECKPOINT_0 + race->next_checkpoint)
-    surface_t next_cp_surface = (surface_t)(SURFACE_CHECKPOINT_0 + race->next_checkpoint);
-    if (track_car_touches_surface((int)car_x, (int)car_y, car_w, car_h, next_cp_surface)) {
-        if (race->next_checkpoint == 0) {
-            // Lap complete!
-            race->current_lap++;
-            race->next_checkpoint = 1;
-        } else {
-            // Progress to the next checkpoint
-            race->next_checkpoint = (race->next_checkpoint + 1) % 4;
-        }
-    }
-}
 
 bool race_is_finished(const race_t *race) {
     return race != NULL && race->current_lap > race->total_laps;
