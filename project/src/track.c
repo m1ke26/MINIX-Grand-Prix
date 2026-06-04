@@ -71,5 +71,12 @@ int collision_track(track_t *track, int car_x, int car_y)
 
 void destroy_track(track_t *track)
 {
+    if (track == NULL) return;
+    if (track->pix_trackmap != NULL) {
+        free(track->pix_trackmap);
+    }
+    if (track->pix_collisionmap != NULL) {
+        free(track->pix_collisionmap);
+    }
     free(track); /* liberta a memoria alocada pelo create_track */
 }

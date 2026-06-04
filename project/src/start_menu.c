@@ -1,6 +1,7 @@
 #include "start_menu.h"
 #include "colors.h"
 #include <stdlib.h>
+#include <stdio.h>
 
 start_menu_t* start_menu_create(font_t *font) {
   start_menu_t *sm = (start_menu_t *) malloc(sizeof(start_menu_t));
@@ -30,9 +31,9 @@ start_menu_t* start_menu_create(font_t *font) {
     sm->car_sprites[i] = create_sprite((xpm_map_t) car_xpms[i]);
   }
 
-  // Track Selector
+  // Track Selector — preload small track previews (takes < 0.03s total)
   for (int i = 0; i < NUM_TRACKS; i++) {
-    sm->track_sprites[i] = create_sprite((xpm_map_t) track_xpms[i]);
+    sm->track_sprites[i] = create_sprite((xpm_map_t) track_preview_xpms[i]);
   }
 
   return sm;
@@ -100,14 +101,18 @@ void start_menu_draw(start_menu_t *sm, int cursor_x, int cursor_y) {
   }
   
   // Track Sprite
-   if (sm->track_sprites[sm->track_index] != NULL)
-    draw_sprite_scaled_down(sm->track_sprites[sm->track_index], 595, 255, 10 );
+  if (sm->track_sprites[sm->track_index] != NULL)
+    draw_sprite_scaled_down(sm->track_sprites[sm->track_index], 595, 255, 1);
 
   // Car Label
-  draw_string_scaled(sm->font, "<CAR1>", 75, 420, 2, COLOR_MENU_TEXT);
+  char car_label[16];
+  sprintf(car_label, "<CAR%d>", sm->car_index + 1);
+  draw_string_scaled(sm->font, car_label, 75, 420, 2, COLOR_MENU_TEXT);
 
   // Track Label
-  draw_string_scaled(sm->font, "<TRACK1>", 600, 420, 2, COLOR_MENU_TEXT);
+  char track_label[16];
+  sprintf(track_label, "<TRACK%d>", sm->track_index + 1);
+  draw_string_scaled(sm->font, track_label, 600, 420, 2, COLOR_MENU_TEXT);
 
 }
 
@@ -126,4 +131,14 @@ void start_menu_handle_key(start_menu_t *sm, char key) {
     sm->name_len++;
     sm->player_name[sm->name_len] = '\0';
   }
+}
+
+void start_menu_change_track(start_menu_t *sm, int delta) {
+  if (sm == NULL) return;
+  sm->track_index = (sm->track_index + delta + NUM_TRACKS) % NUM_TRACKS;
+}
+
+void start_menu_change_car(start_menu_t *sm, int delta) {
+  if (sm == NULL) return;
+  sm->car_index = (sm->car_index + delta + NUM_CARS) % NUM_CARS;
 }
