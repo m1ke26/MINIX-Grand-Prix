@@ -11,6 +11,8 @@
 #include "pause_menu.h"
 #include "font.h"
 #include "race.h"
+#include "rtc.h"
+#include "cursor.h"
 
 extern bool running;
 
@@ -25,12 +27,9 @@ typedef enum
 typedef struct
 {
     state_tag_t tag;
-    union
-    {
-        struct
-        {
-            int cursor_x;
-            int cursor_y;
+    cursor_t *cursor;
+    union {
+        struct {
             start_menu_t *menu;
         } start;
 
@@ -50,14 +49,12 @@ typedef struct
             game_input_t input;
             bool pause;
             pause_menu_t *pause_menu;
-            int cursor_x;
-            int cursor_y;
         } in_game;
 
         struct
         {
             unsigned final_time;
-            unsigned laps_done;
+            rtc_date date;
         } game_over;
     } data;
 } state_t;
@@ -115,9 +112,16 @@ void state_enter_loading(state_t *state, font_t *font);
  *
  * @param state Pointer to the current game state.
  * @param font  The font to reuse for the start menu.
- * @param cursor_x The x-coordinate of the mouse cursor.
- * @param cursor_y The y-coordinate of the mouse cursor.
  */
-void state_enter_start(state_t *state, font_t *font, int cursor_x, int cursor_y);
+void state_enter_start(state_t *state, font_t *font);
+
+/**
+ * @brief Transitions the game to the game-over state.
+ *
+ * @param state Pointer to the current game state.
+ * @param font  The font to use for game over menu.
+ * @param final_time The final race time in seconds.
+ */
+void state_enter_game_over(state_t *state, font_t *font, unsigned final_time);
 
 #endif /* _STATE_H_ */
