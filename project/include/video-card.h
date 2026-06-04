@@ -29,3 +29,7 @@ void vg_buf_swap(void);
 
 /** Free back buffer memory. */
 void vg_free_double_buffer(void);
+
+/** Converts every pixel in the back buffer to greyscale in-place.
+ *  Call after drawing the game world and before drawing the pause menu. */
+void vg_buf_desaturate(void);

@@ -1,7 +1,8 @@
 #include "font.h"
+#include "colors.h"
 #include <stdlib.h>
 #include <string.h>
-
+#include "video-card.h"
 
 // Procedural converter that reads directly from the global font_bits array
 xpm_map_t create_xpm_font(int index) {
@@ -10,8 +11,8 @@ xpm_map_t create_xpm_font(int index) {
   if (xpm == NULL) return NULL;
 
   xpm[0] = strdup("8 8 2 1");
-  xpm[1] = strdup("  c #000000"); // 0 bit = transparent (Pure Black)
-  xpm[2] = strdup("X c #222222"); // 1 bit = crisp charcoal text (Dark Gray)  
+  xpm[1] = strdup("  c #000000"); // 0 bit = transparent
+  xpm[2] = strdup("X c #222222"); // 1 bit = font ink
 
   // Pull the 8 rows of bits for this specific character index
   uint8_t const *char_rows = font_bits[index];
@@ -84,22 +85,55 @@ void font_destroy(font_t *font) {
   free(font);
 }
 
-void draw_string(font_t *font, const char *str, int x, int y) {
+void draw_string(font_t *font, const char *str, int x, int y, uint32_t color) {
   if (font == NULL || str == NULL) return;
-  
+
+  uint32_t transp = xpm_transparency_color(XPM_8_8_8);
   int curr_x = x;
   for (size_t i = 0; i < strlen(str); i++) {
     char c = str[i];
     int index = -1;
 
-    // Simple mapping: ASCII ' ' is 0, '!' is 1, etc. 
-    if (c >= 32 && c <= 126) {
-      index = c - 32;
-    }
+    if (c >= 32 && c <= 126) index = c - 32;
 
     if (index >= 0 && (uint32_t)index < font->number_of_tiles) {
-      sprite_draw(font->tiles[index], curr_x, y);
+      sprite_t *tile = font->tiles[index];
+      if (tile == NULL || tile->map == NULL) { curr_x += font->tile_size; continue; }
+      for (int row = 0; row < tile->height; row++) {
+        for (int col = 0; col < tile->width; col++) {
+          uint32_t pixel = tile->map[row * tile->width + col];
+          if (pixel != transp && pixel != COLOR_BLACK)
+            vg_buf_draw_pixel(curr_x + col, y + row, color);
+        }
+      }
     }
     curr_x += font->tile_size;
+  }
+}
+
+void draw_string_scaled(font_t *font, const char *str, int x, int y, int scale, uint32_t color) {
+  if (font == NULL || str == NULL || scale < 1) return;
+
+  uint32_t transp = xpm_transparency_color(XPM_8_8_8);
+  int curr_x = x;
+  for (size_t i = 0; i < strlen(str); i++) {
+    char c = str[i];
+    int index = -1;
+
+    if (c >= 32 && c <= 126) index = c - 32;
+
+    if (index >= 0 && (uint32_t)index < font->number_of_tiles) {
+      sprite_t *tile = font->tiles[index];
+      if (tile == NULL || tile->map == NULL) { curr_x += font->tile_size * scale; continue; }
+
+      for (int row = 0; row < tile->height; row++) {
+        for (int col = 0; col < tile->width; col++) {
+          uint32_t pixel = tile->map[row * tile->width + col];
+          if (pixel != transp && pixel != COLOR_BLACK)
+            vg_buf_draw_rect(curr_x + col * scale, y + row * scale, scale, scale, color);
+        }
+      }
+    }
+    curr_x += font->tile_size * scale;
   }
 }

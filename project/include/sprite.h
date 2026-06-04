@@ -33,4 +33,26 @@ void destroy_sprite(sprite_t *sp);
  */
 void sprite_draw(sprite_t *sp, int x, int y);
 
+/**
+ * @brief Draws a sprite scaled down by a given factor.
+ * Samples 1 pixel every `scale` pixels from the original sprite.
+ * @param s Pointer to the sprite to draw.
+ * @param x X coordinate of the top-left corner on screen.
+ * @param y Y coordinate of the top-left corner on screen.
+ * @param scale Downscale factor (e.g. 10 = draws at 1/10th of original size).
+ */
+
+void draw_sprite_scaled_down(sprite_t *s, int x, int y, int scale);
+
+/**
+ * @brief Draws a sprite scaled up by a given factor.
+ * Samples 1 pixel every `scale` pixels from the original sprite.
+ * @param s Pointer to the sprite to draw.
+ * @param x X coordinate of the top-left corner on screen.
+ * @param y Y coordinate of the top-left corner on screen.
+ * @param scale Upscale factor (e.g. 2 = draws at 2 times of original size).
+ */
+
+void draw_sprite_scaled_up(sprite_t *s, int x, int y, int scale);
+
 #endif /* _SPRITE_H_ */

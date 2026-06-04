@@ -1,15 +1,19 @@
 #include <lcom/lcf.h>
 #include "video-card.h"
+#include <stdlib.h>
+#include <string.h>
 
 
 /* Static global variables */
 static char *video_mem;          /* frame-buffer VM address */
+static uint8_t *back_buf = NULL; /* secondary frame-buffer */
 
 /* Other variables that might be used */
 static vbe_mode_info_t vmi;      /* VBE mode info */
 static unsigned bytes_per_pixel; /* Number of VRAM bytes per pixel */
 static unsigned h_res;
 static unsigned v_res;
+static size_t vram_size;
 
 int set_video_mode(uint16_t mode) {
     reg86_t r86;
@@ -40,7 +44,7 @@ int map_video_memory(uint16_t mode) {
   v_res = vmi.YResolution;
   bytes_per_pixel = (vmi.BitsPerPixel + 7) / 8;
 
-  unsigned vram_size = h_res * v_res * bytes_per_pixel;
+  vram_size = h_res * v_res * bytes_per_pixel;
   unsigned vram_base = vmi.PhysBasePtr;
 
   struct minix_mem_range mr;
@@ -104,4 +108,80 @@ int vg_draw_xpm(xpm_map_t xpm, uint16_t x, uint16_t y) {
     }
   }
   return 0;
+}
+
+int vg_init_double_buffer(uint16_t width, uint16_t height, uint8_t bpp) {
+  if (video_mem == NULL) return 1;
+  if (width != h_res || height != v_res || bpp != bytes_per_pixel) return 1;
+
+  back_buf = (uint8_t *) malloc(vram_size);
+  if (back_buf == NULL) return 1;
+
+  memset(back_buf, 0, vram_size);
+  return 0;
+}
+
+void vg_buf_clear(void) {
+  if (back_buf) memset(back_buf, 0, vram_size);
+}
+
+void vg_buf_draw_pixel(int x, int y, uint32_t color) {
+  if (!back_buf) return;
+  if (x < 0 || x >= (int) h_res || y < 0 || y >= (int) v_res) return;
+
+  size_t offset = ((size_t) y * h_res + x) * bytes_per_pixel;
+
+  if (bytes_per_pixel == 3) {
+    back_buf[offset + 0] = color & 0xFF;
+    back_buf[offset + 1] = (color >> 8) & 0xFF;
+    back_buf[offset + 2] = (color >> 16) & 0xFF;
+  }
+  else if (bytes_per_pixel == 2) {
+    uint8_t r = (color >> 16) & 0xFF;
+    uint8_t g = (color >> 8) & 0xFF;
+    uint8_t b = color & 0xFF;
+    uint16_t c = ((r >> 3) << 11) | ((g >> 2) << 5) | (b >> 3);
+
+    back_buf[offset + 0] = c & 0xFF;
+    back_buf[offset + 1] = (c >> 8) & 0xFF;
+  }
+}
+
+void vg_buf_draw_rect(int x, int y, int w, int h, uint32_t color) {
+  for (int row = 0; row < h; row++) {
+    for (int col = 0; col < w; col++) {
+      vg_buf_draw_pixel(x + col, y + row, color);
+    }
+  }
+}
+
+void vg_buf_swap(void) {
+  if (back_buf && video_mem) {
+    memcpy(video_mem, back_buf, vram_size);
+  }
+}
+
+void vg_buf_desaturate(void) {
+  if (!back_buf) return;
+
+  uint32_t total_pixels = h_res * v_res;
+  for (uint32_t i = 0; i < total_pixels; i++) {
+    size_t off = (size_t) i * bytes_per_pixel;
+
+    if (bytes_per_pixel == 3) {
+      uint8_t b = back_buf[off + 0];
+      uint8_t g = back_buf[off + 1];
+      uint8_t r = back_buf[off + 2];
+      uint8_t grey = (uint8_t)(0.299f * r + 0.587f * g + 0.114f * b);
+
+      back_buf[off + 0] = grey;
+      back_buf[off + 1] = grey;
+      back_buf[off + 2] = grey;
+    }
+  }
+}
+
+void vg_free_double_buffer(void) {
+  free(back_buf);
+  back_buf = NULL;
 }
