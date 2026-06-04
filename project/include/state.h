@@ -38,6 +38,7 @@ typedef struct
             font_t *font;
             int track_index;
             int car_index;
+            char username[16];
             bool drawn;
         } loading;
 
@@ -50,12 +51,16 @@ typedef struct
             game_input_t input;
             bool pause;
             pause_menu_t *pause_menu;
+            char username[16];
+            int track_index;
         } in_game;
 
         struct
         {
             unsigned final_time;
             rtc_date date;
+            char username[16];
+            int track_index;
         } game_over;
     } data;
 } state_t;
@@ -122,7 +127,9 @@ void state_enter_start(state_t *state, font_t *font);
  * @param state Pointer to the current game state.
  * @param font  The font to use for game over menu.
  * @param final_time The final race time in seconds.
+ * @param username The player's username.
+ * @param track_index The track index (0-2).
  */
-void state_enter_game_over(state_t *state, font_t *font, unsigned final_time);
+void state_enter_game_over(state_t *state, font_t *font, unsigned final_time, const char *username, int track_index);
 
 #endif /* _STATE_H_ */
