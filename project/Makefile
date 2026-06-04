@@ -7,7 +7,7 @@ PROG = proj
 VPATH = src
 
 # Source files (without directory prefix)
-SRCS = proj.c sprite.c font.c button.c start_menu.c double_buffer.c state.c car.c track.c camera.c pause_menu.c speedometer.c hud.c race.c cursor.c
+SRCS = proj.c sprite.c font.c button.c start_menu.c state.c car.c track.c camera.c pause_menu.c speedometer.c hud.c race.c cursor.c
 
 # Include directories
 CFLAGS += -Iinclude
