@@ -145,18 +145,18 @@ static void update_angle(car_t *car, bool turn_left, bool turn_right) {
   double direction = (car->speed > 0) ? 1.0 : -1.0;
   double speed_ratio = fabs(car->speed) / CAR_MAX_SPEED;
 
-  if (speed_ratio < CAR_MIN_TURN_RATIO) {
-    speed_ratio = CAR_MIN_TURN_RATIO;
-  }
+  // Turning tightness drops off at high speed — use inverse curve
+  double turn_factor = 1.0 / (1.0 + speed_ratio * 1.5);
+  if (turn_factor < CAR_MIN_TURN_RATIO) turn_factor = CAR_MIN_TURN_RATIO;
 
-  double drift_multiplier = car->is_drifting ? 1.6 : 1.0;
-  double turn_rate = CAR_TURN_RATE * direction * speed_ratio * drift_multiplier;
+  double drift_multiplier = car->is_drifting ? 2.2 : 1.0;
+  double turn_rate = CAR_TURN_RATE * direction * turn_factor * drift_multiplier;
 
-  if (turn_left) car->angle -= turn_rate;
+  if (turn_left)  car->angle -= turn_rate;
   if (turn_right) car->angle += turn_rate;
 
-  if (car->angle < 0) car->angle += 360.0;
-  if (car->angle >= 360.0) car->angle -= 360.0;
+  if (car->angle < 0)       car->angle += 360.0;
+  if (car->angle >= 360.0)  car->angle -= 360.0;
 }
 
 static void update_drift(car_t *car, bool handbrake) {
