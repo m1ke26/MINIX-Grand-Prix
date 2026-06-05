@@ -49,38 +49,34 @@ bool move_car(car_t *car, track_t *track) {
   int h = car->sprites[idx]->height;
 
   // Map border clamping
-  if (new_x < 0) { new_x = 0; car->speed = 0; }
-  if (new_x > 2956 - w) { new_x = 2956 - w; car->speed = 0; }
-  if (new_y < 0) { new_y = 0; car->speed = 0; }
-  if (new_y > 2217 - h) { new_y = 2217 - h; car->speed = 0; }
+  int map_w = track->info_trackmap.width;
+  int map_h = track->info_trackmap.height;
+  if (new_x < 0)            { new_x = 0;            car->speed = 0; }
+  if (new_x > map_w - w)    { new_x = map_w - w;    car->speed = 0; }
+  if (new_y < 0)            { new_y = 0;             car->speed = 0; }
+  if (new_y > map_h - h)    { new_y = map_h - h;     car->speed = 0; }
 
   // Track collision: check surface at center of new position
-  int terrain = collision_track(track, (int)new_x + w / 2, (int)new_y + h / 2);
+  terrain_type_t terrain = collision_track(track, (int)new_x + w / 2, (int)new_y + h / 2);
 
-  if (terrain == 1) { /* blocked */
-    // Try sliding along X axis only
-    int tx = collision_track(track, (int)new_x + w / 2, (int)car->y + h / 2);
-    if (tx != 1) {
+  if (terrain == TERRAIN_BLOCKED) {
+    terrain_type_t tx = collision_track(track, (int)new_x + w / 2, (int)car->y + h / 2);
+    if (tx != TERRAIN_BLOCKED) {
       car->x = new_x;
-      if (tx == 2) car->speed *= 0.95;
-    }
-    // Try sliding along Y axis only
-    else {
-      int ty = collision_track(track, (int)car->x + w / 2, (int)new_y + h / 2);
-      if (ty != 1) {
+      if (tx == TERRAIN_SLOW) car->speed *= 0.95;
+    } else {
+      terrain_type_t ty = collision_track(track, (int)car->x + w / 2, (int)new_y + h / 2);
+      if (ty != TERRAIN_BLOCKED) {
         car->y = new_y;
-        if (ty == 2) car->speed *= 0.95;
-      }
-      // Can't move at all - stop
-      else {
+        if (ty == TERRAIN_SLOW) car->speed *= 0.95;
+      } else {
         car->speed = 0;
       }
     }
   } else {
     car->x = new_x;
     car->y = new_y;
-    // Slow zone: reduce speed gradually
-    if (terrain == 2) car->speed *= 0.95;
+    if (terrain == TERRAIN_SLOW) car->speed *= 0.95;
   }
 
   return true;
@@ -96,14 +92,18 @@ void destroy_car(car_t *car) {
   free(car);
 }
 
-void draw_car(car_t *car, int cam_x, int cam_y) {
-  if (car == NULL) return;
-  double step = 360.0 / car->num_sprites;
-  int raw_idx = (int)((car->angle + step / 2.0) / step) % car->num_sprites;
-  int idx = (raw_idx + car->num_sprites * 3 / 4) % car->num_sprites;
+void draw_car(car_t *car, int cam_x, int cam_y, int idx) {
+ 
   int screen_x = (int)car->x - cam_x;
   int screen_y = (int)car->y - cam_y;
   sprite_draw(car->sprites[idx], screen_x, screen_y);
+}
+
+int car_sprite_index(car_t *car) {
+  if (car == NULL) return 0;
+  double step = 360.0 / car->num_sprites;
+  int raw_idx = (int)((car->angle + step / 2.0) / step) % car->num_sprites;
+  return (raw_idx + car->num_sprites * 3 / 4) % car->num_sprites;
 }
 
 static bool update_boost(car_t *car, bool boost_pressed) {

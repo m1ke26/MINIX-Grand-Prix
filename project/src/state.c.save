@@ -1,4 +1,4 @@
-#include <stdio.h>
+qq#include <stdio.h>
 #include <string.h>
 #include "speedometer.h"
 #include "state.h"
@@ -17,7 +17,6 @@
 #include "tracks_pixmaps.h"
 #include "leaderboard.h"
 #include "leaderboard_menu.h"
-#include "minimap.h"
 
 
 static void reset_game_input(game_input_t *input)
@@ -130,7 +129,6 @@ void draw_state(state_t *state)
         draw_car(state->data.in_game.car, state->data.in_game.camera->cam_x, state->data.in_game.camera->cam_y, car_sprite_index(state->data.in_game.car));
         speedometer_draw(state->data.in_game.car->speed);
         hud_draw_boost_indicator(state->data.in_game.car);
-        minimap_draw((int)state->data.in_game.car->x, (int)state->data.in_game.car->y);
 
         if (!race_has_started(&state->data.in_game.race))
         {
@@ -240,7 +238,6 @@ static void state_enter_in_game(state_t *state, font_t *font, int track_idx, int
 
     state->data.in_game.track = create_track((xpm_map_t)track_xpms[track_idx], (xpm_map_t)collision_xpms[track_idx]);
     state->data.in_game.camera = create_camera(state->data.in_game.track->info_trackmap.width, state->data.in_game.track->info_trackmap.height);
-    minimap_init(track_idx, state->data.in_game.track);
 
     int spawn_x = 1290;
     int spawn_y = 415;
@@ -290,7 +287,6 @@ void state_enter_start(state_t *state, font_t *font, const char *username)
     state_exit_current(state);
     state->tag = STATE_START;
     state->data.start.menu = start_menu_create(font, local_username);
-    minimap_destroy();
 }
 
 void state_enter_game_over(state_t *state, font_t *font, const race_t *race)

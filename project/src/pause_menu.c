@@ -38,3 +38,14 @@ void pause_menu_draw(pause_menu_t *pm, int cursor_x, int cursor_y) {
     if (pm->exit_btn != NULL)
         button_draw(pm->exit_btn, button_is_hovered(pm->exit_btn, cursor_x, cursor_y));
 }
+
+pause_menu_action_t pause_menu_handle_click(pause_menu_t *pm, int x, int y) {
+    if (pm == NULL) return PAUSE_MENU_ACTION_NONE;
+
+    if (button_is_hovered(pm->resume_btn, x, y))
+        return PAUSE_MENU_ACTION_RESUME;
+    if (button_is_hovered(pm->exit_btn, x, y))
+        return PAUSE_MENU_ACTION_EXIT;
+
+    return PAUSE_MENU_ACTION_NONE;
+}

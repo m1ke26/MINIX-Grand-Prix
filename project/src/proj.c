@@ -4,11 +4,8 @@
 #include "kbc.h"
 #include "mouse.h"
 #include "video-card.h"
-#include "start_menu.h"
 #include "font.h"
-#include "button.h"
 #include "state.h"
-#include "track.h"
 #include "cursor.h"
 
 
@@ -46,7 +43,7 @@ int (proj_main_loop)(int argc, char *argv[]) {
   state_t *state = init_state();
   if (state == NULL) {font_destroy(font); return 1; }
 
-  state->data.start.menu = start_menu_create(font);
+  state->data.start.menu = start_menu_create(font, NULL);
   if (state->data.start.menu == NULL) { font_destroy(font); destroy_state(state); return 1;}
 
   if (state->cursor != NULL && state->data.start.menu != NULL) {

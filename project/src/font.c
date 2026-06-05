@@ -137,3 +137,12 @@ void draw_string_scaled(font_t *font, const char *str, int x, int y, int scale, 
     curr_x += font->tile_size * scale;
   }
 }
+
+void draw_centered_text(font_t *font, const char *text, int y, int scale, uint32_t color) {
+    if (font == NULL || text == NULL) return;
+
+    int width = (int) strlen(text) * 8 * scale;
+    int x = (800 - width) / 2;
+    draw_string_scaled(font, text, x, y, scale, color);
+}
+
