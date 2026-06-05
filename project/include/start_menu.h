@@ -8,12 +8,24 @@
 #include "tracks_pixmaps.h"
 #include "sprite.h"
 
+typedef enum {
+    START_MENU_ACTION_NONE,
+    START_MENU_ACTION_START,
+    START_MENU_ACTION_LEADERBOARD,
+    START_MENU_ACTION_EXIT,
+    START_MENU_ACTION_CAR_LEFT,
+    START_MENU_ACTION_CAR_RIGHT,
+    START_MENU_ACTION_TRACK_LEFT,
+    START_MENU_ACTION_TRACK_RIGHT,
+} start_menu_action_t;
+
 #define NUM_CARS   NUM_VEHICLES
 #define NUM_TRACKS 3
 
 typedef struct {
   font_t *font;
   button_t *start_btn;
+  button_t *leaderboard_btn;
   button_t *exit_btn;
   button_t *car_left;
   button_t *car_right;
@@ -29,8 +41,10 @@ typedef struct {
 
 /**
  * @brief Initializes the start menu and its buttons.
+ * @param font The font to use for rendering.
+ * @param username Optional username to pre-fill; if NULL or empty, shows placeholder.
  */
-start_menu_t* start_menu_create(font_t *font);
+start_menu_t* start_menu_create(font_t *font, const char *username);
 
 /**
  * @brief Frees start menu resources.
@@ -55,7 +69,7 @@ void start_menu_draw(start_menu_t *sm, int cursor_x, int cursor_y);
 void start_menu_handle_key(start_menu_t *sm, char key);
 
 /**
- * @brief Cycles the track selection by delta (+1 or -1). Frees old preview, loads new.
+ * @brief Cycles the track selection by delta (+1 or -1).
  */
 void start_menu_change_track(start_menu_t *sm, int delta);
 
@@ -63,5 +77,14 @@ void start_menu_change_track(start_menu_t *sm, int delta);
  * @brief Cycles the car selection by delta (+1 or -1).
  */
 void start_menu_change_car(start_menu_t *sm, int delta);
+
+/**
+ * @brief Processes a left-click at (x, y) and returns the triggered action.
+ * @param sm      Pointer to the start menu.
+ * @param x       Mouse x coordinate.
+ * @param y       Mouse y coordinate.
+ * @return The action that should be taken (NONE if no button was hit).
+ */
+start_menu_action_t start_menu_handle_click(start_menu_t *sm, int x, int y);
 
 #endif /* _START_MENU_H_ */

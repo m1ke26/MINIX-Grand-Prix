@@ -5,6 +5,12 @@
 #include "font.h"
 #include "video-card.h"
 
+typedef enum {
+    PAUSE_MENU_ACTION_NONE,
+    PAUSE_MENU_ACTION_RESUME,
+    PAUSE_MENU_ACTION_EXIT,
+} pause_menu_action_t;
+
 typedef struct {
   font_t *font;
   button_t *resume_btn;
@@ -28,5 +34,14 @@ void pause_menu_destroy(pause_menu_t *pm);
  * @param cursor_y Current mouse y position.
  */
 void pause_menu_draw(pause_menu_t *pm, int cursor_x, int cursor_y);
+
+/**
+ * @brief Processes a left-click at (x, y) and returns the triggered action.
+ * @param pm Pointer to the pause menu.
+ * @param x  Mouse x coordinate.
+ * @param y  Mouse y coordinate.
+ * @return The action that should be taken (NONE if no button was hit).
+ */
+pause_menu_action_t pause_menu_handle_click(pause_menu_t *pm, int x, int y);
 
 #endif /* _PAUSE_MENU_H_ */

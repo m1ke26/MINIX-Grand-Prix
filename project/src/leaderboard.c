@@ -11,6 +11,41 @@
 #define LEADERBOARD_FILE "/home/lcom/labs/grupo_2leic01_2/project/leaderboard.txt"
 #define MAX_ENTRIES 100
 
+bool leaderboard_get_user_best(const char *username, unsigned out_times[], int num_tracks) {
+    if (username == NULL || out_times == NULL || num_tracks <= 0) return false;
+
+    // Initialize outputs to 0 (meaning no record)
+    for (int i = 0; i < num_tracks; ++i)
+        out_times[i] = 0;
+
+    FILE *file = fopen(LEADERBOARD_FILE, "r");
+    if (file == NULL) return false;
+
+    char line[256];
+    bool found_any = false;
+    while (fgets(line, sizeof(line), file) != NULL) {
+        int day=0, month=0, year=0;
+        unsigned temp_time = 0;
+        int temp_track = 0;
+        char temp_name[MAX_USERNAME_LEN] = {0};
+
+        if (sscanf(line, "\"%15[^\"]\" %u %d %d %d %d", temp_name, &temp_time, &temp_track,
+                   &day, &month, &year) == 6 ||
+            sscanf(line, "%15s %u %d %d %d %d", temp_name, &temp_time, &temp_track,
+                   &day, &month, &year) == 6) {
+            if (strcmp(temp_name, username) == 0 && temp_track >= 0 && temp_track < num_tracks) {
+                if (out_times[temp_track] == 0 || temp_time < out_times[temp_track]) {
+                    out_times[temp_track] = temp_time;
+                }
+                found_any = true;
+            }
+        }
+    }
+
+    fclose(file);
+    return found_any;
+}
+
 void leaderboard_save_time(const char *username, unsigned time, int track_index, rtc_date date) {
     if (username == NULL) return;
     if (username[0] == '\0') return; // don't save empty names

@@ -12,6 +12,7 @@
 #include "font.h"
 #include "race.h"
 #include "finish_menu.h"
+#include "leaderboard_menu.h"
 #include "rtc.h"
 #include "cursor.h"
 
@@ -20,6 +21,7 @@ extern bool running;
 typedef enum
 {
     STATE_START,
+    STATE_LEADERBOARD,
     STATE_LOADING,
     STATE_IN_GAME,
     STATE_GAME_OVER
@@ -59,7 +61,11 @@ typedef struct
         struct
         {
             finish_menu_t *menu;
+            char username[16];
         } game_over;
+        struct {
+            leaderboard_menu_t *menu;
+        } leaderboard;
     } data;
 } state_t;
 
@@ -116,8 +122,9 @@ void state_enter_loading(state_t *state, font_t *font);
  *
  * @param state Pointer to the current game state.
  * @param font  The font to reuse for the start menu.
+ * @param username Optional username to preserve; if NULL, shows placeholder.
  */
-void state_enter_start(state_t *state, font_t *font);
+void state_enter_start(state_t *state, font_t *font, const char *username);
 
 /**
  * @brief Transitions the game to the game-over state.
@@ -127,5 +134,13 @@ void state_enter_start(state_t *state, font_t *font);
  * @param race  The completed race, used to populate lap times.
  */
 void state_enter_game_over(state_t *state, font_t *font, const race_t *race);
+
+/**
+ * @brief Transitions the game to the leaderboard menu showing current user's best times.
+ * @param state Pointer to the current game state.
+ * @param font The font to use for the leaderboard menu.
+ * @param username The player's username to display and load times for.
+ */
+void state_enter_leaderboard(state_t *state, font_t *font, const char *username);
 
 #endif /* _STATE_H_ */

@@ -56,3 +56,16 @@ void hud_draw_timer(font_t *font, unsigned time_elapsed) {
 
   hud_draw_centered_text(font, text, 60, 2, COLOR_WHITE);
 }
+
+void hud_draw_controls_panel(font_t *font) {
+  if (font == NULL) return;
+
+  vg_buf_draw_rect(160, 320, 480, 260, COLOR_HUD_PANEL);
+  hud_draw_centered_text(font, "CONTROLS",    340, 3, COLOR_WHITE);
+  hud_draw_centered_text(font, "UP-W",        400, 2, COLOR_WHITE);
+  draw_string_scaled(font, "LEFT-A",          290, 430, 2, COLOR_WHITE);
+  draw_string_scaled(font, "RIGHT-D",         420, 430, 2, COLOR_WHITE);
+  hud_draw_centered_text(font, "DOWN-S",      460, 2, COLOR_WHITE);
+  draw_string_scaled(font, "NITRO-SHIFT",     170, 520, 2, COLOR_WHITE);
+  draw_string_scaled(font, "DRIFT-SPACE",     450, 520, 2, COLOR_WHITE);
+}

@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <string.h>
 #include "speedometer.h"
 #include "state.h"
 #include "finish_menu.h"
@@ -15,8 +16,8 @@
 #include "rtc.h"
 #include "tracks_pixmaps.h"
 #include "leaderboard.h"
-#include <string.h>
-#include <stdio.h>
+#include "leaderboard_menu.h"
+
 
 static void reset_game_input(game_input_t *input)
 {
@@ -46,7 +47,9 @@ static void state_exit_in_game(state_t *state)
     state->data.in_game.pause_menu = NULL;
 
     destroy_track(state->data.in_game.track);
+    state->data.in_game.track = NULL;
     destroy_camera(state->data.in_game.camera);
+    state->data.in_game.camera = NULL;
 }
 
 static void state_exit_current(state_t *state)
@@ -58,6 +61,12 @@ static void state_exit_current(state_t *state)
     {
     case STATE_START:
         state_exit_start(state);
+        break;
+    case STATE_LEADERBOARD:
+        if (state->data.leaderboard.menu != NULL) {
+            leaderboard_menu_destroy(state->data.leaderboard.menu);
+            state->data.leaderboard.menu = NULL;
+        }
         break;
     case STATE_LOADING:
         break;
@@ -100,6 +109,11 @@ void draw_state(state_t *state)
             draw_cursor(state->cursor);
         }
         break;
+    case STATE_LEADERBOARD:
+        if (state->data.leaderboard.menu != NULL) {
+            leaderboard_menu_draw(state->data.leaderboard.menu);
+        }
+        break;
     case STATE_LOADING:
         vg_buf_clear();
         vg_buf_draw_rect(0, 0, 800, 600, COLOR_MENU_BACKGROUND); // Dark blueish background
@@ -126,22 +140,14 @@ void draw_state(state_t *state)
             else
             {
                 hud_draw_race_start_prompt(state->data.in_game.font);
-                vg_buf_draw_rect(160, 320, 480, 260, COLOR_HUD_PANEL);
-                draw_string_scaled(state->data.in_game.font, "CONTROLS", 310, 340, 3, COLOR_WHITE);
-                draw_string_scaled(state->data.in_game.font, "UP-W", 370, 400, 2, COLOR_WHITE);
-                draw_string_scaled(state->data.in_game.font, "LEFT-A", 290, 430, 2, COLOR_WHITE);
-                draw_string_scaled(state->data.in_game.font, "RIGHT-D", 420, 430, 2, COLOR_WHITE);
-                draw_string_scaled(state->data.in_game.font, "DOWN-S", 355, 460, 2, COLOR_WHITE);
-                draw_string_scaled(state->data.in_game.font, "NITRO-SHIFT", 170, 520, 2, COLOR_WHITE);
-                draw_string_scaled(state->data.in_game.font, "DRIFT-SPACE", 450, 520, 2, COLOR_WHITE);
+                hud_draw_controls_panel(state->data.in_game.font);
             }
             break;
         }
-        if (race_has_started(&state->data.in_game.race))
-        {
-            hud_draw_lap_counter(state->data.in_game.font, state->data.in_game.race.current_lap, state->data.in_game.race.total_laps);
-            hud_draw_timer(state->data.in_game.font, state->data.in_game.race.seconds_elapsed);
-        }
+        
+        hud_draw_lap_counter(state->data.in_game.font, state->data.in_game.race.current_lap, state->data.in_game.race.total_laps);
+        hud_draw_timer(state->data.in_game.font, state->data.in_game.race.seconds_elapsed);
+        
         if (state->data.in_game.pause)
         {
             vg_buf_desaturate(); // Grey out the frozen game world
@@ -196,21 +202,22 @@ void state_enter_loading(state_t *state, font_t *font)
     {
         strncpy(state->data.loading.username, username, sizeof(state->data.loading.username) - 1);
         state->data.loading.username[sizeof(state->data.loading.username) - 1] = '\0';
-
-        // Strip any trailing newlines, carriage returns, or whitespace
-        int len = strlen(state->data.loading.username);
-        while (len > 0 && (state->data.loading.username[len - 1] == '\n' ||
-                           state->data.loading.username[len - 1] == '\r' ||
-                           state->data.loading.username[len - 1] == ' '))
-        {
-            state->data.loading.username[--len] = '\0';
-        }
     }
     else
     {
-        strcpy(state->data.loading.username, "Player");
+        state->data.loading.username[0] = '\0';
     }
     state->data.loading.drawn = false;
+}
+
+void state_enter_leaderboard(state_t *state, font_t *font, const char *username)
+{
+    if (state == NULL)
+        return;
+
+    state_exit_current(state);
+    state->tag = STATE_LEADERBOARD;
+    state->data.leaderboard.menu = leaderboard_menu_create(font, username);
 }
 
 static void state_enter_in_game(state_t *state, font_t *font, int track_idx, int car_idx, const char *username)
@@ -266,14 +273,20 @@ static void state_enter_in_game(state_t *state, font_t *font, int track_idx, int
 }
 
 /* Tears down all in-game resources and transitions back to the start menu */
-void state_enter_start(state_t *state, font_t *font)
+void state_enter_start(state_t *state, font_t *font, const char *username)
 {
-    if (state == NULL)
-        return;
+    if (state == NULL) return;
+
+    char local_username[16] = {0};
+    if (username != NULL)
+    {
+        strncpy(local_username, username, sizeof(local_username) - 1);
+        local_username[sizeof(local_username) - 1] = '\0';
+    }
 
     state_exit_current(state);
     state->tag = STATE_START;
-    state->data.start.menu = start_menu_create(font);
+    state->data.start.menu = start_menu_create(font, local_username);
 }
 
 void state_enter_game_over(state_t *state, font_t *font, const race_t *race)
@@ -294,12 +307,16 @@ void state_enter_game_over(state_t *state, font_t *font, const race_t *race)
     state->tag = STATE_GAME_OVER;
     state->data.game_over.menu = finish_menu_create(font, race);
 
+    // Store username for later use when returning to menu
+    strncpy(state->data.game_over.username, saved_username, sizeof(state->data.game_over.username) - 1);
+    state->data.game_over.username[sizeof(state->data.game_over.username) - 1] = '\0';
+
     // Now safe to use the saved values
     if (race != NULL && saved_username[0] != '\0')
     {
         rtc_date date;
         rtc_read_date(&date);
-        leaderboard_save_time(saved_username, race->seconds_elapsed, saved_track_index, date);
+        leaderboard_save_time(saved_username, race->ticks_elapsed, saved_track_index, date);
     }
 }
 
@@ -308,64 +325,108 @@ void handle_mouse_event(state_t *state, struct packet *pp, int cursor_x, int cur
     if (state == NULL)
         return;
 
+    if (!pp->lb)
+        return;
+
     switch (state->tag)
     {
     case STATE_START:
     {
         start_menu_t *menu = state->data.start.menu;
-        if (menu == NULL)
-            break;
+        if (menu == NULL) break;
 
-        if (!pp->lb)
-            break;
-
-        if (button_is_hovered(menu->start_btn, cursor_x, cursor_y))
+        switch (start_menu_handle_click(menu, cursor_x, cursor_y))
         {
+        case START_MENU_ACTION_START:
             state_enter_loading(state, menu->font);
-        }
-        else if (button_is_hovered(menu->exit_btn, cursor_x, cursor_y))
-        {
+            break;
+        case START_MENU_ACTION_LEADERBOARD:
+            state_enter_leaderboard(state, menu->font, menu->player_name);
+            break;
+        case START_MENU_ACTION_EXIT:
             running = false;
-        }
-        else if (button_is_hovered(menu->car_left, cursor_x, cursor_y))
-        {
+            break;
+        case START_MENU_ACTION_CAR_LEFT:
             start_menu_change_car(menu, -1);
-        }
-        else if (button_is_hovered(menu->car_right, cursor_x, cursor_y))
-        {
+            break;
+        case START_MENU_ACTION_CAR_RIGHT:
             start_menu_change_car(menu, 1);
-        }
-        else if (button_is_hovered(menu->track_left, cursor_x, cursor_y))
-        {
+            break;
+        case START_MENU_ACTION_TRACK_LEFT:
             start_menu_change_track(menu, -1);
-        }
-        else if (button_is_hovered(menu->track_right, cursor_x, cursor_y))
-        {
+            break;
+        case START_MENU_ACTION_TRACK_RIGHT:
             start_menu_change_track(menu, 1);
+            break;
+        case START_MENU_ACTION_NONE:
+        default:
+            break;
         }
         break;
     }
 
     case STATE_IN_GAME:
-        if (pp->lb && state->data.in_game.pause && state->data.in_game.pause_menu != NULL)
+        if (!state->data.in_game.pause || state->data.in_game.pause_menu == NULL)
+            break;
+
+        switch (pause_menu_handle_click(state->data.in_game.pause_menu, cursor_x, cursor_y))
         {
-            if (button_is_hovered(state->data.in_game.pause_menu->resume_btn, cursor_x, cursor_y))
-            {
-                state->data.in_game.pause = false;
-            }
-            else if (button_is_hovered(state->data.in_game.pause_menu->exit_btn, cursor_x, cursor_y))
-            {
-                font_t *font = state->data.in_game.pause_menu->font;
-                state_enter_start(state, font);
-            }
+        case PAUSE_MENU_ACTION_RESUME:
+            state->data.in_game.pause = false;
+            break;
+        case PAUSE_MENU_ACTION_EXIT:
+            state_enter_start(state,
+                              state->data.in_game.pause_menu->font,
+                              state->data.in_game.username);
+            break;
+        case PAUSE_MENU_ACTION_NONE:
+        default:
+            break;
         }
         break;
 
+    case STATE_LEADERBOARD:
     case STATE_LOADING:
-        break;
     case STATE_GAME_OVER:
+    default:
         break;
     }
+}
+
+static void in_game_handle_key(state_t *state, uint8_t scancode)
+{
+    race_t       *race  = &state->data.in_game.race;
+    game_input_t *input = &state->data.in_game.input;
+    bool         *pause = &state->data.in_game.pause;
+
+    /* Before race starts: only ENTER kicks off the countdown */
+    if (!race_has_started(race)) {
+        if (scancode == ENTER_MAKE)
+            race_start_countdown(race);
+        return;
+    }
+
+    /* ESC toggles pause regardless of current pause state */
+    if (scancode == ESC_MAKE) {
+        *pause = !*pause;
+        return;
+    }
+
+    /* Driving controls — only when not paused */
+    if (*pause) return;
+
+    if      (scancode == W_MAKE)      input->accelerate = true;
+    else if (scancode == W_BREAK)     input->accelerate = false;
+    if      (scancode == S_MAKE)      input->brake      = true;
+    else if (scancode == S_BREAK)     input->brake      = false;
+    if      (scancode == A_MAKE)      input->turn_left  = true;
+    else if (scancode == A_BREAK)     input->turn_left  = false;
+    if      (scancode == D_MAKE)      input->turn_right = true;
+    else if (scancode == D_BREAK)     input->turn_right = false;
+    if      (scancode == SPACE_MAKE)  input->handbrake  = true;
+    else if (scancode == SPACE_BREAK) input->handbrake  = false;
+    if      (scancode == SHIFT_MAKE)  input->boost      = true;
+    else if (scancode == SHIFT_BREAK) input->boost      = false;
 }
 
 void handle_kbd_event(state_t *state, uint8_t scancode)
@@ -377,64 +438,38 @@ void handle_kbd_event(state_t *state, uint8_t scancode)
     {
     case STATE_START:
         if (scancode == 0xE0 || scancode == 0xE1)
-            break; // skip prefix bytes
+            break;
         char c = kbd_scancode_to_char(scancode);
         if (c != 0)
             start_menu_handle_key(state->data.start.menu, c);
         break;
 
+    case STATE_LEADERBOARD:
+        if (state->data.leaderboard.menu != NULL &&
+            leaderboard_menu_handle_key(state->data.leaderboard.menu, scancode))
+        {
+            state_enter_start(state,
+                              state->data.leaderboard.menu->font,
+                              state->data.leaderboard.menu->username);
+        }
+        break;
+
     case STATE_IN_GAME:
-        if (!race_has_started(&state->data.in_game.race))
-        {
-            if (scancode == ENTER_MAKE)
-                race_start_countdown(&state->data.in_game.race);
-            break;
-        }
-        if (scancode == ESC_MAKE)
-        {
-            state->data.in_game.pause = !state->data.in_game.pause;
-            break;
-        }
-        if (!state->data.in_game.pause)
-        {
-            if (scancode == W_MAKE)
-                state->data.in_game.input.accelerate = true;
-            else if (scancode == W_BREAK)
-                state->data.in_game.input.accelerate = false;
-
-            if (scancode == S_MAKE)
-                state->data.in_game.input.brake = true;
-            else if (scancode == S_BREAK)
-                state->data.in_game.input.brake = false;
-
-            if (scancode == A_MAKE)
-                state->data.in_game.input.turn_left = true;
-            else if (scancode == A_BREAK)
-                state->data.in_game.input.turn_left = false;
-
-            if (scancode == D_MAKE)
-                state->data.in_game.input.turn_right = true;
-            else if (scancode == D_BREAK)
-                state->data.in_game.input.turn_right = false;
-
-            if (scancode == SPACE_MAKE)
-                state->data.in_game.input.handbrake = true;
-            else if (scancode == SPACE_BREAK)
-                state->data.in_game.input.handbrake = false;
-
-            if (scancode == SHIFT_MAKE)
-                state->data.in_game.input.boost = true;
-            else if (scancode == SHIFT_BREAK)
-                state->data.in_game.input.boost = false;
-        }
+        in_game_handle_key(state, scancode);
         break;
-    case STATE_LOADING:
-        break;
+
     case STATE_GAME_OVER:
-        if (state->data.game_over.menu != NULL && finish_menu_handle_key(state->data.game_over.menu, scancode))
+        if (state->data.game_over.menu != NULL &&
+            finish_menu_handle_key(state->data.game_over.menu, scancode))
         {
-            state_enter_start(state, state->data.game_over.menu->font);
+            state_enter_start(state,
+                              state->data.game_over.menu->font,
+                              state->data.game_over.username);
         }
+        break;
+
+    case STATE_LOADING:
+    default:
         break;
     }
 }
@@ -468,11 +503,10 @@ void update_state(state_t *state)
         if (!race_countdown_started(&state->data.in_game.race))
             break;
 
-        update_car_physics(state->data.in_game.car, &state->data.in_game.input, state->data.in_game.track);
-
         car_t *c = state->data.in_game.car;
-        if (c == NULL)
-            break;
+        if (c == NULL) break;
+        update_car_physics(c, &state->data.in_game.input, state->data.in_game.track);
+
         int idx = car_sprite_index(c);
 
         if (race_has_started(&state->data.in_game.race))
@@ -495,5 +529,8 @@ void update_state(state_t *state)
     }
     case STATE_GAME_OVER:
         break;
-    }
+    
+    case STATE_LEADERBOARD:
+        break;
+}
 }

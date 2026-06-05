@@ -42,4 +42,10 @@ void hud_draw_lap_counter(font_t *font, int current_lap, int total_laps);
 **/
 void hud_draw_timer(font_t *font, unsigned time_elapsed);
 
+/**
+ * @brief Draws the controls reference panel shown before the race starts.
+ * @param font Pointer to the font to use for drawing the text.
+**/
+void hud_draw_controls_panel(font_t *font);
+
 #endif /* _HUD_H_ */
