@@ -2,13 +2,13 @@
 #include <stdlib.h>
 #include <math.h>
 
-car_t* create_car(double x, double y, double speed, double angle, xpm_map_t xpms[], int num_sprites) {
+car_t* create_car(double x, double y, double angle, xpm_map_t xpms[], int num_sprites) {
   car_t *car = (car_t *) malloc(sizeof(car_t));
   if (car == NULL) return NULL;
 
   car->x = x;
   car->y = y;
-  car->speed = speed;
+  car->speed = 0;
   car->angle = angle;
   car->boost_amount = CAR_BOOST_MAX;
   car->velocity_angle = angle;

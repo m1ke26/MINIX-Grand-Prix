@@ -53,6 +53,7 @@ button_t* button_create(font_t *font, const char *text, int x, int y,
 
 /**
  * @brief Destroys a button.
+ * @param b Pointer to the button to destroy.
  */
 void button_destroy(button_t *b);
 
@@ -65,6 +66,10 @@ void button_draw(button_t *b, bool hover);
 
 /**
  * @brief Checks if a position is inside the button.
+ * @param b Pointer to the button.
+ * @param x X coordinate of the position to check.
+ * @param y Y coordinate of the position to check.
+ * @return True if the position is inside the button, false otherwise.
  */
 bool button_is_hovered(button_t *b, int x, int y);
 

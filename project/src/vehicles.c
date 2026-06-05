@@ -1,6 +1,5 @@
 #include "vehicles.h"
 #include "car.h"
-#include "car_pixmaps.h"
 #include "taxi_pixmaps.h"
 #include "police_pixmaps.h"
 #include "ambulance_pixmaps.h"

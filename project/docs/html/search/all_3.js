@@ -1,0 +1,27 @@
+var searchData=
+[
+  ['d_5fbreak_0',['D_BREAK',['../kbc_8h.html#ad2db9242348c43c781cc14746060470b',1,'kbc.h']]],
+  ['d_5fmake_1',['D_MAKE',['../kbc_8h.html#a629b0c93e278a4bf1e1678af58fbea95',1,'kbc.h']]],
+  ['data_2',['data',['../structstate__t.html#a36c19cf4d42a17e1e413b43fdb249ed5',1,'state_t']]],
+  ['date_3',['date',['../structleaderboard__entry__t.html#af240ef80649ea220359aff42b11f7b11',1,'leaderboard_entry_t']]],
+  ['dates_4',['dates',['../structleaderboard__menu__t.html#ab1ab52cba6274d880b2dc7515289830f',1,'leaderboard_menu_t']]],
+  ['day_5',['day',['../structrtc__date.html#aafe421d9a0f25c596f639f15429ca5a3',1,'rtc_date']]],
+  ['delay_5fus_6',['DELAY_US',['../mouse_8h.html#a1a522aa19bcb695a9df30032a893bee3',1,'mouse.h']]],
+  ['destroy_5fcamera_7',['destroy_camera',['../camera_8h.html#a73c77984a72f28e9d1bc7346cff785d4',1,'destroy_camera(camera_t *camera):&#160;camera.c'],['../camera_8c.html#a73c77984a72f28e9d1bc7346cff785d4',1,'destroy_camera(camera_t *camera):&#160;camera.c']]],
+  ['destroy_5fcar_8',['destroy_car',['../car_8h.html#a53b6217b4aad7154cd154364ad650fd3',1,'destroy_car(car_t *car):&#160;car.c'],['../car_8c.html#a53b6217b4aad7154cd154364ad650fd3',1,'destroy_car(car_t *car):&#160;car.c']]],
+  ['destroy_5fcursor_9',['destroy_cursor',['../cursor_8h.html#a46fe65b4821a99d6ec2d5dc1f8d14c42',1,'destroy_cursor(cursor_t *cursor):&#160;cursor.c'],['../cursor_8c.html#a46fe65b4821a99d6ec2d5dc1f8d14c42',1,'destroy_cursor(cursor_t *cursor):&#160;cursor.c']]],
+  ['destroy_5fsprite_10',['destroy_sprite',['../sprite_8h.html#ab78b0b42532b8c0b5322ddf0e1ed85e1',1,'destroy_sprite(sprite_t *sp):&#160;sprite.c'],['../sprite_8c.html#ab78b0b42532b8c0b5322ddf0e1ed85e1',1,'destroy_sprite(sprite_t *sp):&#160;sprite.c']]],
+  ['destroy_5fstate_11',['destroy_state',['../state_8h.html#a48bf1a1dc7901e2ccfc5e3eec5b3ec26',1,'destroy_state(state_t *state):&#160;state.c'],['../state_8c.html#a48bf1a1dc7901e2ccfc5e3eec5b3ec26',1,'destroy_state(state_t *state):&#160;state.c']]],
+  ['destroy_5ftrack_12',['destroy_track',['../track_8h.html#a880aa02d425ccb0450db3134ca4d673e',1,'destroy_track(track_t *track):&#160;track.c'],['../track_8c.html#a880aa02d425ccb0450db3134ca4d673e',1,'destroy_track(track_t *track):&#160;track.c']]],
+  ['draw_5fcar_13',['draw_car',['../car_8h.html#a5b61cf301bf6152b5292afc47f02b290',1,'draw_car(car_t *car, int cam_x, int cam_y, int sprite_idx):&#160;car.c'],['../car_8c.html#a0ef0b85ff7681209b94f2aff64c23b9b',1,'draw_car(car_t *car, int cam_x, int cam_y, int idx):&#160;car.c']]],
+  ['draw_5fcentered_5ftext_14',['draw_centered_text',['../font_8h.html#a4c5f826055af3abdeffb895f4216e3ed',1,'draw_centered_text(font_t *font, const char *text, int y, int scale, uint32_t color):&#160;font.c'],['../font_8c.html#a4c5f826055af3abdeffb895f4216e3ed',1,'draw_centered_text(font_t *font, const char *text, int y, int scale, uint32_t color):&#160;font.c']]],
+  ['draw_5fcursor_15',['draw_cursor',['../cursor_8h.html#ac62179dfa1a7ac1624acae7d285770cd',1,'draw_cursor(cursor_t *cursor):&#160;cursor.c'],['../cursor_8c.html#ac62179dfa1a7ac1624acae7d285770cd',1,'draw_cursor(cursor_t *cursor):&#160;cursor.c']]],
+  ['draw_5fsprite_5fscaled_5fdown_16',['draw_sprite_scaled_down',['../sprite_8h.html#af7f37f597fd5ad827eeb766373423f88',1,'draw_sprite_scaled_down(sprite_t *s, int x, int y, int scale):&#160;sprite.c'],['../sprite_8c.html#af7f37f597fd5ad827eeb766373423f88',1,'draw_sprite_scaled_down(sprite_t *s, int x, int y, int scale):&#160;sprite.c']]],
+  ['draw_5fsprite_5fscaled_5fup_17',['draw_sprite_scaled_up',['../sprite_8h.html#a7ed0cdd8f06f2e9f4b1d062772ccc3dd',1,'draw_sprite_scaled_up(sprite_t *s, int x, int y, double scale):&#160;sprite.c'],['../sprite_8c.html#a7ed0cdd8f06f2e9f4b1d062772ccc3dd',1,'draw_sprite_scaled_up(sprite_t *s, int x, int y, double scale):&#160;sprite.c']]],
+  ['draw_5fstate_18',['draw_state',['../state_8h.html#ad778440eb0ddce85390fb82aef3e114d',1,'draw_state(state_t *state):&#160;state.c'],['../state_8c.html#ad778440eb0ddce85390fb82aef3e114d',1,'draw_state(state_t *state):&#160;state.c']]],
+  ['draw_5fstring_19',['draw_string',['../font_8h.html#adf5162756f50bf7d22fb4dc69c3bdc3a',1,'draw_string(font_t *font, const char *str, int x, int y, uint32_t color):&#160;font.c'],['../font_8c.html#adf5162756f50bf7d22fb4dc69c3bdc3a',1,'draw_string(font_t *font, const char *str, int x, int y, uint32_t color):&#160;font.c']]],
+  ['draw_5fstring_5fscaled_20',['draw_string_scaled',['../font_8h.html#a524497d1ec3012be99a09ed7974a6393',1,'draw_string_scaled(font_t *font, const char *str, int x, int y, int scale, uint32_t color):&#160;font.c'],['../font_8c.html#a524497d1ec3012be99a09ed7974a6393',1,'draw_string_scaled(font_t *font, const char *str, int x, int y, int scale, uint32_t color):&#160;font.c']]],
+  ['draw_5ftrack_21',['draw_track',['../track_8h.html#ab74b6861689d13aaa67358b29adeeed6',1,'draw_track(track_t *track, int cam_x, int cam_y):&#160;track.c'],['../track_8c.html#ab74b6861689d13aaa67358b29adeeed6',1,'draw_track(track_t *track, int cam_x, int cam_y):&#160;track.c']]],
+  ['drawn_22',['drawn',['../structstate__t.html#aab93936867404076fb4b46f66ce3404b',1,'state_t']]],
+  ['drift_5fmin_5fspeed_23',['DRIFT_MIN_SPEED',['../car_8h.html#a21e1ceb167315714ce29f81523464fc5',1,'car.h']]]
+];

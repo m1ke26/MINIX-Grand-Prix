@@ -57,11 +57,22 @@ terrain_type_t collision_track(track_t *track, int car_x, int car_y);
 
 /**
  * @brief Returns the first race checkpoint/start terrain under the car, or TERRAIN_ROAD if none.
+ * @param track Pointer to the track.
+ * @param car_x X coordinate of the car.
+ * @param car_y Y coordinate of the car.
+ * @param car_w Width of the car sprite.
+ * @param car_h Height of the car sprite.
+ * @return The terrain type of the first checkpoint under the car, or TERRAIN_ROAD if none.
  */
 terrain_type_t track_car_checkpoint(track_t *track, int car_x, int car_y, int car_w, int car_h);
 
 /**
  * @brief Finds the center of the green START zone and writes the car top-left spawn position.
+ * @param track Pointer to the track.
+ * @param car_w Width of the car sprite.
+ * @param car_h Height of the car sprite.
+ * @param spawn_x Pointer to store the X coordinate of the spawn position.
+ * @param spawn_y Pointer to store the Y coordinate of the spawn position.
  * @return true if a START zone was found, false otherwise.
  */
 bool track_find_start_spawn(track_t *track, int car_w, int car_h, int *spawn_x, int *spawn_y);

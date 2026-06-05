@@ -122,12 +122,17 @@ font_t* font_create();
 
 /**
  * @brief Destroys a font and its tiles.
+ * @param font Pointer to the font to destroy.
  */
 void font_destroy(font_t *font);
 
 /**
  * @brief Draws a string using the font.
  * @param color 0xRRGGBB colour to draw the text in.
+ * @param x X coordinate of the top-left corner of the text.
+ * @param y Y coordinate of the top-left corner of the text.
+ * @param str Null-terminated string to draw.
+ * @param font Pointer to the font to use for rendering.
  */
 void draw_string(font_t *font, const char *str, int x, int y, uint32_t color);
 
@@ -136,6 +141,10 @@ void draw_string(font_t *font, const char *str, int x, int y, uint32_t color);
  * Each font pixel is rendered as a scale×scale block.
  * @param scale Integer scale factor (1 = normal 8px, 2 = 16px, 3 = 24px, etc.)
  * @param color 0xRRGGBB colour to draw the text in.
+ * @param x X coordinate of the top-left corner of the text.
+ * @param y Y coordinate of the top-left corner of the text.
+ * @param str Null-terminated string to draw.
+ * @param font Pointer to the font to use for rendering.
  */
 void draw_string_scaled(font_t *font, const char *str, int x, int y, int scale, uint32_t color);
 

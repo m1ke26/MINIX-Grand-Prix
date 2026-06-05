@@ -40,12 +40,12 @@ typedef struct {
     @brief Creates a new car with the given parameters.
     @param x The x-coordinate of the car.
     @param y The y-coordinate of the car.
-    @param speed The speed of the car.
     @param angle The angle of the car.
     @param xpms Array of xpm maps for the car sprites.
+    @param num_sprites Number of sprites in the xpms array.
     @return Pointer to the new car.
 **/
-car_t* create_car(double x, double y, double speed, double angle, xpm_map_t xpms[], int num_sprites);
+car_t* create_car(double x, double y,double angle, xpm_map_t xpms[], int num_sprites);
 /**
     @brief Destroys the car and frees any allocated resources.
     @param car Pointer to the car to be destroyed.

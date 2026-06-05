@@ -1,0 +1,13 @@
+var searchData=
+[
+  ['race_5fcheck_5fcheckpoints_0',['race_check_checkpoints',['../race_8h.html#a5f0da62e9a0fab7decc21f3ca9156369',1,'race_check_checkpoints(race_t *race, track_t *track, double car_x, double car_y, int car_w, int car_h):&#160;race.c'],['../race_8c.html#a5f0da62e9a0fab7decc21f3ca9156369',1,'race_check_checkpoints(race_t *race, track_t *track, double car_x, double car_y, int car_w, int car_h):&#160;race.c']]],
+  ['race_5fcountdown_5fseconds_5fleft_1',['race_countdown_seconds_left',['../race_8h.html#ab94b0e4da51ed6c345e0e64ef74e3226',1,'race_countdown_seconds_left(const race_t *race):&#160;race.c'],['../race_8c.html#ab94b0e4da51ed6c345e0e64ef74e3226',1,'race_countdown_seconds_left(const race_t *race):&#160;race.c']]],
+  ['race_5fcountdown_5fstarted_2',['race_countdown_started',['../race_8h.html#ad3e2cb5cdfd0190dfea318dd5444f424',1,'race_countdown_started(const race_t *race):&#160;race.c'],['../race_8c.html#ad3e2cb5cdfd0190dfea318dd5444f424',1,'race_countdown_started(const race_t *race):&#160;race.c']]],
+  ['race_5fformat_5ftime_3',['race_format_time',['../race_8h.html#ae8d54b1d0ea642d1dac0c5df2c59f303',1,'race_format_time(char *out, size_t size, unsigned ticks):&#160;race.c'],['../race_8c.html#ae8d54b1d0ea642d1dac0c5df2c59f303',1,'race_format_time(char *out, size_t size, unsigned ticks):&#160;race.c']]],
+  ['race_5fhas_5fstarted_4',['race_has_started',['../race_8h.html#af5ce80cc5681a3ec63c0ee54b66f8de0',1,'race_has_started(const race_t *race):&#160;race.c'],['../race_8c.html#af5ce80cc5681a3ec63c0ee54b66f8de0',1,'race_has_started(const race_t *race):&#160;race.c']]],
+  ['race_5finit_5',['race_init',['../race_8h.html#addb6a2da8fd9bea5c0f3dfeed31c546e',1,'race_init(race_t *race):&#160;race.c'],['../race_8c.html#addb6a2da8fd9bea5c0f3dfeed31c546e',1,'race_init(race_t *race):&#160;race.c']]],
+  ['race_5fis_5ffinished_6',['race_is_finished',['../race_8h.html#a05ab651384379afdaf7001adb36280dc',1,'race_is_finished(const race_t *race):&#160;race.c'],['../race_8c.html#a05ab651384379afdaf7001adb36280dc',1,'race_is_finished(const race_t *race):&#160;race.c']]],
+  ['race_5fstart_5fcountdown_7',['race_start_countdown',['../race_8h.html#aa6fe3cda188a0e371918f03ac1e9b910',1,'race_start_countdown(race_t *race):&#160;race.c'],['../race_8c.html#aa6fe3cda188a0e371918f03ac1e9b910',1,'race_start_countdown(race_t *race):&#160;race.c']]],
+  ['race_5fupdate_8',['race_update',['../race_8h.html#a5aeaf4d72b9b03f7ec04d866a3480d14',1,'race_update(race_t *race):&#160;race.c'],['../race_8c.html#a5aeaf4d72b9b03f7ec04d866a3480d14',1,'race_update(race_t *race):&#160;race.c']]],
+  ['rtc_5fread_5fdate_9',['rtc_read_date',['../rtc_8h.html#a40b0d612861625726053db582810457a',1,'rtc.h']]]
+];

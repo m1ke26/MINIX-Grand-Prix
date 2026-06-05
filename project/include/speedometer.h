@@ -19,8 +19,20 @@
 #define NEEDLE_ANGLE_MIN (-220.0)
 #define NEEDLE_ANGLE_MAX (40.0)
 
+/**
+ * @brief Initializes the speedometer, loading necessary sprites and resources.
+ */
 void speedometer_init();
+
+/**
+ * @brief Draws the speedometer on the screen, with the needle indicating the current speed.
+ * @param speed The current speed of the car, used to calculate the needle angle.
+ */
 void speedometer_draw(float speed);
+
+/**
+ * @brief Destroys the speedometer and frees any allocated resources.
+ */
 void speedometer_destroy();
 
 #endif /* _SPEEDOMETER_H_ */

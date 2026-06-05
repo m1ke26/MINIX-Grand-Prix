@@ -1,0 +1,28 @@
+var searchData=
+[
+  ['bitwise_2eh_0',['bitwise.h',['../bitwise_8h.html',1,'']]],
+  ['boost_1',['boost',['../structgame__input__t.html#a102785b9f773995f5b65b31becd907a8',1,'game_input_t']]],
+  ['boost_5famount_2',['boost_amount',['../structcar__t.html#a39601c2557d5c7d362b73f1a76edefc5',1,'car_t']]],
+  ['border_3',['BORDER',['../button_8h.html#a6d0652ae6ea6a5c4fef68baf139fd085',1,'button.h']]],
+  ['border_5fcolor_4',['border_color',['../structbutton__t.html#a65ed4b225fb5235b3ba829fd982addc8',1,'button_t']]],
+  ['brake_5',['brake',['../structgame__input__t.html#a87371f07ebc0d6b625c8a337b8fccdd8',1,'game_input_t']]],
+  ['btn_5fdark_5fgray_6',['BTN_DARK_GRAY',['../button_8h.html#a6cb42e8c6ffeb779186277dc63e8aaeba521ed5ed140f4a092b8b6b25fd994e91',1,'button.h']]],
+  ['btn_5fdark_5fnavy_7',['BTN_DARK_NAVY',['../button_8h.html#a6cb42e8c6ffeb779186277dc63e8aaeba6a8123fe5cb2a255deb9cf94c92e7902',1,'button.h']]],
+  ['btn_5fh_8',['BTN_H',['../button_8h.html#aafc5be6b9e11a5cf8ef124119f875aa9',1,'button.h']]],
+  ['btn_5flight_5fnavy_9',['BTN_LIGHT_NAVY',['../button_8h.html#a6cb42e8c6ffeb779186277dc63e8aaebabc0ecd1982c70f7b41e2349eb456e0a0',1,'button.h']]],
+  ['btn_5fshape_5farrow_5fleft_10',['BTN_SHAPE_ARROW_LEFT',['../button_8h.html#a352b3cf3f8e050e92b72fefbb0a7367aac2f4b308f02ed92144d33d3514e7065a',1,'button.h']]],
+  ['btn_5fshape_5farrow_5fright_11',['BTN_SHAPE_ARROW_RIGHT',['../button_8h.html#a352b3cf3f8e050e92b72fefbb0a7367aa371a3fad899ca63da1dbc4caa355e521',1,'button.h']]],
+  ['btn_5fshape_5frect_12',['BTN_SHAPE_RECT',['../button_8h.html#a352b3cf3f8e050e92b72fefbb0a7367aa276891e7e65083f88f7a723841091ded',1,'button.h']]],
+  ['btn_5fsilver_13',['BTN_SILVER',['../button_8h.html#a6cb42e8c6ffeb779186277dc63e8aaeba825f2f1daf4e1e7ff754a8d3ede7ece5',1,'button.h']]],
+  ['btn_5fw_14',['BTN_W',['../button_8h.html#a88518206f114f83cf5c0bb345a44ec4c',1,'button.h']]],
+  ['btn_5fwhite_15',['BTN_WHITE',['../button_8h.html#a6cb42e8c6ffeb779186277dc63e8aaeba98323607181cdde86c1d438424260526',1,'button.h']]],
+  ['button_2ec_16',['button.c',['../button_8c.html',1,'']]],
+  ['button_2eh_17',['button.h',['../button_8h.html',1,'']]],
+  ['button_5fcolor_5ft_18',['button_color_t',['../button_8h.html#a6cb42e8c6ffeb779186277dc63e8aaeb',1,'button.h']]],
+  ['button_5fcreate_19',['button_create',['../button_8h.html#ae91a9742bd5599a0e9cff63462b2220d',1,'button_create(font_t *font, const char *text, int x, int y, button_color_t color, button_color_t hover_color, button_color_t border_color, button_shape_t shape):&#160;button.c'],['../button_8c.html#ae91a9742bd5599a0e9cff63462b2220d',1,'button_create(font_t *font, const char *text, int x, int y, button_color_t color, button_color_t hover_color, button_color_t border_color, button_shape_t shape):&#160;button.c']]],
+  ['button_5fdestroy_20',['button_destroy',['../button_8h.html#add9cef2ef9b51deb308e60e4cb25f955',1,'button_destroy(button_t *b):&#160;button.c'],['../button_8c.html#add9cef2ef9b51deb308e60e4cb25f955',1,'button_destroy(button_t *b):&#160;button.c']]],
+  ['button_5fdraw_21',['button_draw',['../button_8h.html#a409a954e80dd229711c7e36926072f85',1,'button_draw(button_t *b, bool hover):&#160;button.c'],['../button_8c.html#a409a954e80dd229711c7e36926072f85',1,'button_draw(button_t *b, bool hover):&#160;button.c']]],
+  ['button_5fis_5fhovered_22',['button_is_hovered',['../button_8h.html#aa64fe62bd341d64b917badca67ac9ff4',1,'button_is_hovered(button_t *b, int x, int y):&#160;button.c'],['../button_8c.html#aa64fe62bd341d64b917badca67ac9ff4',1,'button_is_hovered(button_t *b, int x, int y):&#160;button.c']]],
+  ['button_5fshape_5ft_23',['button_shape_t',['../button_8h.html#a352b3cf3f8e050e92b72fefbb0a7367a',1,'button.h']]],
+  ['button_5ft_24',['button_t',['../structbutton__t.html',1,'']]]
+];

@@ -70,11 +70,15 @@ void start_menu_handle_key(start_menu_t *sm, char key);
 
 /**
  * @brief Cycles the track selection by delta (+1 or -1).
+ * @param sm Pointer to the start menu.
+ * @param delta Direction to cycle (1 for next track, -1 for previous track).
  */
 void start_menu_change_track(start_menu_t *sm, int delta);
 
 /**
  * @brief Cycles the car selection by delta (+1 or -1).
+ * @param sm Pointer to the start menu.
+ * @param delta Direction to cycle (1 for next car, -1 for previous car).
  */
 void start_menu_change_car(start_menu_t *sm, int delta);
 

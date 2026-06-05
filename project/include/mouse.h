@@ -35,14 +35,53 @@
 #define MOUSE_IRQ  12
 #define DELAY_US   20000
 
+/**
+ * @brief Subscribes to mouse interrupts.
+ * @param bit_no Pointer to the bit number for the interrupt.
+ * @return 0 on success, -1 on failure.
+ */
 int  mouse_subscribe_int(uint8_t *bit_no);
+
+/**
+ * @brief Unsubscribes from mouse interrupts.
+ * @return 0 on success, -1 on failure.
+ */
 int  mouse_unsubscribe_int(void);
+
+/**
+ * @brief Mouse interrupt handler.
+ */
 void (mouse_ih)(void);
+
+/**
+ * @brief Writes a command to the mouse and polls for a response.
+ * @param cmd The command to write.
+ * @return 0 on success, -1 on failure.
+ */
 int  mouse_write_cmd_poll(uint8_t cmd);
+/**
+ * @brief Disables mouse data reporting.
+ * @return 0 on success, -1 on failure.
+ */
 int  mouse_disable_data_reporting(void);
+/**
+ * @brief Synchronizes and parses the mouse packet.
+ * @param pp Pointer to the packet structure to populate.
+ */
 void mouse_sync_and_parse(struct packet *pp);
+/**
+ * @brief Gets the number of bytes received from the mouse.
+ * @return The number of bytes received.
+ */
 int  mouse_get_byte_count(void);
+/**
+ * @brief Sets the number of bytes received from the mouse.
+ * @param count The number of bytes to set.
+ */
 void mouse_set_byte_count(int count);
+/**
+ * @brief Increments the byte count of received mouse bytes by one.
+ */
 void mouse_increment_byte_count(void);
 
 #endif /* _LCOM_MOUSE_H_ */

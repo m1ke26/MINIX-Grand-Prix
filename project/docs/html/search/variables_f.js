@@ -1,0 +1,20 @@
+var searchData=
+[
+  ['tag_0',['tag',['../structstate__t.html#a148e27d20e5d1de85f2fd66a5ebecc45',1,'state_t']]],
+  ['text_1',['text',['../structbutton__t.html#a8cd72645efab635418fcdacdfcced561',1,'button_t']]],
+  ['ticks_5felapsed_2',['ticks_elapsed',['../structrace__t.html#ae0530058f0274a5472d658a518730bd8',1,'race_t']]],
+  ['tile_5fsize_3',['tile_size',['../structfont__t.html#a41b7cca014804053c66f20ac73d58f4e',1,'font_t']]],
+  ['tiles_4',['tiles',['../structfont__t.html#af56d5aeb923a5c786b511c85eca90feb',1,'font_t']]],
+  ['time_5',['time',['../structleaderboard__entry__t.html#a5d6e4df66e16737eaf689417fa617718',1,'leaderboard_entry_t']]],
+  ['times_6',['times',['../structleaderboard__menu__t.html#ad99b6ea34f134b2cec1138492fe19ae8',1,'leaderboard_menu_t']]],
+  ['total_5flaps_7',['total_laps',['../structrace__t.html#a591338c1e01cdfb44bee1f5eab204b93',1,'race_t']]],
+  ['track_8',['track',['../structstate__t.html#a95444c978c80777b38d80fa95a01e330',1,'state_t']]],
+  ['track_5findex_9',['track_index',['../structleaderboard__entry__t.html#abc5b883a2640206c3efeea9d736cfe1f',1,'leaderboard_entry_t::track_index'],['../structstart__menu__t.html#a79dffd7db4a28dafb4f550bd2f6e6cc4',1,'start_menu_t::track_index'],['../structstate__t.html#a22ae7a28fbb9c752a3f56f865122b8a3',1,'state_t::track_index']]],
+  ['track_5fleft_10',['track_left',['../structstart__menu__t.html#a52799274a1caf2b3c147210719254502',1,'start_menu_t']]],
+  ['track_5fpreview_5fxpms_11',['track_preview_xpms',['../tracks__pixmaps_8h.html#afae8a52a1fbe75397fd6df600a0c3ec0',1,'track_preview_xpms:&#160;tracks_pixmaps.c'],['../tracks__pixmaps_8c.html#afae8a52a1fbe75397fd6df600a0c3ec0',1,'track_preview_xpms:&#160;tracks_pixmaps.c']]],
+  ['track_5fright_12',['track_right',['../structstart__menu__t.html#a8db51febe9a3d19703b76f11ef8e4368',1,'start_menu_t']]],
+  ['track_5fsprites_13',['track_sprites',['../structstart__menu__t.html#a0f29455301853ab05db6fb9f74498e17',1,'start_menu_t']]],
+  ['track_5fxpms_14',['track_xpms',['../tracks__pixmaps_8h.html#aaf2b36f28e433265de73836419f9a56b',1,'track_xpms:&#160;tracks_pixmaps.c'],['../tracks__pixmaps_8c.html#aaf2b36f28e433265de73836419f9a56b',1,'track_xpms:&#160;tracks_pixmaps.c']]],
+  ['turn_5fleft_15',['turn_left',['../structgame__input__t.html#a73aba60fc5473f427961293252a7d278',1,'game_input_t']]],
+  ['turn_5fright_16',['turn_right',['../structgame__input__t.html#a142a7e0d384a32eee4c44c5d4dff649b',1,'game_input_t']]]
+];

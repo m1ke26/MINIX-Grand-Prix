@@ -244,7 +244,7 @@ static void state_enter_in_game(state_t *state, font_t *font, int track_idx, int
 
     int spawn_x = 1290;
     int spawn_y = 415;
-    state->data.in_game.car = create_car(spawn_x, spawn_y, 0, 90, vehicle->xpms, vehicle->num_sprites);
+    state->data.in_game.car = create_car(spawn_x, spawn_y, 90, vehicle->xpms, vehicle->num_sprites);
     if (state->data.in_game.car != NULL)
     {
         int idx = car_sprite_index(state->data.in_game.car);

@@ -1,0 +1,26 @@
+var structstate__t =
+[
+    [ "camera", "structstate__t.html#a8faa06a09e5a8c40a27730a30a92f54e", null ],
+    [ "car", "structstate__t.html#a574157a387ad4a0f5f45a5ba19201bca", null ],
+    [ "car_index", "structstate__t.html#a0c1d89d2a32395ed09e87ac4fde07c48", null ],
+    [ "cursor", "structstate__t.html#a53a8cf02fa284faadce560456b20bb7f", null ],
+    [ "data", "structstate__t.html#a36c19cf4d42a17e1e413b43fdb249ed5", null ],
+    [ "drawn", "structstate__t.html#aab93936867404076fb4b46f66ce3404b", null ],
+    [ "font", "structstate__t.html#ac518b6e8aeaaaabfc4aa47fa4a43ce0b", null ],
+    [ "game_over", "structstate__t.html#a7e4f0269684ebbee445eb1a034e18ef2", null ],
+    [ "in_game", "structstate__t.html#a7a8aee9b68948a22986508655d39389c", null ],
+    [ "input", "structstate__t.html#a5a4eced71999cf5059038d54dc71f7ab", null ],
+    [ "leaderboard", "structstate__t.html#a41cd43823761e16a167cf0a0c64b5597", null ],
+    [ "loading", "structstate__t.html#a45dbf530076517875c5506fd2afe90a6", null ],
+    [ "menu", "structstate__t.html#a8d82cffda43d645cd16889463eb0db39", null ],
+    [ "menu", "structstate__t.html#ae256b050c4ee4713922d8096898809f7", null ],
+    [ "menu", "structstate__t.html#a0516c02d875dcf04a21e7cb12381c09d", null ],
+    [ "pause", "structstate__t.html#acfccfa8cf4f4bf37c1d46f9630129631", null ],
+    [ "pause_menu", "structstate__t.html#ab172a6b37dca8f6a23b80798f45d2f15", null ],
+    [ "race", "structstate__t.html#a66598be3547be8594b227f1c1bc3a938", null ],
+    [ "start", "structstate__t.html#a68050cca8c461fd70cdd063063fb07c3", null ],
+    [ "tag", "structstate__t.html#a148e27d20e5d1de85f2fd66a5ebecc45", null ],
+    [ "track", "structstate__t.html#a95444c978c80777b38d80fa95a01e330", null ],
+    [ "track_index", "structstate__t.html#a22ae7a28fbb9c752a3f56f865122b8a3", null ],
+    [ "username", "structstate__t.html#af63be077f94ae1014996f132a345387b", null ]
+];

@@ -27,15 +27,47 @@
 #define SPACE_BREAK (SPACE_MAKE | 0x80)
 #define SHIFT_BREAK (SHIFT_MAKE | 0x80)
 
+/**
+ * @brief Keyboard interrupt handler. Reads the scancode and updates the internal state.
+ */
 void (kbc_ih)();
 
+/**
+ * @brief Subscribes to keyboard interrupts.
+ * @param bit_no Pointer to the bit number for the interrupt.
+ * @return 0 on success, -1 on failure.
+ */
 int (kbd_subscribe_int)(uint8_t *bit_no);
+/**
+ * @brief Unsubscribes from keyboard interrupts.
+ * @return 0 on success, -1 on failure.
+ */
 int (kbd_unsubscribe_int)();
 
+/**
+ * @brief Gets the scancode from the keyboard.
+ * @return The scancode.
+ */
 uint8_t (kbc_get_scancode)();
+/**
+ * @brief Checks if a scancode is ready to be read.
+ * @return True if a scancode is ready, false otherwise.
+ */
+
 bool (kbc_scancode_ready)();
+
+/**
+ * @brief Checks if there was an error in the last scancode read.
+ * @return True if there was an error, false otherwise.
+ */
 bool (kbc_has_error)();
 
+
+/**
+ * @brief Converts a scancode to a character.
+ * @param scancode The scancode to convert.
+ * @return The corresponding character, or 0 if the scancode does not correspond to a character.
+ */
 char kbd_scancode_to_char(uint8_t scancode);
 
 #endif
