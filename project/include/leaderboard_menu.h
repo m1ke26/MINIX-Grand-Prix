@@ -2,11 +2,13 @@
 #define _LEADERBOARD_MENU_H_
 
 #include "font.h"
+#include "rtc.h"
 
 typedef struct {
     font_t *font;
     char username[16];
     unsigned times[3];
+    rtc_date dates[3];
 } leaderboard_menu_t;
 
 /**

@@ -26,9 +26,10 @@ void leaderboard_save_time(const char *username, unsigned time, int track_index,
  * @brief Retrieves the best times for a given username across tracks.
  * @param username Player username to query.
  * @param out_times Pointer to an array of at least `num_tracks` unsigned elements to receive best times.
+ * @param out_dates Pointer to an array of at least `num_tracks` rtc_date elements to receive dates. May be NULL.
  * @param num_tracks Number of tracks to fill (usually 3).
  * @return true if at least one record was found for the user, false otherwise.
  */
-bool leaderboard_get_user_best(const char *username, unsigned out_times[], int num_tracks);
+bool leaderboard_get_user_best(const char *username, unsigned out_times[], rtc_date out_dates[], int num_tracks);
 
 #endif /* _LEADERBOARD_H_ */

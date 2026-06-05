@@ -18,11 +18,14 @@ leaderboard_menu_t *leaderboard_menu_create(font_t *font, const char *username) 
         strncpy(menu->username, username, sizeof(menu->username)-1);
         menu->username[sizeof(menu->username)-1] = '\0';
     }
-    // initialize times
-    for (int i = 0; i < 3; ++i) menu->times[i] = 0;
+    // initialize times and dates
+    for (int i = 0; i < 3; ++i) {
+        menu->times[i] = 0;
+        menu->dates[i].day = menu->dates[i].month = menu->dates[i].year = 0;
+    }
 
-    // Fill times from leaderboard
-    leaderboard_get_user_best(menu->username, menu->times, 3);
+    // Fill times and dates from leaderboard
+    leaderboard_get_user_best(menu->username, menu->times, menu->dates, 3);
 
     return menu;
 }
@@ -44,15 +47,21 @@ void leaderboard_menu_draw(const leaderboard_menu_t *menu) {
     for (int i = 0; i < 3; ++i) {
         if (menu->times[i] == 0) {
             snprintf(line, sizeof(line), "Track %d: --:--.---", i+1);
+            draw_centered_text(menu->font, line, 160 + i * 60, 2, COLOR_MENU_TEXT);
         } else {
             char time_str[32];
             race_format_time(time_str, sizeof(time_str), menu->times[i]);
             snprintf(line, sizeof(line), "Track %d: %s", i+1, time_str);
+            draw_centered_text(menu->font, line, 160 + i * 60, 2, COLOR_MENU_TEXT);
+
+            char date_str[32];
+            snprintf(date_str, sizeof(date_str), "%02d/%02d/%02d",
+                     menu->dates[i].day, menu->dates[i].month, menu->dates[i].year);
+            draw_centered_text(menu->font, date_str, 180 + i * 60, 2, COLOR_MENU_TEXT);
         }
-        draw_centered_text(menu->font, line, 160 + i * 40, 2, COLOR_MENU_TEXT);
     }
 
-    draw_centered_text(menu->font, "PRESS ENTER TO RETURN", 520, 2, COLOR_WHITE);
+    draw_centered_text(menu->font, "PRESS ENTER TO RETURN", 540, 2, COLOR_WHITE);
 }
 
 bool leaderboard_menu_handle_key(const leaderboard_menu_t *menu, uint8_t scancode) {
