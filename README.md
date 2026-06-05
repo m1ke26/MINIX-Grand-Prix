@@ -7,6 +7,24 @@
 Welcome to your LCOM code repository. This is where your team should deliver all the required artifacts, including code.
 Please take your time to get acquainted with GitLab and its functionalities. The way your team uses Git and GitLab to collaborate will be evaluated. 
 
+## How to Run
+
+1. In the root of the repository, run the setup script:
+```bash
+   ./create_libs.sh
+```
+
+2. Navigate to the project folder and build:
+```bash
+   cd project
+   make
+```
+
+3. Launch the game:
+```bash
+   lcom_run proj
+```
+
 ## Boilerplate
 
 In this repository, you will find some pre-loaded files and an initial setup of your team's project board. 

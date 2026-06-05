@@ -44,3 +44,4 @@ gmon.out
 .gdb_history
 
 project/proj
+.gdbinit
