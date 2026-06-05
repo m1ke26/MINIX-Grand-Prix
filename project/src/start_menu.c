@@ -2,16 +2,18 @@
 #include "colors.h"
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 
-start_menu_t* start_menu_create(font_t *font) {
+start_menu_t* start_menu_create(font_t *font, const char *username) {
   start_menu_t *sm = (start_menu_t *) malloc(sizeof(start_menu_t));
   if (sm == NULL) return NULL;
 
   sm->font = font;
   
   // Create buttons centered horizontally
-  sm->start_btn = button_create(font, "START", 300, 250, BTN_DARK_NAVY, BTN_LIGHT_NAVY, BTN_WHITE, BTN_SHAPE_RECT);
-  sm->exit_btn  = button_create(font, "EXIT",  300, 330, BTN_DARK_NAVY, BTN_LIGHT_NAVY, BTN_WHITE, BTN_SHAPE_RECT);
+  sm->start_btn = button_create(font, "START", 300, 230, BTN_DARK_NAVY, BTN_LIGHT_NAVY, BTN_WHITE, BTN_SHAPE_RECT);
+  sm->leaderboard_btn = button_create(font, "LEADERBOARD", 300, 290, BTN_DARK_NAVY, BTN_LIGHT_NAVY, BTN_WHITE, BTN_SHAPE_RECT);
+  sm->exit_btn  = button_create(font, "EXIT",  300, 350, BTN_DARK_NAVY, BTN_LIGHT_NAVY, BTN_WHITE, BTN_SHAPE_RECT);
 
   // Car arrows
   sm->car_left  = button_create(NULL, "", 5 ,325, COLOR_BLACK, BTN_DARK_GRAY, COLOR_BLACK, BTN_SHAPE_ARROW_LEFT);
@@ -23,8 +25,15 @@ start_menu_t* start_menu_create(font_t *font) {
 
   sm->car_index   = 0;
   sm->track_index = 0;
-  sm->player_name[0] = '\0';
   sm->name_len = 0;
+  sm->player_name[0] = '\0';
+  
+  // Pre-fill username if provided
+  if (username != NULL && username[0] != '\0') {
+    strncpy(sm->player_name, username, sizeof(sm->player_name) - 1);
+    sm->player_name[sizeof(sm->player_name) - 1] = '\0';
+    sm->name_len = (int)strlen(sm->player_name);
+  }
 
   // Car Selector (preview uses first sprite of each vehicle)
   for (int i = 0; i < NUM_CARS; i++) {
@@ -42,6 +51,7 @@ start_menu_t* start_menu_create(font_t *font) {
 void start_menu_destroy(start_menu_t *sm) {
   if (sm == NULL) return;
   button_destroy(sm->start_btn);
+  button_destroy(sm->leaderboard_btn);
   button_destroy(sm->exit_btn);
   button_destroy(sm->car_left);
   button_destroy(sm->car_right);
@@ -76,6 +86,8 @@ void start_menu_draw(start_menu_t *sm, int cursor_x, int cursor_y) {
   // 3. Draw Buttons (only if they exist)
   if (sm->start_btn != NULL)
     button_draw(sm->start_btn, button_is_hovered(sm->start_btn, cursor_x, cursor_y));
+  if (sm->leaderboard_btn != NULL)
+    button_draw(sm->leaderboard_btn, button_is_hovered(sm->leaderboard_btn, cursor_x, cursor_y));
   if (sm->exit_btn != NULL)
     button_draw(sm->exit_btn, button_is_hovered(sm->exit_btn, cursor_x, cursor_y));
   if (sm->car_left != NULL)
@@ -90,7 +102,10 @@ void start_menu_draw(start_menu_t *sm, int cursor_x, int cursor_y) {
   // 4. Player name
   if (sm->font != NULL) {
     draw_string_scaled(sm->font, "PLAYERNAME:", 320, 470, 2, COLOR_MENU_TEXT);
-    draw_string_scaled(sm->font, sm->player_name, 285, 510, 2, COLOR_MENU_TEXT);
+    if (sm->name_len > 0)
+      draw_string_scaled(sm->font, sm->player_name, 285, 510, 2, COLOR_MENU_TEXT);
+    else
+      draw_string_scaled(sm->font, "[PLAYER]", 280, 510, 2, COLOR_BUTTON_DARK_GRAY);
     vg_buf_draw_rect(285, 535, 240, 3, COLOR_MENU_UNDERLINE);
   }
 
@@ -144,4 +159,19 @@ void start_menu_change_track(start_menu_t *sm, int delta) {
 void start_menu_change_car(start_menu_t *sm, int delta) {
   if (sm == NULL) return;
   sm->car_index = (sm->car_index + delta + NUM_CARS) % NUM_CARS;
+}
+
+start_menu_action_t start_menu_handle_click(start_menu_t *sm, int x, int y) {
+  if (sm == NULL) return START_MENU_ACTION_NONE;
+
+  if (button_is_hovered(sm->start_btn,       x, y)) return START_MENU_ACTION_START;
+  if (button_is_hovered(sm->leaderboard_btn, x, y)) return START_MENU_ACTION_LEADERBOARD;
+  if (button_is_hovered(sm->exit_btn,        x, y)) return START_MENU_ACTION_EXIT;
+
+  if (button_is_hovered(sm->car_left,    x, y)) return START_MENU_ACTION_CAR_LEFT;
+  if (button_is_hovered(sm->car_right,   x, y)) return START_MENU_ACTION_CAR_RIGHT;
+  if (button_is_hovered(sm->track_left,  x, y)) return START_MENU_ACTION_TRACK_LEFT;
+  if (button_is_hovered(sm->track_right, x, y)) return START_MENU_ACTION_TRACK_RIGHT;
+
+  return START_MENU_ACTION_NONE;
 }

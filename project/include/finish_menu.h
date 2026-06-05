@@ -5,9 +5,7 @@
 #include <stdint.h>
 #include "font.h"
 #include "race.h"
-
-#define SCREEN_WIDTH 800
-#define SCREEN_HEIGHT 600
+#include "video-card.h"
 
 typedef struct finish_menu {
     font_t *font;

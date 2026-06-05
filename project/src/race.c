@@ -12,7 +12,7 @@ void race_init(race_t *race) {
     race->countdown_started = false;
     race->countdown_ticks = 0;
     race->current_lap = 1;
-    race->total_laps = 1;
+    race->total_laps = 3;
     race->seconds_elapsed = 0;
     race->ticks_elapsed = 0;
     race->next_checkpoint = CHECKPOINT_1;
@@ -57,6 +57,14 @@ int race_countdown_seconds_left(const race_t *race) {
 
 bool race_is_finished(const race_t *race) {
     return race != NULL && race->current_lap > race->total_laps;
+}
+
+void race_format_time(char *out, size_t size, unsigned ticks) {
+    unsigned total_seconds = ticks / TIMER_TICKS_PER_SECOND;
+    unsigned mins = total_seconds / 60;
+    unsigned secs = total_seconds % 60;
+    unsigned ms   = (ticks % TIMER_TICKS_PER_SECOND) * 1000 / TIMER_TICKS_PER_SECOND;
+    snprintf(out, size, "%02u:%02u.%03u", mins, secs, ms);
 }
 
 static void race_advance_checkpoint(race_t *race, terrain_type_t hit) {
