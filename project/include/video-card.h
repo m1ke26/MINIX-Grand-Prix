@@ -2,6 +2,9 @@
 #include <stdint.h>
 #include <stdio.h>
 
+#define SCREEN_WIDTH  800
+#define SCREEN_HEIGHT 600
+
 int set_video_mode(uint16_t mode);
 int map_video_memory(uint16_t mode);
 int vg_draw_line(uint16_t x, uint16_t y, uint16_t len, uint32_t color);

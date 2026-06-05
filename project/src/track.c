@@ -37,9 +37,9 @@ track_t *create_track(xpm_map_t track, xpm_map_t collision)
 
 void draw_track(track_t *track, int cam_x, int cam_y)
 {
-    for (int y = 0; y < 600; y++)
+    for (int y = 0; y < SCREEN_HEIGHT; y++)
     {
-        for (int x = 0; x < 800; x++)
+        for (int x = 0; x < SCREEN_WIDTH; x++)
         {
             int map_x = cam_x + x;
             /*
@@ -154,5 +154,8 @@ terrain_type_t track_car_checkpoint(track_t *track, int car_x, int car_y, int ca
 
 void destroy_track(track_t *track)
 {
-    free(track); /* liberta a memoria alocada pelo create_track */
+    if (track == NULL) return;
+    free(track->pix_trackmap);
+    free(track->pix_collisionmap);
+    free(track);
 }

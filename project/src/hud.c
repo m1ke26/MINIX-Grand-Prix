@@ -1,24 +1,17 @@
 #include "hud.h"
 #include "colors.h"
 #include "video-card.h"
+#include "font.h"
 #include <stdio.h>
 #include <string.h>
-
-static void hud_draw_centered_text(font_t *font, const char *text, int y, int scale, uint32_t color) {
-  if (font == NULL || text == NULL) return;
-
-  int width = (int) strlen(text) * 8 * scale;
-  int x = (SCREEN_WIDTH - width) / 2;
-  draw_string_scaled(font, text, x, y, scale, color);
-}
 
 void hud_draw_boost_indicator(car_t *car) {
   if (car == NULL) return;
 
   int bar_width = 140;
   int bar_height = 14;
-  int x = 800 - bar_width - 20;
-  int y = 600 - bar_height - 20;
+  int x = SCREEN_WIDTH  - bar_width - 20;
+  int y = SCREEN_HEIGHT - bar_height - 20;
   double boost_ratio = car->boost_amount / CAR_BOOST_MAX;
   int fill_width = (int)(bar_width * boost_ratio);
 
@@ -29,8 +22,8 @@ void hud_draw_boost_indicator(car_t *car) {
 
 void hud_draw_race_start_prompt(font_t *font) {
   vg_buf_draw_rect(160, 196, 480, 112, COLOR_HUD_PANEL);
-  hud_draw_centered_text(font, "PRESS ENTER TO START", 216, 2, COLOR_WHITE);
-  hud_draw_centered_text(font, "GET READY", 280, 3, COLOR_COUNTDOWN_TEXT);
+  draw_centered_text(font, "PRESS ENTER TO START", 216, 2, COLOR_WHITE);
+  draw_centered_text(font, "GET READY", 280, 3, COLOR_COUNTDOWN_TEXT);
 }
 
 void hud_draw_race_countdown(font_t *font, int seconds_left) {
@@ -38,14 +31,13 @@ void hud_draw_race_countdown(font_t *font, int seconds_left) {
   snprintf(text, sizeof(text), "%d", seconds_left);
 
   vg_buf_draw_rect(332, 190, 136, 104, COLOR_HUD_PANEL);
-  hud_draw_centered_text(font, text, 214, 8, COLOR_COUNTDOWN_TEXT);
+  draw_centered_text(font, text, 214, 8, COLOR_COUNTDOWN_TEXT);
 }
 
 void hud_draw_lap_counter(font_t *font, int current_lap, int total_laps) {
   char text[20];
   snprintf(text, sizeof(text), "Laps:%d/%d", current_lap, total_laps);
-  
-  hud_draw_centered_text(font, text, 20, 2, COLOR_WHITE);
+  draw_centered_text(font, text, 20, 2, COLOR_WHITE);
 }
 
 void hud_draw_timer(font_t *font, unsigned time_elapsed) {
@@ -53,19 +45,18 @@ void hud_draw_timer(font_t *font, unsigned time_elapsed) {
   int secs = time_elapsed % 60;
   char text[12];
   snprintf(text, sizeof(text), "Time: %02d:%02d", mins, secs);
-
-  hud_draw_centered_text(font, text, 60, 2, COLOR_WHITE);
+  draw_centered_text(font, text, 60, 2, COLOR_WHITE);
 }
 
 void hud_draw_controls_panel(font_t *font) {
   if (font == NULL) return;
 
   vg_buf_draw_rect(160, 320, 480, 260, COLOR_HUD_PANEL);
-  hud_draw_centered_text(font, "CONTROLS",    340, 3, COLOR_WHITE);
-  hud_draw_centered_text(font, "UP-W",        400, 2, COLOR_WHITE);
-  draw_string_scaled(font, "LEFT-A",          290, 430, 2, COLOR_WHITE);
-  draw_string_scaled(font, "RIGHT-D",         420, 430, 2, COLOR_WHITE);
-  hud_draw_centered_text(font, "DOWN-S",      460, 2, COLOR_WHITE);
-  draw_string_scaled(font, "NITRO-SHIFT",     170, 520, 2, COLOR_WHITE);
-  draw_string_scaled(font, "DRIFT-SPACE",     450, 520, 2, COLOR_WHITE);
+  draw_centered_text(font, "CONTROLS", 340, 3, COLOR_WHITE);
+  draw_centered_text(font, "UP-W",     400, 2, COLOR_WHITE);
+  draw_string_scaled(font, "LEFT-A",   290, 430, 2, COLOR_WHITE);
+  draw_string_scaled(font, "RIGHT-D",  420, 430, 2, COLOR_WHITE);
+  draw_centered_text(font, "DOWN-S",   460, 2, COLOR_WHITE);
+  draw_string_scaled(font, "NITRO-SHIFT", 170, 520, 2, COLOR_WHITE);
+  draw_string_scaled(font, "DRIFT-SPACE", 450, 520, 2, COLOR_WHITE);
 }

@@ -4,11 +4,8 @@
 #include "kbc.h"
 #include "mouse.h"
 #include "video-card.h"
-#include "start_menu.h"
 #include "font.h"
-#include "button.h"
 #include "state.h"
-#include "track.h"
 #include "cursor.h"
 
 

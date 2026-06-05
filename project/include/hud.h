@@ -4,9 +4,7 @@
 #include <lcom/lcf.h>
 #include "car.h"
 #include "font.h"
-
-#define SCREEN_WIDTH 800
-#define SCREEN_HEIGHT 600
+#include "video-card.h"
 
 /** 
  * @brief Draws the boost indicator for the car.

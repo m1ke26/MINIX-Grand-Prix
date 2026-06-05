@@ -49,10 +49,12 @@ bool move_car(car_t *car, track_t *track) {
   int h = car->sprites[idx]->height;
 
   // Map border clamping
-  if (new_x < 0) { new_x = 0; car->speed = 0; }
-  if (new_x > 2956 - w) { new_x = 2956 - w; car->speed = 0; }
-  if (new_y < 0) { new_y = 0; car->speed = 0; }
-  if (new_y > 2217 - h) { new_y = 2217 - h; car->speed = 0; }
+  int map_w = track->info_trackmap.width;
+  int map_h = track->info_trackmap.height;
+  if (new_x < 0)            { new_x = 0;            car->speed = 0; }
+  if (new_x > map_w - w)    { new_x = map_w - w;    car->speed = 0; }
+  if (new_y < 0)            { new_y = 0;             car->speed = 0; }
+  if (new_y > map_h - h)    { new_y = map_h - h;     car->speed = 0; }
 
   // Track collision: check surface at center of new position
   terrain_type_t terrain = collision_track(track, (int)new_x + w / 2, (int)new_y + h / 2);

@@ -62,4 +62,12 @@ void race_check_checkpoints(race_t *race, track_t *track, double car_x, double c
  */
 bool race_is_finished(const race_t *race);
 
+/**
+ * @brief Formats a tick count into a "MM:SS.mmm" string.
+ * @param out     Output buffer.
+ * @param size    Size of the output buffer.
+ * @param ticks   Tick count to format (60 ticks = 1 second).
+ */
+void race_format_time(char *out, size_t size, unsigned ticks);
+
 #endif /* _RACE_H_ */

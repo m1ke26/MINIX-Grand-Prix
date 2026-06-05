@@ -104,12 +104,8 @@ void leaderboard_save_time(const char *username, unsigned time, int track_index,
         count++;
     }
     
-    // Save back to file 
+    // Save back to file
     file = fopen(LEADERBOARD_FILE, "w");
-    if (file == NULL) {
-        file = fopen(LEADERBOARD_FILE, "w+");
-    }
-    
     if (file != NULL) {
         for (int i = 0; i < count; i++) {
             fprintf(file, "\"%s\" %u %d %d %d %d\n",

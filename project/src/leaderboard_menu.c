@@ -7,15 +7,7 @@
 #include "video-card.h"
 #include "leaderboard.h"
 #include "kbc.h"
-
-static void format_ticks_ms(char *out, size_t out_size, unsigned ticks) {
-    const unsigned TICKS_PER_SECOND = 60;
-    unsigned total_seconds = ticks / TICKS_PER_SECOND;
-    unsigned mins = total_seconds / 60;
-    unsigned secs = total_seconds % 60;
-    unsigned ms = (ticks % TICKS_PER_SECOND) * 1000 / TICKS_PER_SECOND;
-    snprintf(out, out_size, "%02u:%02u.%03u", mins, secs, ms);
-}
+#include "race.h"
 
 leaderboard_menu_t *leaderboard_menu_create(font_t *font, const char *username) {
     leaderboard_menu_t *menu = malloc(sizeof(leaderboard_menu_t));
@@ -43,7 +35,7 @@ void leaderboard_menu_destroy(leaderboard_menu_t *menu) {
 void leaderboard_menu_draw(const leaderboard_menu_t *menu) {
     if (menu == NULL || menu->font == NULL) return;
 
-    vg_buf_draw_rect(0, 0, 800, 600, COLOR_MENU_BACKGROUND);
+    vg_buf_draw_rect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, COLOR_MENU_BACKGROUND);
     char title[64];
     snprintf(title, sizeof(title), "%s's Best Times", menu->username[0] ? menu->username : "Player");
     draw_centered_text(menu->font, title, 80, 3, COLOR_MENU_TITLE);
@@ -54,10 +46,10 @@ void leaderboard_menu_draw(const leaderboard_menu_t *menu) {
             snprintf(line, sizeof(line), "Track %d: --:--.---", i+1);
         } else {
             char time_str[32];
-            format_ticks_ms(time_str, sizeof(time_str), menu->times[i]);
+            race_format_time(time_str, sizeof(time_str), menu->times[i]);
             snprintf(line, sizeof(line), "Track %d: %s", i+1, time_str);
         }
-        draw_string_scaled(menu->font, line, 260, 160 + i * 40, 2, COLOR_MENU_TEXT);
+        draw_centered_text(menu->font, line, 160 + i * 40, 2, COLOR_MENU_TEXT);
     }
 
     draw_centered_text(menu->font, "PRESS ENTER TO RETURN", 520, 2, COLOR_WHITE);
