@@ -11,15 +11,15 @@
 ## Project Description
 
 MINIX Grand Prix is a top-down racing game for MINIX, built from scratch on top of our own device drivers:
-- Timer;
-- Keyboard;
-- Mouse;
-- Video graphics;
-- RTC (real-time clock).
+- RTC - Lab 1;
+- Timer - Lab 2;
+- Keyboard - Lab 3;
+- Mouse - Lab 4;
+- Video Graphics - Lab 5.
 
 Pick a vehicle (taxi, police car or ambulance) and a track (grass, arctic or lava), and race three laps against the clock. The game has a scrolling camera, a minimap, a speedometer, nitro and drifting, a pause menu, and a leaderboard that records each player's best times with the date read from the RTC.
 
-This was a 4-person team project (myself, José Maio, Vasco Guimarães and Victor Gomez) for the Laboratório de Computadores (LCOM) course unit, FEUP, 2025/26.
+This was a 4-person team project (myself (up202407610@edu.fe.up.pt), José Maio (up202404872@edu.fe.up.pt), Vasco Guimarães (up202403604@edu.fe.up.pt) and Victor Gomez (up202406138@edu.fe.up.pt)) for the Laboratório de Computadores (LCOM) course unit, FEUP, 2025/26.
 
 The original delivered README is kept intact in [`Delivered_Readme.md`](./Delivered_Readme.md), and my individual lab assignments (lab1 to lab5) are in [`labs/`](./labs).
 
@@ -27,7 +27,6 @@ The original delivered README is kept intact in [`Delivered_Readme.md`](./Delive
 
 ## My Contribution
 
-[Revê e ajusta — tirado dos teus commits:]
 - Scrolling track map and camera;
 - Complete overhaul of the track, camera and collision system, including checkpoints in the collision maps;
 - Car sprites: from 8 to 16 angles, and then 48 sprites for smooth rotation;
