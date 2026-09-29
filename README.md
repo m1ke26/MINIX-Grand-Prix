@@ -7,6 +7,7 @@
 ![Project Grade](https://img.shields.io/badge/Project_Grade-18%2F20-3a3a3a?style=for-the-badge&labelColor=111111)
 ![Course](https://img.shields.io/badge/Course-LCOM-3a3a3a?style=for-the-badge&labelColor=111111)
 ![Year](https://img.shields.io/badge/Year-2025%2F26-3a3a3a?style=for-the-badge&labelColor=111111)
+![Language](https://img.shields.io/badge/Language-C-3a3a3a?style=for-the-badge&labelColor=111111)
 
 ## Project Description
 
