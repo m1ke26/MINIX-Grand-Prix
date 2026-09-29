@@ -1,99 +1,48 @@
-# Template
+# MINIX Grand Prix
 
+<p align="center">
+  <img src="project/docs/cover.jpg" width="700"/>
+</p>
 
+![Project Grade](https://img.shields.io/badge/Project_Grade-18%2F20-3a3a3a?style=for-the-badge&labelColor=111111)
+![Course](https://img.shields.io/badge/Course-LCOM-3a3a3a?style=for-the-badge&labelColor=111111)
+![Year](https://img.shields.io/badge/Year-2025%2F26-3a3a3a?style=for-the-badge&labelColor=111111)
 
-## Getting started
+## Project Description
 
-Welcome to your LCOM code repository. This is where your team should deliver all the required artifacts, including code.
-Please take your time to get acquainted with GitLab and its functionalities. The way your team uses Git and GitLab to collaborate will be evaluated. 
+MINIX Grand Prix is a top-down racing game for MINIX, built from scratch on top of our own device drivers:
+- Timer;
+- Keyboard;
+- Mouse;
+- Video graphics;
+- RTC (real-time clock).
 
-## How to Run
+Pick a vehicle (taxi, police car or ambulance) and a track (grass, arctic or lava), and race three laps against the clock. The game has a scrolling camera, a minimap, a speedometer, nitro and drifting, a pause menu, and a leaderboard that records each player's best times with the date read from the RTC.
 
-1. In the root of the repository, run the setup script:
-```bash
-   ./create_libs.sh
+This was a 4-person team project (myself, José Maio, Vasco Guimarães and Victor Gomez) for the Laboratório de Computadores (LCOM) course unit, FEUP, 2025/26.
+
+The original delivered README is kept intact in [`Delivered_Readme.md`](./Delivered_Readme.md), and my individual lab assignments (lab1 to lab5) are in [`labs/`](./labs).
+
+> This repository is a personal copy (with full commit history preserved) of the original group submission on FEUP's GitLab.
+
+## My Contribution
+
+[Revê e ajusta — tirado dos teus commits:]
+- Scrolling track map and camera;
+- Complete overhaul of the track, camera and collision system, including checkpoints in the collision maps;
+- Car sprites: from 8 to 16 angles, and then 48 sprites for smooth rotation;
+- Improved track 3 map and the controls screen shown at the start of a race.
+
+## Environment
+
+1. In the root of the repository, build the driver libraries:
+```sh
+./create_libs.sh
 ```
 
-2. Navigate to the project folder and build:
-```bash
-   cd project
-   make
+2. Build and run the game inside MINIX:
+```sh
+cd project
+make
+lcom_run proj
 ```
-
-3. Launch the game:
-```bash
-   lcom_run proj
-```
-
-## Boilerplate
-
-In this repository, you will find some pre-loaded files and an initial setup of your team's project board. 
-Along the semester, you will be adding files and folders to this repository.
-Make sure you expand on the issues and milestones for your project, helping your team to coordinate and meet all the deadlines. Major deadlines are already setup but you should add your own sub-issues, additional issues, and deadlines. 
-
-## GitLab Setup 
-
-### Add your files
-
-* [Create](https://docs.gitlab.com/ee/user/project/repository/web_editor.html#create-a-file) or [upload](https://docs.gitlab.com/ee/user/project/repository/web_editor.html#upload-a-file) files
-* [Add files using the command line](https://docs.gitlab.com/topics/git/add_files/#add-files-to-a-git-repository) or push an existing Git repository with the following command:
-
-```
-cd existing_repo
-git remote add origin https://gitlab.up.pt/lcom-26/template.git
-git branch -M main
-git push -uf origin main
-```
-
-### Integrate with your tools
-
-* [Set up project integrations](https://gitlab.up.pt/lcom-26/template/-/settings/integrations)
-
-### Collaborate with your team
-
-* [Invite team members and collaborators](https://docs.gitlab.com/ee/user/project/members/)
-* [Create a new merge request](https://docs.gitlab.com/ee/user/project/merge_requests/creating_merge_requests.html)
-* [Automatically close issues from merge requests](https://docs.gitlab.com/ee/user/project/issues/managing_issues.html#closing-issues-automatically)
-* [Enable merge request approvals](https://docs.gitlab.com/ee/user/project/merge_requests/approvals/)
-* [Set auto-merge](https://docs.gitlab.com/user/project/merge_requests/auto_merge/)
-
-### Test and Deploy
-
-Use the built-in continuous integration in GitLab.
-
-* [Get started with GitLab CI/CD](https://docs.gitlab.com/ee/ci/quick_start/)
-* [Analyze your code for known vulnerabilities with Static Application Security Testing (SAST)](https://docs.gitlab.com/ee/user/application_security/sast/)
-* [Deploy to Kubernetes, Amazon EC2, or Amazon ECS using Auto Deploy](https://docs.gitlab.com/ee/topics/autodevops/requirements.html)
-* [Use pull-based deployments for improved Kubernetes management](https://docs.gitlab.com/ee/user/clusters/agent/)
-* [Set up protected environments](https://docs.gitlab.com/ee/ci/environments/protected_environments.html)
-
-***
-
-## License
-For open source projects, say how it is licensed.
-
-## Declaration of Responsible AI Use
-
-We declare that:
-
-1. We are responsible for all code and documentation in this repository, and we understand that we must be able to explain and justify any part of it on request.  
-2. We have used AI-based tools (e.g., code assistants, chatbots, or generators) only to support my learning, not to bypass the intended learning outcomes or any assessment rules.  
-3. Wherever AI tools contributed to this work, we have:  
-   - Used them within the limits set by the course policies and institutional regulations.  
-   - Reviewed, tested, and, where necessary, edited the outputs, taking full responsibility for their correctness, originality, and legality.  
-   - Ensured that no confidential, personal, or sensitive data were shared with AI tools.  
-4. We have not used AI tools to generate complete solutions that we present as entirely our own unaided work, and we have avoided plagiarism, whether from AI outputs or other sources.  
-5. If asked, we will provide details of which tools we used, for which files or parts of the project, and how we verified and adapted their outputs.
-
-Signed: `José Maio`, `Vasco Guimarães`, `Miguel Mimoso`, `Victor Gomez`  
-Date: `25/02/2026`
-
-## Authors and acknowledgment
-
-LCOM Project for group GRUPO_2LEIC01_2.
-Group members:
-
-José Maio (up202404872@up.pt)
-Vasco Guimarães (up202403604@up.pt)
-Miguel Mimoso (up202407610@up.pt)
-Victor Gomez (up202406138@up.pt)
